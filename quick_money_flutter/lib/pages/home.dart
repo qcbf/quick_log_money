@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:quick_money_flutter/pages/record_money/record_money.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
-
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const RecordMoney()));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,19 +32,8 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Object? result = await showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text("Add"),
-                  actions: [
-                    IconButton(
-                        onPressed: () => Navigator.pop(context, 123),
-                        icon: const Icon(Icons.done))
-                  ],
-                );
-              });
-          print(result);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const RecordMoney()));
         },
         mini: false,
         shape: const CircleBorder(),
