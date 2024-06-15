@@ -13,6 +13,7 @@ enum NumericKeyboardKey {
   N9,
   Dot,
   Back,
+  LongBack,
 }
 
 String NumericKeyboardKeyToString(NumericKeyboardKey key) {
@@ -48,7 +49,9 @@ class NumericKeyboard extends StatelessWidget {
           NumericButton(NumericKeyboardKey.N9),
         ]),
         TableRow(children: [
-          NumericButton(NumericKeyboardKey.Back),
+          GestureDetector(
+              onLongPress: () => OnTap(NumericKeyboardKey.LongBack, ""),
+              child: NumericButton(NumericKeyboardKey.Back)),
           NumericButton(NumericKeyboardKey.N0),
           NumericButton(NumericKeyboardKey.Dot),
         ]),
@@ -56,7 +59,7 @@ class NumericKeyboard extends StatelessWidget {
     );
   }
 
-  TextButton NumericButton(NumericKeyboardKey key) {
+  ButtonStyleButton NumericButton(NumericKeyboardKey key) {
     var keyStr = NumericKeyboardKeyToString(key);
     return TextButton(onPressed: () => OnTap(key, keyStr), child: Text(keyStr));
   }
