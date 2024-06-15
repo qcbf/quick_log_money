@@ -16,51 +16,49 @@ enum NumericKeyboardKey {
   LongBack,
 }
 
-String NumericKeyboardKeyToString(NumericKeyboardKey key) {
+Widget NumericKeyboardKeyToWidget(NumericKeyboardKey key) {
   if (key == NumericKeyboardKey.Back) {
-    return "⬅";
+    return const Icon(Icons.keyboard_backspace);
   } else if (key == NumericKeyboardKey.Dot) {
-    return ".";
+    return const Text(".");
   }
-  return key.index.toString();
+  return Text(key.index.toString());
 }
 
 class NumericKeyboard extends StatelessWidget {
-  final Function(NumericKeyboardKey, String) OnTap;
+  final Function(NumericKeyboardKey key) OnTap;
+
   const NumericKeyboard(this.OnTap, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Table(
+    return Column(
       children: [
-        TableRow(children: [
-          NumericButton(NumericKeyboardKey.N1),
-          NumericButton(NumericKeyboardKey.N2),
-          NumericButton(NumericKeyboardKey.N3),
-        ]),
-        TableRow(children: [
-          NumericButton(NumericKeyboardKey.N4),
-          NumericButton(NumericKeyboardKey.N5),
-          NumericButton(NumericKeyboardKey.N6),
-        ]),
-        TableRow(children: [
-          NumericButton(NumericKeyboardKey.N7),
-          NumericButton(NumericKeyboardKey.N8),
-          NumericButton(NumericKeyboardKey.N9),
-        ]),
-        TableRow(children: [
-          GestureDetector(
-              onLongPress: () => OnTap(NumericKeyboardKey.LongBack, ""),
-              child: NumericButton(NumericKeyboardKey.Back)),
-          NumericButton(NumericKeyboardKey.N0),
-          NumericButton(NumericKeyboardKey.Dot),
-        ]),
+        _KeyboardRow(NumericKeyboardKey.N1, NumericKeyboardKey.N2, NumericKeyboardKey.N3),
+        _KeyboardRow(NumericKeyboardKey.N4, NumericKeyboardKey.N5, NumericKeyboardKey.N6),
+        _KeyboardRow(NumericKeyboardKey.N7, NumericKeyboardKey.N8, NumericKeyboardKey.N9),
+        _KeyboardRow(NumericKeyboardKey.Back, NumericKeyboardKey.N0, NumericKeyboardKey.Dot),
       ],
     );
   }
 
-  ButtonStyleButton NumericButton(NumericKeyboardKey key) {
-    var keyStr = NumericKeyboardKeyToString(key);
-    return TextButton(onPressed: () => OnTap(key, keyStr), child: Text(keyStr));
+  Widget _KeyboardRow(NumericKeyboardKey k1, NumericKeyboardKey k2, NumericKeyboardKey k3) {
+    return Expanded(
+      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        _NumericButton(k1),
+        _NumericButton(k2),
+        _NumericButton(k3),
+      ]),
+    );
   }
+
+  Widget _NumericButton(NumericKeyboardKey key) {
+    var keyStr = NumericKeyboardKeyToWidget(key);
+    Widget result = key == NumericKeyboardKey.Back
+        ? GestureDetector(onLongPress: () => OnTap(NumericKeyboardKey.LongBack), child: _NumericButtonImpl(key, keyStr))
+        : _NumericButtonImpl(key, keyStr);
+    return Expanded(child: result);
+  }
+
+  TextButton _NumericButtonImpl(NumericKeyboardKey key, Widget keyWidget) => TextButton(onPressed: () => OnTap(key), child: keyWidget);
 }
