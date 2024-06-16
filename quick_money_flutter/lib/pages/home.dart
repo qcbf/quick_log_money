@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quick_money_flutter/pages/RecordMoney/RecordPage.dart';
+import 'package:quick_money_flutter/Pages/RecordMoney/RecordPage.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});

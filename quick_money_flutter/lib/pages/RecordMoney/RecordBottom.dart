@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:quick_money_flutter/flib/extensions_helper.dart';
-import 'package:quick_money_flutter/pages/RecordMoney/Keyboard.dart';
+import 'package:quick_money_flutter/FLib/extensions_helper.dart';
+import 'package:quick_money_flutter/Pages/RecordMoney/RecordKeyboard.dart';
 
-/// 底部输入键盘
+/// 底部输入区域
 class RecordBottom extends StatefulWidget {
   const RecordBottom({super.key});
   @override
@@ -32,7 +32,7 @@ class _RecordBottomState extends State<RecordBottom> with SingleTickerProviderSt
         children: [
           BuildLeftMenu().WrapExpanded(flex: 10),
           TabBarView(controller: _TabCtrl, children: const [
-            Keyboard(),
+            RecordKeyboard(),
             Text("2"),
             Text("3"),
           ]).WrapExpanded(flex: 30),
@@ -46,7 +46,7 @@ class _RecordBottomState extends State<RecordBottom> with SingleTickerProviderSt
       quarterTurns: 1,
       child: TabBar(controller: _TabCtrl, tabs: const [
         SizedBox(height: double.infinity, child: RotatedBox(quarterTurns: -1, child: Tab(text: "记账"))),
-        SizedBox(height: double.infinity, child: RotatedBox(quarterTurns: -1, child: Tab(text: "分类"))),
+        SizedBox(height: double.infinity, child: RotatedBox(quarterTurns: -1, child: Tab(text: "类别"))),
         SizedBox(height: double.infinity, child: RotatedBox(quarterTurns: -1, child: Tab(text: "账本"))),
       ]),
     );
