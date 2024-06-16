@@ -49,7 +49,7 @@ class MoneyLogData with ChangeNotifier {
     return "默认账本";
   }
 
-  void MarkDirty() {
+  void SetDirty() {
     notifyListeners();
   }
 }

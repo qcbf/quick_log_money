@@ -77,11 +77,13 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton(
-          style: styleFrom,
-          onPressed: () {},
-          child: const Text("保存", style: TextStyle(color: Colors.red)),
-        ).WrapPadding(paddingValue).WrapExpanded(),
+        Consumer<MoneyLogData>(builder: (BuildContext context, MoneyLogData value, Widget? child) {
+          return ElevatedButton(
+            style: styleFrom,
+            onPressed: () {},
+            child: Text("保存", style: TextStyle(color: value.IsCost ? Colors.red : Colors.green)),
+          ).WrapPadding(paddingValue).WrapExpanded();
+        }),
         ElevatedButton(
           style: styleFrom,
           onPressed: () {},
@@ -148,7 +150,7 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
       final money = double.tryParse(InputStr) ?? 0;
       var data = context.read<MoneyLogData>();
       data.Money = money;
-      data.MarkDirty();
+      data.SetDirty();
       HapticFeedback.lightImpact();
     }
   }
