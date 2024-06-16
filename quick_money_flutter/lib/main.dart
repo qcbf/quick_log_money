@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quick_money_flutter/pages/home.dart';
+import 'package:quick_money_flutter/pages/Home.dart';
 
 void main() {
   runApp(const MainApp());
@@ -13,8 +13,8 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "title",
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: ThemeData.from(colorScheme: ColorScheme.fromSeed(seedColor: Colors.white, brightness: Brightness.light, dynamicSchemeVariant: DynamicSchemeVariant.fidelity)),
+      // darkTheme: ThemeData.from(colorScheme: ColorScheme.fromSeed(seedColor: Colors.grey, brightness: Brightness.dark, dynamicSchemeVariant: DynamicSchemeVariant.fidelity)),
       home: const Home(),
     );
   }

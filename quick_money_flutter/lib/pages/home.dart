@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quick_money_flutter/pages/record_money/record_money.dart';
+import 'package:quick_money_flutter/pages/RecordMoney/RecordPage.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,7 +13,7 @@ class _HomeState extends State<Home> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const RecordMoney()));
+          MaterialPageRoute(builder: (context) => const RecordPage()));
     });
   }
 
@@ -33,7 +33,7 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const RecordMoney()));
+              MaterialPageRoute(builder: (context) => const RecordPage()));
         },
         mini: false,
         shape: const CircleBorder(),
