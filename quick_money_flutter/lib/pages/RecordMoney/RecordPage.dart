@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_money_flutter/Datas/MoneyLogData.dart';
 import 'package:quick_money_flutter/Pages/RecordMoney/RecordBottom.dart';
-import 'package:quick_money_flutter/Pages/RecordMoney/RecordContent.dart';
+import 'package:quick_money_flutter/Pages/RecordMoney/RecordDescription.dart';
+import 'package:quick_money_flutter/Pages/RecordMoney/RecordRecentlyTagGroup.dart';
 
 class RecordPage extends StatefulWidget {
   const RecordPage({super.key});
@@ -32,9 +33,11 @@ class _RecordPageState extends State<RecordPage> {
             actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.settings))],
           ),
           body: const Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              RecordContent(),
+              RecordDescription(),
               Spacer(),
+              RecordRecentlyTagGroup(),
               SizedBox(height: 225, child: RecordBottom()),
             ],
           ),

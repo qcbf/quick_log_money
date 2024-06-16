@@ -8,7 +8,7 @@ class RecordDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MoneyLogData>(builder: (context, value, child) => _BuildDescriptionLabel(value.IsCost, context, value));
+    return Card(elevation: 4, child: Consumer<MoneyLogData>(builder: (context, value, child) => _BuildDescriptionLabel(value.IsCost, context, value)));
   }
 
   static Widget _BuildDescriptionLabel(bool isCost, BuildContext context, MoneyLogData value) {
@@ -23,6 +23,6 @@ class RecordDescription extends StatelessWidget {
       TextSpan(style: actionTextStyle, text: value.GetTagName()),
       const TextSpan(text: " 记录到 "),
       TextSpan(style: actionTextStyle, text: value.GetBookName()),
-    ])).WrapPadding(const EdgeInsets.fromLTRB(22, 0, 22, 0));
+    ])).WrapPadding(const EdgeInsets.fromLTRB(22, 10, 22, 10));
   }
 }

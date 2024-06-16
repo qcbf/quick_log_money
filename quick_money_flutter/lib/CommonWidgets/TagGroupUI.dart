@@ -1,10 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:quick_money_flutter/CommonWidgets/TagUI.dart';
+import 'package:quick_money_flutter/Datas/TagData.dart';
 
-class TagGroupUI extends StatelessWidget {
-  const TagGroupUI({super.key});
+class TagGroupUI extends StatefulWidget {
+  final List<TagData> Datas;
+  const TagGroupUI(this.Datas, {super.key});
+  @override
+  State<TagGroupUI> createState() => _TagGroupUIState();
+}
+
+class _TagGroupUIState extends State<TagGroupUI> {
+  int _SelectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Wrap(
+      children: List.generate(
+        widget.Datas.length,
+        BuildTagItem,
+      ),
+    );
   }
+
+  Widget BuildTagItem(index) => TagUI(() {
+        setState(() {
+          _SelectedIndex = index;
+        });
+      }, widget.Datas[index], IsSelected: _SelectedIndex == index);
 }
