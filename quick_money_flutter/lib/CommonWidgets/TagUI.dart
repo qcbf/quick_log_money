@@ -9,16 +9,16 @@ class TagUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var style = const ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.all(3)), shape: WidgetStatePropertyAll(RoundedRectangleBorder()));
+    var style = const ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.fromLTRB(2, 12, 2, 12)), shape: WidgetStatePropertyAll(RoundedRectangleBorder()));
     if (IsSelected) {
       var theme = Theme.of(context);
-      style = style.copyWith(backgroundColor: WidgetStatePropertyAll(theme.hoverColor), side: WidgetStatePropertyAll(BorderSide(color: theme.highlightColor, width: 1)));
+      style = style.copyWith(side: WidgetStatePropertyAll(BorderSide(color: theme.colorScheme.primary, width: 1)));
     }
     return Padding(
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.all(1),
       child: SizedBox(
-        width: 68,
-        height: 56,
+        width: 62,
+        height: 48,
         child: TextButton(
           onPressed: OnPressed,
           style: style,
@@ -29,10 +29,12 @@ class TagUI extends StatelessWidget {
                 Icons.home,
                 size: 20,
               ),
-              Text(
-                Data.Name,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 12),
+              FittedBox(
+                child: Text(
+                  Data.Name,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 12),
+                ),
               ),
             ],
           ),

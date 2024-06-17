@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_money_flutter/Datas/MoneyLogData.dart';
 import 'package:quick_money_flutter/FLib/extensions_helper.dart';
+import 'package:quick_money_flutter/Pages/RecordMoney/RecordRecentlyTagGroup.dart';
 
 enum KeyboardKey {
   N0,
@@ -20,15 +21,6 @@ enum KeyboardKey {
   LongBack,
 }
 
-Widget NumericKeyboardKeyToWidget(KeyboardKey key) {
-  if (key == KeyboardKey.Back) {
-    return const Icon(Icons.keyboard_backspace);
-  } else if (key == KeyboardKey.Dot) {
-    return const Text(".");
-  }
-  return Text(key.index.toString());
-}
-
 /// 底部输入键盘
 class RecordKeyboard extends StatefulWidget {
   const RecordKeyboard({super.key});
@@ -43,19 +35,17 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        const TextField(
-          textInputAction: TextInputAction.done,
-          maxLength: 500,
-          decoration: InputDecoration(hintText: "备注...", counterText: "", border: InputBorder.none, contentPadding: EdgeInsets.zero, isDense: true),
-          style: TextStyle(fontSize: 14),
-        ).WrapPadding(const EdgeInsets.only(top: 10, bottom: 10)),
-        Row(
-          children: [
-            _BuildLeftMenu().WrapExpanded(flex: 35),
-            _BuildRightMenu().WrapExpanded(flex: 10),
-          ],
-        ).WrapExpanded(),
+        const RecordRecentlyTagGroup(),
+        Expanded(
+          child: Row(
+            children: [
+              _BuildLeftMenu().WrapExpanded(flex: 35),
+              _BuildRightMenu().WrapExpanded(flex: 10),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -63,46 +53,56 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
   Column _BuildLeftMenu() {
     return Column(
       children: [
-        _KeyboardRow(KeyboardKey.N1, KeyboardKey.N2, KeyboardKey.N3),
-        _KeyboardRow(KeyboardKey.N4, KeyboardKey.N5, KeyboardKey.N6),
         _KeyboardRow(KeyboardKey.N7, KeyboardKey.N8, KeyboardKey.N9),
+        _KeyboardRow(KeyboardKey.N4, KeyboardKey.N5, KeyboardKey.N6),
+        _KeyboardRow(KeyboardKey.N1, KeyboardKey.N2, KeyboardKey.N3),
         _KeyboardRow(KeyboardKey.Dot, KeyboardKey.N0, KeyboardKey.Back),
+        const TextField(
+          textInputAction: TextInputAction.done,
+          maxLength: 500,
+          decoration: InputDecoration(hintText: "备注...", counterText: "", border: InputBorder.none, contentPadding: EdgeInsets.zero, isDense: true),
+          style: TextStyle(fontSize: 14),
+        ).WrapPadding(const EdgeInsets.only(top: 6, bottom: 6)),
       ],
     );
   }
 
   Widget _BuildRightMenu() {
     const paddingValue = EdgeInsets.fromLTRB(0, 4, 0, 4);
-    var styleFrom = ElevatedButton.styleFrom(padding: EdgeInsets.zero);
+    var styleFrom = TextButton.styleFrom(padding: EdgeInsets.zero);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Consumer<MoneyLogData>(builder: (BuildContext context, MoneyLogData value, Widget? child) {
-          return ElevatedButton(
+        Expanded(
+          flex: 1,
+          child: TextButton(
             style: styleFrom,
             onPressed: () {},
-            child: Text("保存", style: TextStyle(color: value.IsCost ? Colors.red : Colors.green)),
-          ).WrapPadding(paddingValue).WrapExpanded();
-        }),
-        ElevatedButton(
+            child: const Icon(Icons.add),
+          ).WrapPadding(paddingValue),
+        ),
+        Expanded(
+          flex: 1,
+          child: TextButton(
+            style: styleFrom,
+            onPressed: () {},
+            child: const Icon(Icons.remove),
+          ).WrapPadding(paddingValue),
+        ),
+        TextButton(
           style: styleFrom,
           onPressed: () {},
-          child: const Text(
-            "确认\n存模板",
-            style: TextStyle(fontSize: 10),
-            textAlign: TextAlign.center,
-          ),
-        ).WrapPadding(paddingValue).WrapExpanded(),
-        ElevatedButton(
-          style: styleFrom,
-          onPressed: () {},
-          child: const Icon(Icons.add),
-        ).WrapPadding(paddingValue).WrapExpanded(),
-        ElevatedButton(
-          style: styleFrom,
-          onPressed: () {},
-          child: const Icon(Icons.remove),
-        ).WrapPadding(paddingValue).WrapExpanded(),
+          child: const Text("存模板"),
+        ).WrapPadding(paddingValue),
+        Consumer<MoneyLogData>(
+            builder: (BuildContext context, MoneyLogData value, Widget? child) => Expanded(
+                  flex: 2,
+                  child: TextButton(
+                    style: styleFrom,
+                    onPressed: () {},
+                    child: Text("保存", style: TextStyle(color: value.IsCost ? Colors.red : Colors.green)),
+                  ).WrapPadding(paddingValue),
+                )),
       ],
     );
   }
@@ -118,15 +118,25 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
   }
 
   Widget _NumericButton(KeyboardKey key) {
-    var keyStr = NumericKeyboardKeyToWidget(key);
+    var keyStr = _NumericKeyLabel(key);
     Widget result =
-        key == KeyboardKey.Back ? GestureDetector(onLongPress: () => _InputKey(KeyboardKey.LongBack), child: _NumericButtonImpl(key, keyStr)) : _NumericButtonImpl(key, keyStr);
+        key == KeyboardKey.Back ? GestureDetector(onLongPress: () => _OnInputKey(KeyboardKey.LongBack), child: _NumericButtonImpl(key, keyStr)) : _NumericButtonImpl(key, keyStr);
     return Expanded(child: result);
   }
 
-  Widget _NumericButtonImpl(KeyboardKey key, Widget keyWidget) => ElevatedButton(onPressed: () => _InputKey(key), child: keyWidget).WrapPadding(const EdgeInsets.all(3));
+  Widget _NumericButtonImpl(KeyboardKey key, Widget keyWidget) => TextButton(onPressed: () => _OnInputKey(key), child: keyWidget).WrapPadding(const EdgeInsets.all(2));
 
-  void _InputKey(KeyboardKey key) {
+  Widget _NumericKeyLabel(KeyboardKey key) {
+    const fontSize = 20.0;
+    if (key == KeyboardKey.Back) {
+      return const Icon(Icons.keyboard_backspace);
+    } else if (key == KeyboardKey.Dot) {
+      return const Text(".", style: TextStyle(fontSize: fontSize));
+    }
+    return Text(key.index.toString(), style: const TextStyle(fontSize: fontSize));
+  }
+
+  void _OnInputKey(KeyboardKey key) {
     var newStr = InputStr;
     if (key == KeyboardKey.Back) {
       if (newStr.isNotEmpty) {

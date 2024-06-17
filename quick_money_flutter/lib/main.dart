@@ -29,9 +29,11 @@ class MainApp extends StatelessWidget {
   }
 
   static ThemeData _GetTheme(Brightness brightness) {
+    var colorScheme = ColorScheme.fromSeed(seedColor: Colors.grey, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);
     return ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity),
-        cardTheme: const CardTheme(margin: EdgeInsets.fromLTRB(0, 4, 0, 4)));
+        colorScheme: colorScheme,
+        cardTheme: const CardTheme(margin: EdgeInsets.fromLTRB(0, 4, 0, 4)),
+        textButtonTheme: TextButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(colorScheme.surfaceContainer))));
   }
 }
 
