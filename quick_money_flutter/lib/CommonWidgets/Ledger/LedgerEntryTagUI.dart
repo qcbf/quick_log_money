@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:quick_money_flutter/Datas/TagData.dart';
+import 'package:quick_money_flutter/Datas/Ledger/TagData.dart';
 
-class TagUI extends StatelessWidget {
+class LedgerEntryTagUI extends StatelessWidget {
   final TagData Data;
   final VoidCallback OnPressed;
   final bool IsSelected;
-  const TagUI(this.OnPressed, this.Data, {this.IsSelected = false, super.key});
+  const LedgerEntryTagUI(this.OnPressed, this.Data, {this.IsSelected = false, super.key});
 
   @override
   Widget build(BuildContext context) {

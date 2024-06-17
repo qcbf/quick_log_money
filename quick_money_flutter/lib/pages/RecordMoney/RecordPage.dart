@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/Datas/MoneyLogData.dart';
+import 'package:quick_money_flutter/Datas/Ledger/EntryData.dart';
 import 'package:quick_money_flutter/FLib/extensions_helper.dart';
 import 'package:quick_money_flutter/Pages/RecordMoney/RecordBottom.dart';
 import 'package:quick_money_flutter/Pages/RecordMoney/RecordDescription.dart';
@@ -10,7 +10,7 @@ class RecordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => MoneyLogData(),
+      create: (context) => EntryData(),
       child: _RecordPageContent(key: key),
     );
   }
@@ -60,7 +60,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
 
   /// 设置是否消费记账
   void SetIsCost(BuildContext context) {
-    var data = context.read<MoneyLogData>();
+    var data = context.read<EntryData>();
     data.IsCost = _TabCtrl.index == 0;
     data.SetDirty();
   }

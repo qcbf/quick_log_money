@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MoneyLogData with ChangeNotifier {
+class EntryData with ChangeNotifier {
   ///
   bool IsCost = true;
 

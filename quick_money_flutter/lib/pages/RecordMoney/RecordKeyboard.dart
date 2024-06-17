@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/Datas/MoneyLogData.dart';
+import 'package:quick_money_flutter/Datas/Ledger/EntryData.dart';
 import 'package:quick_money_flutter/FLib/extensions_helper.dart';
 import 'package:quick_money_flutter/Pages/RecordMoney/RecordRecentlyTagGroup.dart';
 
@@ -94,8 +94,8 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
           onPressed: () {},
           child: const Text("存模板"),
         ).WrapPadding(paddingValue),
-        Consumer<MoneyLogData>(
-            builder: (BuildContext context, MoneyLogData value, Widget? child) => Expanded(
+        Consumer<EntryData>(
+            builder: (BuildContext context, EntryData value, Widget? child) => Expanded(
                   flex: 2,
                   child: TextButton(
                     style: styleFrom,
@@ -158,7 +158,7 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
         InputStr = newStr;
       });
       final money = double.tryParse(InputStr) ?? 0;
-      var data = context.read<MoneyLogData>();
+      var data = context.read<EntryData>();
       data.Money = money;
       data.SetDirty();
       HapticFeedback.lightImpact();

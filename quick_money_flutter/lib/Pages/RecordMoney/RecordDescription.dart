@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/Datas/MoneyLogData.dart';
+import 'package:quick_money_flutter/Datas/Ledger/EntryData.dart';
 import 'package:quick_money_flutter/FLib/extensions_helper.dart';
 
 class RecordDescription extends StatelessWidget {
@@ -8,10 +8,10 @@ class RecordDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(child: Consumer<MoneyLogData>(builder: (context, value, child) => _BuildDescriptionLabel(value.IsCost, context, value)));
+    return Card(child: Consumer<EntryData>(builder: (context, value, child) => _BuildDescriptionLabel(value.IsCost, context, value)));
   }
 
-  static Widget _BuildDescriptionLabel(bool isCost, BuildContext context, MoneyLogData value) {
+  static Widget _BuildDescriptionLabel(bool isCost, BuildContext context, EntryData value) {
     var baseTextStyle = Theme.of(context).textTheme.titleMedium!;
     var actionTextStyle = baseTextStyle.apply(color: Colors.blueGrey, fontSizeDelta: 2).copyWith(fontWeight: FontWeight.bold, decoration: TextDecoration.underline);
     return RichText(
