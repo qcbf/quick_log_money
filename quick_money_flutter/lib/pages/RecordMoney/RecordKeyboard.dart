@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/Datas/Ledger/EntryData.dart';
+import 'package:quick_money_flutter/Datas/Ledger/EntryEditingData.dart';
 import 'package:quick_money_flutter/FLib/extensions_helper.dart';
 import 'package:quick_money_flutter/Pages/RecordMoney/RecordRecentlyTagGroup.dart';
 
@@ -30,7 +30,10 @@ class RecordKeyboard extends StatefulWidget {
 }
 
 class _RecordKeyboardState extends State<RecordKeyboard> {
-  String InputStr = "";
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,8 +97,8 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
           onPressed: () {},
           child: const Text("存模板"),
         ).WrapPadding(paddingValue),
-        Consumer<EntryData>(
-            builder: (BuildContext context, EntryData value, Widget? child) => Expanded(
+        Consumer<EntryEditingData>(
+            builder: (BuildContext context, EntryEditingData value, Widget? child) => Expanded(
                   flex: 2,
                   child: TextButton(
                     style: styleFrom,
@@ -137,29 +140,38 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
   }
 
   void _OnInputKey(KeyboardKey key) {
-    var newStr = InputStr;
+    var data = context.read<EntryEditingData>();
+
+    var newInteger = data.MoneyIntegerStr;
+    var newDecimal = data.MoneyDecimalStr;
+
     if (key == KeyboardKey.Back) {
-      if (newStr.isNotEmpty) {
-        newStr = newStr.substring(0, newStr.length - 1);
+      if (newDecimal != null) {
+        newDecimal = newDecimal.isEmpty ? null : newDecimal.substring(0, newDecimal.length - 1);
+      } else if (newInteger.isNotEmpty) {
+        newInteger = newInteger.substring(0, newInteger.length - 1);
       }
     } else if (key == KeyboardKey.LongBack) {
-      newStr = "";
+      newInteger = "";
+      newDecimal = null;
     } else if (key == KeyboardKey.Dot) {
-      if (newStr.isEmpty) {
-        newStr = "0.";
-      } else if (!newStr.contains(".")) {
-        newStr += ".";
+      newDecimal ??= "";
+    } else {
+      var keyStr = key.index.toString();
+      if (newDecimal != null) {
+        if (newDecimal.length < 2) {
+          newDecimal += keyStr;
+        } else {
+          newDecimal = newDecimal[0] + keyStr;
+        }
+      } else {
+        newInteger += keyStr;
       }
-    } else if (key != KeyboardKey.N0 || newStr.isNotEmpty) {
-      newStr += key.index.toString();
     }
-    if (InputStr != newStr) {
-      setState(() {
-        InputStr = newStr;
-      });
-      final money = double.tryParse(InputStr) ?? 0;
-      var data = context.read<EntryData>();
-      data.Money = money;
+
+    if (newInteger != data.MoneyIntegerStr || newDecimal != data.MoneyDecimalStr) {
+      data.MoneyIntegerStr = newInteger;
+      data.MoneyDecimalStr = newDecimal;
       data.SetDirty();
       HapticFeedback.lightImpact();
     }

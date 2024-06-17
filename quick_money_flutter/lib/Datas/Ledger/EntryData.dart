@@ -2,22 +2,23 @@ import 'package:flutter/material.dart';
 
 class EntryData with ChangeNotifier {
   ///
-  bool IsCost = true;
-
-  ///
   int Book = 0;
 
   ///
   int TagId = 0;
 
   ///
-  double Money = 0;
+  int Money = 0;
 
   ///
   DateTime Date = DateTime.now();
 
   ///
   String? Comment;
+
+  String GetMoneyString() {
+    return (Money * 0.01).toString();
+  }
 
   String GetDateTime() {
     var str = StringBuffer();
