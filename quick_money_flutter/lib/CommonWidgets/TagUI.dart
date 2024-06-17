@@ -32,7 +32,7 @@ class TagUI extends StatelessWidget {
               Text(
                 Data.Name,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: 12),
               ),
             ],
           ),
