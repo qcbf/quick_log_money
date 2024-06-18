@@ -65,7 +65,13 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
         const TextField(
           textInputAction: TextInputAction.done,
           maxLength: 500,
-          decoration: InputDecoration(hintText: "备注...", counterText: "", border: InputBorder.none, contentPadding: EdgeInsets.zero, isDense: true),
+          decoration: InputDecoration(
+              hintText: "备注...",
+              hintStyle: TextStyle(letterSpacing: 3),
+              counterText: "",
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+              isDense: true),
           style: TextStyle(fontSize: 14),
         ).WrapPadding(const EdgeInsets.only(top: 6, bottom: 6)),
       ],
@@ -124,8 +130,9 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
 
   Widget _NumericButton(_KeyboardKey key) {
     var keyStr = _NumericKeyLabel(key);
-    Widget result =
-        key == _KeyboardKey.Back ? GestureDetector(onLongPress: () => _OnInputKey(_KeyboardKey.LongBack), child: _NumericButtonImpl(key, keyStr)) : _NumericButtonImpl(key, keyStr);
+    Widget result = key == _KeyboardKey.Back
+        ? GestureDetector(onLongPress: () => _OnInputKey(_KeyboardKey.LongBack), child: _NumericButtonImpl(key, keyStr))
+        : _NumericButtonImpl(key, keyStr);
     return Expanded(child: result);
   }
 

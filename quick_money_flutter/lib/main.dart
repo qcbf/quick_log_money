@@ -1,7 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:quick_money_flutter/Datas/Ledger/LedgerData.dart';
+import 'package:quick_money_flutter/Datas/UserData.dart';
 import 'package:quick_money_flutter/Pages/Home.dart';
+import 'package:quick_money_flutter/pages/RecordMoney/RecordPage.dart';
 
 void main() {
   runApp(const MainApp());
@@ -20,20 +24,28 @@ class MainApp extends StatelessWidget {
 
   static MaterialApp CreateApp({ThemeMode? themeMode}) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      themeMode: themeMode,
-      theme: _GetTheme(Brightness.light),
-      darkTheme: _GetTheme(Brightness.dark),
-      home: const Home(),
-    );
+        debugShowCheckedModeBanner: false,
+        themeMode: themeMode,
+        theme: _GetTheme(Brightness.light),
+        darkTheme: _GetTheme(Brightness.dark),
+        home: MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (context) => UserDataProvider()),
+            ChangeNotifierProvider(create: (context) => LedgerProvider()),
+          ],
+          // ignore: dead_code
+          child: true ? const RecordPage() : const Home(),
+        ));
   }
 
   static ThemeData _GetTheme(Brightness brightness) {
-    var colorScheme = ColorScheme.fromSeed(seedColor: Colors.grey, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);
+    var colorScheme = ColorScheme.fromSeed(
+        seedColor: Colors.grey, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);
     return ThemeData(
         colorScheme: colorScheme,
         cardTheme: const CardTheme(margin: EdgeInsets.fromLTRB(0, 4, 0, 4)),
-        textButtonTheme: TextButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(colorScheme.surfaceContainer))));
+        textButtonTheme: TextButtonThemeData(
+            style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(colorScheme.surfaceContainer))));
   }
 }
 

@@ -9,15 +9,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const RecordPage()));
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -26,14 +17,11 @@ class _HomeState extends State<Home> {
           "notify",
           style: TextStyle(fontSize: 14),
         ),
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.widgets))
-        ],
+        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.widgets))],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const RecordPage()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const RecordPage()));
         },
         mini: false,
         shape: const CircleBorder(),
