@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/Datas/Ledger/EntryEditingData.dart';
+import 'package:quick_money_flutter/Datas/Ledger/Entry/EntryEditingData.dart';
 import 'package:quick_money_flutter/FLib/extensions_helper.dart';
 import 'package:quick_money_flutter/Pages/RecordMoney/RecordRecentlyTagGroup.dart';
 
-enum KeyboardKey {
+enum _KeyboardKey {
   N0,
   N1,
   N2,
@@ -30,6 +30,8 @@ class RecordKeyboard extends StatefulWidget {
 }
 
 class _RecordKeyboardState extends State<RecordKeyboard> {
+  final ButtonStyle _BtnStyle = const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder()));
+
   @override
   void initState() {
     super.initState();
@@ -56,10 +58,10 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
   Column _BuildLeftMenu() {
     return Column(
       children: [
-        _KeyboardRow(KeyboardKey.N7, KeyboardKey.N8, KeyboardKey.N9),
-        _KeyboardRow(KeyboardKey.N4, KeyboardKey.N5, KeyboardKey.N6),
-        _KeyboardRow(KeyboardKey.N1, KeyboardKey.N2, KeyboardKey.N3),
-        _KeyboardRow(KeyboardKey.Dot, KeyboardKey.N0, KeyboardKey.Back),
+        _KeyboardRow(_KeyboardKey.N7, _KeyboardKey.N8, _KeyboardKey.N9),
+        _KeyboardRow(_KeyboardKey.N4, _KeyboardKey.N5, _KeyboardKey.N6),
+        _KeyboardRow(_KeyboardKey.N1, _KeyboardKey.N2, _KeyboardKey.N3),
+        _KeyboardRow(_KeyboardKey.Dot, _KeyboardKey.N0, _KeyboardKey.Back),
         const TextField(
           textInputAction: TextInputAction.done,
           maxLength: 500,
@@ -72,7 +74,7 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
 
   Widget _BuildRightMenu() {
     const paddingValue = EdgeInsets.fromLTRB(0, 4, 0, 4);
-    var styleFrom = TextButton.styleFrom(padding: EdgeInsets.zero);
+    var styleFrom = _BtnStyle.copyWith(padding: const WidgetStatePropertyAll(EdgeInsets.zero));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -110,7 +112,7 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
     );
   }
 
-  Widget _KeyboardRow(KeyboardKey k1, KeyboardKey k2, KeyboardKey k3) {
+  Widget _KeyboardRow(_KeyboardKey k1, _KeyboardKey k2, _KeyboardKey k3) {
     return Expanded(
       child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         _NumericButton(k1),
@@ -120,41 +122,45 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
     );
   }
 
-  Widget _NumericButton(KeyboardKey key) {
+  Widget _NumericButton(_KeyboardKey key) {
     var keyStr = _NumericKeyLabel(key);
     Widget result =
-        key == KeyboardKey.Back ? GestureDetector(onLongPress: () => _OnInputKey(KeyboardKey.LongBack), child: _NumericButtonImpl(key, keyStr)) : _NumericButtonImpl(key, keyStr);
+        key == _KeyboardKey.Back ? GestureDetector(onLongPress: () => _OnInputKey(_KeyboardKey.LongBack), child: _NumericButtonImpl(key, keyStr)) : _NumericButtonImpl(key, keyStr);
     return Expanded(child: result);
   }
 
-  Widget _NumericButtonImpl(KeyboardKey key, Widget keyWidget) => TextButton(onPressed: () => _OnInputKey(key), child: keyWidget).WrapPadding(const EdgeInsets.all(2));
+  Widget _NumericButtonImpl(_KeyboardKey key, Widget keyWidget) => TextButton(
+        style: _BtnStyle,
+        onPressed: () => _OnInputKey(key),
+        child: keyWidget,
+      ).WrapPadding(const EdgeInsets.all(2));
 
-  Widget _NumericKeyLabel(KeyboardKey key) {
+  Widget _NumericKeyLabel(_KeyboardKey key) {
     const fontSize = 20.0;
-    if (key == KeyboardKey.Back) {
+    if (key == _KeyboardKey.Back) {
       return const Icon(Icons.keyboard_backspace);
-    } else if (key == KeyboardKey.Dot) {
+    } else if (key == _KeyboardKey.Dot) {
       return const Text(".", style: TextStyle(fontSize: fontSize));
     }
     return Text(key.index.toString(), style: const TextStyle(fontSize: fontSize));
   }
 
-  void _OnInputKey(KeyboardKey key) {
+  void _OnInputKey(_KeyboardKey key) {
     var data = context.read<EntryEditingData>();
 
     var newInteger = data.MoneyIntegerStr;
     var newDecimal = data.MoneyDecimalStr;
 
-    if (key == KeyboardKey.Back) {
+    if (key == _KeyboardKey.Back) {
       if (newDecimal != null) {
         newDecimal = newDecimal.isEmpty ? null : newDecimal.substring(0, newDecimal.length - 1);
       } else if (newInteger.isNotEmpty) {
         newInteger = newInteger.substring(0, newInteger.length - 1);
       }
-    } else if (key == KeyboardKey.LongBack) {
+    } else if (key == _KeyboardKey.LongBack) {
       newInteger = "";
       newDecimal = null;
-    } else if (key == KeyboardKey.Dot) {
+    } else if (key == _KeyboardKey.Dot) {
       newDecimal ??= "";
     } else {
       var keyStr = key.index.toString();
@@ -165,7 +171,7 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
           newDecimal = newDecimal[0] + keyStr;
         }
       } else {
-        newInteger += keyStr;
+        if (key != _KeyboardKey.N0 || newInteger.isNotEmpty) newInteger += keyStr;
       }
     }
 

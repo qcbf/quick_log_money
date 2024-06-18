@@ -1,4 +1,4 @@
-import 'package:quick_money_flutter/Datas/Ledger/EntryData.dart';
+import 'package:quick_money_flutter/Datas/Ledger/Entry/EntryData.dart';
 
 class EntryEditingData extends EntryData {
   ///

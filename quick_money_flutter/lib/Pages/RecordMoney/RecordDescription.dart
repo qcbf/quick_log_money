@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/Datas/Ledger/EntryEditingData.dart';
+import 'package:quick_money_flutter/Datas/Ledger/Entry/EntryEditingData.dart';
 import 'package:quick_money_flutter/FLib/extensions_helper.dart';
 
 class RecordDescription extends StatelessWidget {
