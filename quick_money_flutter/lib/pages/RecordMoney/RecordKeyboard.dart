@@ -73,7 +73,7 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
   }
 
   Widget _BuildRightMenu() {
-    const paddingValue = EdgeInsets.fromLTRB(0, 4, 0, 4);
+    const paddingValue = EdgeInsets.fromLTRB(0, 2, 0, 0);
     var styleFrom = _BtnStyle.copyWith(padding: const WidgetStatePropertyAll(EdgeInsets.zero));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -133,7 +133,7 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
         style: _BtnStyle,
         onPressed: () => _OnInputKey(key),
         child: keyWidget,
-      ).WrapPadding(const EdgeInsets.all(2));
+      ).WrapPadding(const EdgeInsets.fromLTRB(0, 2, 2, 0));
 
   Widget _NumericKeyLabel(_KeyboardKey key) {
     const fontSize = 20.0;
