@@ -9,13 +9,20 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  hive: ^2.2.3
+  json_annotation: ^4.9.0
+  package_info_plus: ^8.0.0
+  path_provider: ^2.1.3
   provider: ^6.1.2
-  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  json_serializable: ^6.8.0
+  build_runner: ^2.4.11
 
 flutter:
   uses-material-design: true
+  assets:
+    - Assets/Configs/

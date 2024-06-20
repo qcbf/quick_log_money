@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/Datas/Ledger/Entry/EntryEditingData.dart';
 import 'package:quick_money_flutter/FLib/extensions_helper.dart';
 import 'package:quick_money_flutter/Pages/RecordMoney/RecordRecentlyTagGroup.dart';
+import 'package:quick_money_flutter/pages/RecordMoney/RecordPage.dart';
 
 enum _KeyboardKey {
   N0,
@@ -105,8 +105,8 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
           onPressed: () {},
           child: const Text("存模板"),
         ).WrapPadding(paddingValue),
-        Consumer<EntryEditingData>(
-            builder: (BuildContext context, EntryEditingData value, Widget? child) => Expanded(
+        Consumer<EntryEditingProvier>(
+            builder: (BuildContext context, EntryEditingProvier value, Widget? child) => Expanded(
                   flex: 2,
                   child: TextButton(
                     style: styleFrom,
@@ -153,7 +153,7 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
   }
 
   void _OnInputKey(_KeyboardKey key) {
-    var data = context.read<EntryEditingData>();
+    var data = context.read<EntryEditingProvier>();
 
     var newInteger = data.MoneyIntegerStr;
     var newDecimal = data.MoneyDecimalStr;

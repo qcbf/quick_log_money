@@ -1,25 +1,25 @@
-import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
+part "EntryData.g.dart";
 
-///
+/// 账本条目
+@JsonSerializable()
 class EntryData {
   ///
-  final int LedgerId;
+  late int LedgerId;
 
   ///
-  final int TagId;
+  late int TagId;
 
   ///
-  final int Money;
+  late int Money;
 
   ///
-  late final DateTime Date;
+  DateTime Date = DateTime.now();
 
   ///
-  final String Comment;
+  late String Comment;
 
-  EntryData(this.Money, this.LedgerId, this.TagId, {DateTime? date, this.Comment = ""}) {
-    Date = date ?? DateTime.now();
-  }
+  EntryData();
 
   String GetMoneyString() {
     return (Money * 0.01).toString();
@@ -54,34 +54,7 @@ class EntryData {
   String GetBookName() {
     return "默认账本";
   }
-}
 
-///
-class EntryDataProvier with ChangeNotifier {
-  EntryData? Data;
-
-  ///
-  bool IsCost = true;
-
-  ///
-  String MoneyIntegerStr = "";
-  String? MoneyDecimalStr;
-
-  String GetMoneyString() {
-    final integer = MoneyIntegerStr.isEmpty ? "0" : MoneyIntegerStr;
-    if (MoneyDecimalStr == null) return integer;
-    return "$integer.$MoneyDecimalStr";
-  }
-
-  void Done() {
-    Data = EntryData();
-    Data.Money = (int.tryParse(MoneyIntegerStr) ?? 0) * 100;
-    if (MoneyDecimalStr?.isNotEmpty == true) {
-      Money += int.parse(MoneyDecimalStr!);
-    }
-  }
-
-  void SetDirty() {
-    notifyListeners();
-  }
+  Map<String, dynamic> toJson() => _$EntryDataToJson(this);
+  factory EntryData.fromJson(Map<String, dynamic> json) => _$EntryDataFromJson(json);
 }

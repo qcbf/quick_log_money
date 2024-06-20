@@ -1,0 +1,15 @@
+{
+	"files.exclude": {
+		"**/*.g.dart": true,
+		"*.lock": true,
+		"*.metadata": true,
+		"*.flutter-plugins*": true,
+		"build": true,
+		// "android": true,
+		// "ios": true,
+		// "linux": true,
+		// "macos": true,
+		// "web": true,
+		// "windows": true,
+	}
+}

@@ -1,21 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/Datas/Ledger/Entry/EntryEditingData.dart';
+import 'package:quick_money_flutter/Datas/Ledger/Entry/EntryData.dart';
 import 'package:quick_money_flutter/FLib/extensions_helper.dart';
 import 'package:quick_money_flutter/Pages/RecordMoney/RecordBottom.dart';
 import 'package:quick_money_flutter/Pages/RecordMoney/RecordDescription.dart';
 
+/// 账单记录页面
 class RecordPage extends StatelessWidget {
   const RecordPage({super.key});
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => EntryEditingData(),
+      create: (context) => EntryEditingProvier(),
       child: _RecordPageContent(key: key),
     );
   }
 }
 
+/// 编辑时的条目数据
+class EntryEditingProvier with ChangeNotifier {
+  final EntryData Data = EntryData();
+
+  ///
+  bool IsCost = true;
+
+  ///
+  String MoneyIntegerStr = "";
+  String? MoneyDecimalStr;
+
+  String GetMoneyString() {
+    final integer = MoneyIntegerStr.isEmpty ? "0" : MoneyIntegerStr;
+    if (MoneyDecimalStr == null) return integer;
+    return "$integer.$MoneyDecimalStr";
+  }
+
+  void Done() {
+    Data.Money = (int.tryParse(MoneyIntegerStr) ?? 0) * 100;
+    if (MoneyDecimalStr?.isNotEmpty == true) {
+      Data.Money += int.parse(MoneyDecimalStr!);
+    }
+  }
+
+  void SetDirty() {
+    notifyListeners();
+  }
+}
+
+///记录页面实际内容ui
 class _RecordPageContent extends StatefulWidget {
   const _RecordPageContent({super.key});
   @override
@@ -45,7 +76,8 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: TabBar(controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
+        title: TabBar(
+            controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
         actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.settings))],
       ),
       body: Column(
@@ -60,7 +92,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
 
   /// 设置是否消费记账
   void SetIsCost(BuildContext context) {
-    var data = context.read<EntryEditingData>();
+    var data = context.read<EntryEditingProvier>();
     data.IsCost = _TabCtrl.index == 0;
     data.SetDirty();
   }
