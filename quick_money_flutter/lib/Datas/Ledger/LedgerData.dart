@@ -61,8 +61,10 @@ class LedgerProvider with ChangeNotifier {
   }
 
   ///
-  Future LoadDefaultConfig() async {
-    _SetValue(await rootBundle.loadString(DefaultLedgerPath));
+  Future LoadTemplate() async {
+    final json = await rootBundle.loadString(DefaultLedgerPath);
+    // LocalDB.put("Ledger", json);
+    _SetValue(json);
   }
 }
 

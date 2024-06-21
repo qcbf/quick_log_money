@@ -11,9 +11,22 @@ import 'package:quick_money_flutter/pages/LoginPage.dart';
 import 'package:quick_money_flutter/pages/RecordMoney/RecordPage.dart';
 
 void main() async {
+  final sw = Stopwatch();
+  sw.start();
+
   await LocalDBHelper.Init();
+
+  print("db: ${sw.elapsedMilliseconds}ms");
+  sw.reset();
+
   await Preference.InitGlobal();
+
+  print("preference: ${sw.elapsedMilliseconds}ms");
+  sw.reset();
+
   runApp(const MainApp());
+
+  print("run: ${sw.elapsedMilliseconds}ms");
 }
 
 ///
@@ -23,14 +36,14 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (kDebugMode) {
-      return const _Debug();
+      return const _DebugCreateApp();
     }
     return CreateApp();
   }
 
   static MaterialApp CreateApp({ThemeMode? themeMode}) {
     late Widget firstPage;
-    if (UserDataProvider.IsLogined) {
+    if (UserProvider.IsLogined) {
       firstPage = Preference.Global.IsFirstPageIsRecord ? const RecordPage() : const HomePage();
     } else {
       firstPage = const LoginPage();
@@ -43,7 +56,7 @@ class MainApp extends StatelessWidget {
         darkTheme: _GetTheme(Brightness.dark),
         home: MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (context) => UserDataProvider()),
+            ChangeNotifierProvider(create: (context) => UserProvider()),
             ChangeNotifierProvider(create: (context) => LedgerProvider()),
           ],
           child: firstPage,
@@ -62,14 +75,14 @@ class MainApp extends StatelessWidget {
 }
 
 ///
-final class _Debug extends StatefulWidget {
-  const _Debug();
+final class _DebugCreateApp extends StatefulWidget {
+  const _DebugCreateApp();
 
   @override
-  State<_Debug> createState() => _DebugState();
+  State<_DebugCreateApp> createState() => _DebugCreateAppState();
 }
 
-class _DebugState extends State<_Debug> {
+class _DebugCreateAppState extends State<_DebugCreateApp> {
   late ThemeMode _themeMode = ThemeMode.dark;
   @override
   Widget build(BuildContext context) {

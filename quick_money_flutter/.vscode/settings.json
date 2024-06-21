@@ -6,10 +6,10 @@
 		"*.flutter-plugins*": true,
 		"build": true,
 		// "android": true,
-		// "ios": true,
-		// "linux": true,
-		// "macos": true,
-		// "web": true,
-		// "windows": true,
+		"ios": true,
+		"linux": true,
+		"macos": true,
+		"web": true,
+		"windows": true,
 	}
 }

@@ -3,13 +3,14 @@ import 'package:quick_money_flutter/Utilities/LocalDB.dart';
 
 part 'Preference.g.dart';
 
-@JsonSerializable(checked: true)
+@JsonSerializable()
 class Preference {
   static late Preference Global;
 
-  bool IsFirstPageIsRecord = false;
+  @JsonKey(defaultValue: false)
+  bool IsFirstPageIsRecord;
 
-  Preference();
+  Preference({required this.IsFirstPageIsRecord});
 
   static Future InitGlobal() async {
     Global = Preference.FromJson(await LocalDB.get("Preference") ?? {});

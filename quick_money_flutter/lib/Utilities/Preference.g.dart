@@ -6,15 +6,8 @@ part of 'Preference.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Preference _$PreferenceFromJson(Map<String, dynamic> json) => $checkedCreate(
-      'Preference',
-      json,
-      ($checkedConvert) {
-        final val = Preference();
-        $checkedConvert(
-            'IsFirstPageIsRecord', (v) => val.IsFirstPageIsRecord = v as bool);
-        return val;
-      },
+Preference _$PreferenceFromJson(Map<String, dynamic> json) => Preference(
+      IsFirstPageIsRecord: json['IsFirstPageIsRecord'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$PreferenceToJson(Preference instance) =>

@@ -26,3 +26,7 @@ flutter:
   uses-material-design: true
   assets:
     - Assets/Configs/
+  fonts:
+    - family: Ledger
+      fonts:
+        - asset: Assets/Ledger/Icon.ttf

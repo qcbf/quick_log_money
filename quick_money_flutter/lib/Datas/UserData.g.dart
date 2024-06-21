@@ -8,7 +8,7 @@ part of 'UserData.dart';
 
 UserData _$UserDataFromJson(Map<String, dynamic> json) => UserData()
   ..Id = (json['Id'] as num).toInt()
-  ..Token = json['Token'] as String
+  ..Token = json['Token'] as String?
   ..Name = json['Name'] as String?
   ..Icon = json['Icon'] as String?
   ..VipExpiryDate = json['VipExpiryDate'] == null

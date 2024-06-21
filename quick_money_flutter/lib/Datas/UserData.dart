@@ -9,7 +9,7 @@ part "UserData.g.dart";
 @JsonSerializable()
 class UserData {
   int Id = 0;
-  String Token = "";
+  String? Token;
   String? Name;
   String? Icon;
   DateTime? VipExpiryDate;
@@ -21,15 +21,31 @@ class UserData {
   factory UserData.FromJson(Map<String, dynamic> json) => _$UserDataFromJson(json);
 }
 
-class UserDataProvider with ChangeNotifier {
-  UserData? Data;
+class UserProvider with ChangeNotifier {
+  UserData? _Data;
+
+  ///
+  UserData? get Data => _Data;
+
+  ///
   static bool IsLogined = LocalDB.containsKey("User");
 
-  UserDataProvider() {
+  UserProvider() {
     if (IsLogined) {
       LocalDB.get("User").then((json) {
-        Data = UserData.FromJson(jsonDecode(json));
+        SetData(UserData.FromJson(jsonDecode(json)));
       });
     }
+  }
+
+  ///
+  void SetData(UserData data) {
+    _Data = data;
+    notifyListeners();
+  }
+
+  ///
+  Future Login() async {
+    await Future.delayed(Durations.short1);
   }
 }
