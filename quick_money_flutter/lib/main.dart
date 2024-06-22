@@ -2,31 +2,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/Datas/Ledger/LedgerData.dart';
-import 'package:quick_money_flutter/Datas/UserData.dart';
-import 'package:quick_money_flutter/Utilities/LocalDB.dart';
-import 'package:quick_money_flutter/Utilities/Preference.dart';
-import 'package:quick_money_flutter/pages/HomePage.dart';
-import 'package:quick_money_flutter/pages/LoginPage.dart';
-import 'package:quick_money_flutter/pages/RecordMoney/RecordPage.dart';
+import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
+import 'package:quick_log_money/Datas/UserData.dart';
+import 'package:quick_log_money/Utilities/LocalDB.dart';
+import 'package:quick_log_money/Utilities/Preference.dart';
+import 'package:quick_log_money/pages/HomePage.dart';
+import 'package:quick_log_money/pages/LoginPage.dart';
+import 'package:quick_log_money/pages/RecordMoney/RecordPage.dart';
 
 void main() async {
-  final sw = Stopwatch();
-  sw.start();
-
+  WidgetsFlutterBinding.ensureInitialized();
   await LocalDBHelper.Init();
-
-  print("db: ${sw.elapsedMilliseconds}ms");
-  sw.reset();
-
   await Preference.InitGlobal();
-
-  print("preference: ${sw.elapsedMilliseconds}ms");
-  sw.reset();
-
   runApp(const MainApp());
-
-  print("run: ${sw.elapsedMilliseconds}ms");
 }
 
 ///
@@ -44,7 +32,7 @@ class MainApp extends StatelessWidget {
   static MaterialApp CreateApp({ThemeMode? themeMode}) {
     late Widget firstPage;
     if (UserProvider.IsLogined) {
-      firstPage = Preference.Global.IsFirstPageIsRecord ? const RecordPage() : const HomePage();
+      firstPage = GlobalPreference.IsFirstPageIsRecord ? const RecordPage() : const HomePage();
     } else {
       firstPage = const LoginPage();
     }
@@ -57,20 +45,18 @@ class MainApp extends StatelessWidget {
         home: MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (context) => UserProvider()),
-            ChangeNotifierProvider(create: (context) => LedgerProvider()),
+            ChangeNotifierProvider(create: (context) => LedgerProvider(), lazy: false),
           ],
           child: firstPage,
         ));
   }
 
   static ThemeData _GetTheme(Brightness brightness) {
-    var colorScheme = ColorScheme.fromSeed(
-        seedColor: Colors.grey, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);
+    var colorScheme = ColorScheme.fromSeed(seedColor: Colors.grey, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);
     return ThemeData(
         colorScheme: colorScheme,
         cardTheme: const CardTheme(margin: EdgeInsets.fromLTRB(0, 4, 0, 4)),
-        textButtonTheme: TextButtonThemeData(
-            style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(colorScheme.surfaceContainer))));
+        textButtonTheme: TextButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(colorScheme.surfaceContainer))));
   }
 }
 

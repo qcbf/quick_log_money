@@ -1,8 +1,9 @@
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
-import "package:quick_money_flutter/Datas/Ledger/LedgerData.dart";
-import "package:quick_money_flutter/Datas/UserData.dart";
-import "package:quick_money_flutter/pages/HomePage.dart";
+import "package:quick_log_money/Datas/Ledger/LedgerData.dart";
+import "package:quick_log_money/Datas/UserData.dart";
+import "package:quick_log_money/Utilities/Def.dart";
+import "package:quick_log_money/pages/HomePage.dart";
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,28 +20,27 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Form(
-        key: _FormKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          children: [
-            _BuildTitleLogo(),
-            _BuildTitleLogoLine(),
-            const SizedBox(height: 60),
-            _BuildUsername(),
-            const SizedBox(height: 30),
-            _BuildPassword(context),
-            _BuildForgetPassword(context),
-            const SizedBox(height: 30),
-            _BuildLoginArea(context),
-            const SizedBox(height: 10),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [_BuildAnonymLogin(), const SizedBox(width: 20), _BuildRegister()]),
-            const SizedBox(height: 40),
-            _BuildOtherLogin(),
-          ],
+      body: SafeArea(
+        child: Form(
+          key: _FormKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            children: [
+              _BuildTitleLogo(),
+              const SizedBox(height: 30),
+              _BuildUsername(),
+              const SizedBox(height: 30),
+              _BuildPassword(context),
+              _BuildForgetPassword(context),
+              const SizedBox(height: 30),
+              _BuildLogin(context),
+              const SizedBox(height: 10),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [_BuildAnonymLogin(), const SizedBox(width: 6), _BuildRegister()]),
+              const SizedBox(height: 40),
+              _BuildOtherLogin(),
+            ],
+          ),
         ),
       ),
     );
@@ -85,18 +85,16 @@ class _LoginPageState extends State<LoginPage> {
       );
 
   ///
-  Widget _BuildLoginArea(BuildContext context) => Align(
+  Widget _BuildLogin(BuildContext context) => Align(
         child: SizedBox(
           height: 45,
           width: 270,
           child: ElevatedButton(
-            style: ButtonStyle(
-                shape: WidgetStateProperty.all(const StadiumBorder(side: BorderSide(style: BorderStyle.none)))),
+            style: ButtonStyle(shape: WidgetStateProperty.all(const StadiumBorder(side: BorderSide(style: BorderStyle.none)))),
             child: Text("登录", style: Theme.of(context).textTheme.titleMedium),
             onPressed: () {
               if (_FormKey.currentState!.validate()) {
                 _FormKey.currentState!.save();
-                //tag 执行登录方法
                 print("email: $_Username, password: $_Password");
               }
             },
@@ -105,16 +103,27 @@ class _LoginPageState extends State<LoginPage> {
       );
 
   ///
-  Widget _BuildRegister() => TextButton(onPressed: () {}, child: const Text("注册用户"));
+  Widget _BuildRegister() => SizedBox(
+        width: 132,
+        height: 40,
+        child: ElevatedButton(onPressed: () {}, child: const Text("注册用户")),
+      );
 
   ///
-  Widget _BuildAnonymLogin() => TextButton(
-      onPressed: () {
-        context.read<UserProvider>().SetData(UserData());
-        context.read<LedgerProvider>().LoadTemplate();
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
-      },
-      child: const Text("试用一下"));
+  Widget _BuildAnonymLogin() => SizedBox(
+        width: 132,
+        height: 40,
+        child: ElevatedButton(
+            onPressed: () async {
+              final user = UserData(Id: DateTime.now().millisecondsSinceEpoch, Name: "临时用户", RegisterDate: DateTime.now());
+              final ledgerData = await LedgerData.CreateFromTemplate(user.Id, Name: "临时账本");
+              if (!mounted) return;
+              context.read<UserProvider>().SetData(user);
+              context.read<LedgerProvider>().SetLedgerFromData(ledgerData);
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+            },
+            child: const Text("试用一下")),
+      );
 
   ///
   Widget _BuildForgetPassword(BuildContext context) => Padding(
@@ -157,11 +166,13 @@ class _LoginPageState extends State<LoginPage> {
       );
 
   ///
-  Widget _BuildTitleLogoLine() {
-    return const Divider();
-  }
-
-  ///
-  Widget _BuildTitleLogo() =>
-      const Padding(padding: EdgeInsets.all(8), child: Icon(IconData(0xe776, fontFamily: "Ledger")));
+  Widget _BuildTitleLogo() => Padding(
+      padding: const EdgeInsets.all(8),
+      child: Image.asset(
+        IconPath,
+        width: 64,
+        height: 64,
+        color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.15 : 0),
+        colorBlendMode: BlendMode.darken,
+      ));
 }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:quick_money_flutter/CommonWidgets/Ledger/Entry/TagUI.dart';
-import 'package:quick_money_flutter/Datas/Ledger/Entry/TagData.dart';
+import 'package:provider/provider.dart';
+import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagUI.dart';
+import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
+import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
 
 class TagGroupUI extends StatefulWidget {
   final List<TagData> Datas;
-  const TagGroupUI(this.Datas, {super.key});
+  final bool IsReverseLayout;
+  const TagGroupUI(this.Datas, {super.key, this.IsReverseLayout = false});
   @override
   State<TagGroupUI> createState() => _TagGroupUIState();
 }
@@ -14,12 +17,19 @@ class _TagGroupUIState extends State<TagGroupUI> {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      children: List.generate(
-        widget.Datas.length,
-        BuildTagItem,
-      ),
-    );
+    return Consumer<EntryEditingProvider>(builder: (context, value, child) {
+      return Align(
+        alignment: widget.IsReverseLayout ? Alignment.centerLeft : Alignment.centerRight,
+        child: Wrap(
+          verticalDirection: VerticalDirection.up,
+          textDirection: widget.IsReverseLayout ? TextDirection.ltr : TextDirection.rtl,
+          children: List.generate(
+            widget.Datas.length,
+            BuildTagItem,
+          ),
+        ),
+      );
+    });
   }
 
   Widget BuildTagItem(index) => TagUI(() {

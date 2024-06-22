@@ -1,4 +1,4 @@
-name: quick_money_flutter
+name: quick_log_money
 description: "A new Flutter project."
 publish_to: "none"
 version: 0.1.0
@@ -21,11 +21,27 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   json_serializable: ^6.8.0
   build_runner: ^2.4.11
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: Assets/Icon.png
+  web:
+    generate: true
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
 
 flutter:
   uses-material-design: true
   assets:
     - Assets/Configs/
+    - Assets/Icon.png
   fonts:
     - family: Ledger
       fonts:

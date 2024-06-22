@@ -1,3 +1,3 @@
-# quick_money_flutter
+# quick_log_money
 
 A new Flutter project.

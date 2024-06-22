@@ -1,23 +1,23 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:quick_money_flutter/Utilities/LocalDB.dart';
+import 'package:quick_log_money/Utilities/LocalDB.dart';
 
 part 'Preference.g.dart';
 
+late Preference GlobalPreference;
+
 @JsonSerializable()
 class Preference {
-  static late Preference Global;
-
   @JsonKey(defaultValue: false)
   bool IsFirstPageIsRecord;
 
   Preference({required this.IsFirstPageIsRecord});
 
   static Future InitGlobal() async {
-    Global = Preference.FromJson(await LocalDB.get("Preference") ?? {});
+    GlobalPreference = Preference.FromJson(await LocalDB.get("Preference") ?? {});
   }
 
   static Future SaveGlobal() async {
-    LocalDB.put("Preference", Global.ToJson());
+    LocalDB.put("Preference", GlobalPreference.ToJson());
   }
 
   Map<String, dynamic> ToJson() => _$PreferenceToJson(this);

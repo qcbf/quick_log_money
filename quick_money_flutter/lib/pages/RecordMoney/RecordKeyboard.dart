@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/FLib/extensions_helper.dart';
-import 'package:quick_money_flutter/Pages/RecordMoney/RecordRecentlyTagGroup.dart';
-import 'package:quick_money_flutter/pages/RecordMoney/RecordPage.dart';
+import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordRecentTag.dart';
 
 enum _KeyboardKey {
   N0,
@@ -22,58 +21,49 @@ enum _KeyboardKey {
 }
 
 /// 底部输入键盘
-class RecordKeyboard extends StatefulWidget {
-  const RecordKeyboard({super.key});
+class RecordKeyboard extends StatelessWidget {
+  final bool IsReverseLayout;
+  const RecordKeyboard({this.IsReverseLayout = false, super.key});
 
-  @override
-  State<RecordKeyboard> createState() => _RecordKeyboardState();
-}
-
-class _RecordKeyboardState extends State<RecordKeyboard> {
   final ButtonStyle _BtnStyle = const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder()));
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    var children = [Expanded(flex: 35, child: _BuildLeftMenu(context)), Expanded(flex: 10, child: _BuildRightMenu())];
+    if (IsReverseLayout) children = children.reversed.toList();
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        const RecordRecentlyTagGroup(),
+        RecordRecentTag(IsReverseLayout),
         Expanded(
-          child: Row(
-            children: [
-              _BuildLeftMenu().WrapExpanded(flex: 35),
-              _BuildRightMenu().WrapExpanded(flex: 10),
-            ],
-          ),
+          child: Row(children: children),
         ),
       ],
     );
   }
 
-  Column _BuildLeftMenu() {
+  Column _BuildLeftMenu(BuildContext context) {
     return Column(
       children: [
-        _KeyboardRow(_KeyboardKey.N7, _KeyboardKey.N8, _KeyboardKey.N9),
-        _KeyboardRow(_KeyboardKey.N4, _KeyboardKey.N5, _KeyboardKey.N6),
-        _KeyboardRow(_KeyboardKey.N1, _KeyboardKey.N2, _KeyboardKey.N3),
-        _KeyboardRow(_KeyboardKey.Dot, _KeyboardKey.N0, _KeyboardKey.Back),
-        const TextField(
-          textInputAction: TextInputAction.done,
-          maxLength: 500,
-          decoration: InputDecoration(
-              hintText: "备注...",
-              hintStyle: TextStyle(letterSpacing: 3),
-              counterText: "",
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-              isDense: true),
-          style: TextStyle(fontSize: 14),
-        ).WrapPadding(const EdgeInsets.only(top: 6, bottom: 6)),
+        _KeyboardRow(context, _KeyboardKey.N7, _KeyboardKey.N8, _KeyboardKey.N9),
+        _KeyboardRow(context, _KeyboardKey.N4, _KeyboardKey.N5, _KeyboardKey.N6),
+        _KeyboardRow(context, _KeyboardKey.N1, _KeyboardKey.N2, _KeyboardKey.N3),
+        _KeyboardRow(context, _KeyboardKey.Dot, _KeyboardKey.N0, _KeyboardKey.Back),
+        const Padding(
+          padding: EdgeInsets.only(top: 6, bottom: 6),
+          child: TextField(
+            textInputAction: TextInputAction.done,
+            maxLength: 500,
+            decoration: InputDecoration(
+                hintText: "备注...",
+                hintStyle: TextStyle(letterSpacing: 3),
+                counterText: "",
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+                isDense: true),
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
       ],
     );
   }
@@ -86,61 +76,76 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
       children: [
         Expanded(
           flex: 1,
-          child: TextButton(
-            style: styleFrom,
-            onPressed: () {},
-            child: const Icon(Icons.add),
-          ).WrapPadding(paddingValue),
+          child: Padding(
+            padding: paddingValue,
+            child: TextButton(
+              style: styleFrom,
+              onPressed: () {},
+              child: const Icon(Icons.add),
+            ),
+          ),
         ),
         Expanded(
           flex: 1,
+          child: Padding(
+            padding: paddingValue,
+            child: TextButton(
+              style: styleFrom,
+              onPressed: () {},
+              child: const Icon(Icons.remove),
+            ),
+          ),
+        ),
+        Padding(
+          padding: paddingValue,
           child: TextButton(
             style: styleFrom,
             onPressed: () {},
-            child: const Icon(Icons.remove),
-          ).WrapPadding(paddingValue),
+            child: const Text("存模板"),
+          ),
         ),
-        TextButton(
-          style: styleFrom,
-          onPressed: () {},
-          child: const Text("存模板"),
-        ).WrapPadding(paddingValue),
-        Consumer<EntryEditingProvier>(
-            builder: (BuildContext context, EntryEditingProvier value, Widget? child) => Expanded(
+        Consumer<EntryEditingProvider>(
+            builder: (BuildContext context, EntryEditingProvider value, Widget? child) => Expanded(
                   flex: 2,
-                  child: TextButton(
-                    style: styleFrom,
-                    onPressed: () {},
-                    child: Text("保存", style: TextStyle(color: value.IsCost ? Colors.red : Colors.green)),
-                  ).WrapPadding(paddingValue),
+                  child: Padding(
+                    padding: paddingValue,
+                    child: TextButton(
+                      style: styleFrom,
+                      onPressed: () {},
+                      child: Text("保存", style: TextStyle(color: value.IsCost ? Colors.red : Colors.green)),
+                    ),
+                  ),
                 )),
       ],
     );
   }
 
-  Widget _KeyboardRow(_KeyboardKey k1, _KeyboardKey k2, _KeyboardKey k3) {
+  Widget _KeyboardRow(BuildContext context, _KeyboardKey k1, _KeyboardKey k2, _KeyboardKey k3) {
     return Expanded(
       child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        _NumericButton(k1),
-        _NumericButton(k2),
-        _NumericButton(k3),
+        _NumericButton(context, k1),
+        _NumericButton(context, k2),
+        _NumericButton(context, k3),
       ]),
     );
   }
 
-  Widget _NumericButton(_KeyboardKey key) {
+  Widget _NumericButton(BuildContext context, _KeyboardKey key) {
     var keyStr = _NumericKeyLabel(key);
     Widget result = key == _KeyboardKey.Back
-        ? GestureDetector(onLongPress: () => _OnInputKey(_KeyboardKey.LongBack), child: _NumericButtonImpl(key, keyStr))
-        : _NumericButtonImpl(key, keyStr);
+        ? GestureDetector(onLongPress: () => _OnInputKey(context, _KeyboardKey.LongBack), child: _NumericButtonImpl(context, key, keyStr))
+        : _NumericButtonImpl(context, key, keyStr);
     return Expanded(child: result);
   }
 
-  Widget _NumericButtonImpl(_KeyboardKey key, Widget keyWidget) => TextButton(
-        style: _BtnStyle,
-        onPressed: () => _OnInputKey(key),
-        child: keyWidget,
-      ).WrapPadding(const EdgeInsets.fromLTRB(0, 2, 2, 0));
+  Widget _NumericButtonImpl(BuildContext context, _KeyboardKey key, Widget keyWidget) => Padding(
+        padding: const EdgeInsets.fromLTRB(0, 2, 2, 0),
+        child: TextButton(
+          style: _BtnStyle,
+          onPressed: () => _OnInputKey(context, key),
+          child: keyWidget,
+        ),
+      );
 
   Widget _NumericKeyLabel(_KeyboardKey key) {
     const fontSize = 20.0;
@@ -152,8 +157,8 @@ class _RecordKeyboardState extends State<RecordKeyboard> {
     return Text(key.index.toString(), style: const TextStyle(fontSize: fontSize));
   }
 
-  void _OnInputKey(_KeyboardKey key) {
-    var data = context.read<EntryEditingProvier>();
+  void _OnInputKey(BuildContext context, _KeyboardKey key) {
+    var data = context.read<EntryEditingProvider>();
 
     var newInteger = data.MoneyIntegerStr;
     var newDecimal = data.MoneyDecimalStr;

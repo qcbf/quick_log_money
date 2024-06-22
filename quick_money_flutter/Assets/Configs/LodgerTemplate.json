@@ -1,15 +1,15 @@
 {
 	"Id": 0,
 	"Type": 1,
-	"Name": "abc",
+	"Name": "本地账户",
 	"Icon": "0",
 	"IsHided": false,
 	"Entries": [],
 	"Tags": {
 		"Group1": [
-			{ "Id": 1, "Icon": "", "Name": "未命名" },
-			{ "Id": 2, "Icon": "", "Name": "未命名" },
-			{ "Id": 3, "Icon": "", "Name": "未命名" }
+			{ "Id": 1, "Icon": 0, "Name": "未命名" },
+			{ "Id": 2, "Icon": 0, "Name": "未命名" },
+			{ "Id": 3, "Icon": 0, "Name": "未命名" }
 		]
 	},
 	"OwnerUser": 0,

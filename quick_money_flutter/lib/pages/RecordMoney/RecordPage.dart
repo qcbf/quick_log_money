@@ -1,48 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_money_flutter/Datas/Ledger/Entry/EntryData.dart';
-import 'package:quick_money_flutter/FLib/extensions_helper.dart';
-import 'package:quick_money_flutter/Pages/RecordMoney/RecordBottom.dart';
-import 'package:quick_money_flutter/Pages/RecordMoney/RecordDescription.dart';
+import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordBottom.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordDescription.dart';
 
 /// 账单记录页面
 class RecordPage extends StatelessWidget {
   const RecordPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => EntryEditingProvier(),
-      child: _RecordPageContent(key: key),
-    );
-  }
-}
-
-/// 编辑时的条目数据
-class EntryEditingProvier with ChangeNotifier {
-  final EntryData Data = EntryData();
-
-  ///
-  bool IsCost = true;
-
-  ///
-  String MoneyIntegerStr = "";
-  String? MoneyDecimalStr;
-
-  String GetMoneyString() {
-    final integer = MoneyIntegerStr.isEmpty ? "0" : MoneyIntegerStr;
-    if (MoneyDecimalStr == null) return integer;
-    return "$integer.$MoneyDecimalStr";
-  }
-
-  void Done() {
-    Data.Money = (int.tryParse(MoneyIntegerStr) ?? 0) * 100;
-    if (MoneyDecimalStr?.isNotEmpty == true) {
-      Data.Money += int.parse(MoneyDecimalStr!);
-    }
-  }
-
-  void SetDirty() {
-    notifyListeners();
+    return ChangeNotifierProvider(create: (context) => EntryEditingProvider(), child: _RecordPageContent(key: key));
   }
 }
 
@@ -72,27 +39,24 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: TabBar(
-            controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.settings))],
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const RecordDescription()).WrapExpanded(),
-          const SizedBox(height: 330, child: RecordBottom()),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: TabBar(controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
+          actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.settings))],
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const RecordDescription())),
+            const SizedBox(height: 330, child: RecordBottom()),
+          ],
+        ),
+      );
 
   /// 设置是否消费记账
   void SetIsCost(BuildContext context) {
-    var data = context.read<EntryEditingProvier>();
+    var data = context.read<EntryEditingProvider>();
     data.IsCost = _TabCtrl.index == 0;
     data.SetDirty();
   }

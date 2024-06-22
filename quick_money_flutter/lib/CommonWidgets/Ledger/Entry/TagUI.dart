@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quick_money_flutter/Datas/Ledger/Entry/TagData.dart';
+import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
 
 class TagUI extends StatelessWidget {
   final TagData Data;
@@ -9,7 +9,8 @@ class TagUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var style = const ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.fromLTRB(2, 12, 2, 12)), shape: WidgetStatePropertyAll(RoundedRectangleBorder()));
+    var style = const ButtonStyle(
+        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 12, horizontal: 2)), shape: WidgetStatePropertyAll(RoundedRectangleBorder()));
     if (IsSelected) {
       var theme = Theme.of(context);
       style = style.copyWith(side: WidgetStatePropertyAll(BorderSide(color: theme.colorScheme.primary, width: 1)));

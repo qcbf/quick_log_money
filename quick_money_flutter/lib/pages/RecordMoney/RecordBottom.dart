@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quick_money_flutter/Pages/RecordMoney/RecordKeyboard.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordKeyboard.dart';
 
 /// 底部输入区域
 class RecordBottom extends StatefulWidget {
@@ -10,7 +10,7 @@ class RecordBottom extends StatefulWidget {
 
 class _RecordBottomState extends State<RecordBottom> with SingleTickerProviderStateMixin {
   late TabController _TabCtrl;
-  bool _IsReverse = false;
+  bool _IsReverseLayout = false;
 
   @override
   Widget build(BuildContext context) {
@@ -18,16 +18,14 @@ class _RecordBottomState extends State<RecordBottom> with SingleTickerProviderSt
       Flexible(flex: 10, child: BuildLeftMenu()),
       Expanded(
         flex: 30,
-        child: TabBarView(controller: _TabCtrl, children: const [
-          RecordKeyboard(),
-          Placeholder(),
-          Placeholder(),
+        child: TabBarView(controller: _TabCtrl, children: [
+          RecordKeyboard(IsReverseLayout: _IsReverseLayout),
+          const Placeholder(),
+          const Placeholder(),
         ]),
       ),
     ];
-    if (_IsReverse) {
-      children = children.reversed.toList();
-    }
+    if (_IsReverseLayout) children = children.reversed.toList();
     return Card(child: Row(children: children));
   }
 
@@ -38,17 +36,17 @@ class _RecordBottomState extends State<RecordBottom> with SingleTickerProviderSt
         TextButton(
             onPressed: () {
               setState(() {
-                _IsReverse = !_IsReverse;
+                _IsReverseLayout = !_IsReverseLayout;
               });
             },
-            child: Icon(_IsReverse ? Icons.keyboard_double_arrow_left : Icons.keyboard_double_arrow_right)),
+            child: Icon(_IsReverseLayout ? Icons.keyboard_double_arrow_left : Icons.keyboard_double_arrow_right)),
         Expanded(
           child: RotatedBox(
             quarterTurns: 1,
             child: TabBar(
                 dividerHeight: 0,
                 indicator: BoxDecoration(
-                    border: _IsReverse
+                    border: _IsReverseLayout
                         ? Border(top: BorderSide(color: Theme.of(context).colorScheme.inversePrimary, width: 4))
                         : Border(bottom: BorderSide(color: Theme.of(context).colorScheme.inversePrimary, width: 4))),
                 controller: _TabCtrl,
