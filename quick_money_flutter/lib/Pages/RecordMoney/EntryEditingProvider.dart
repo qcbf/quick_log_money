@@ -6,7 +6,7 @@ class EntryEditingProvider with ChangeNotifier {
   final EntryData Data = EntryData();
 
   ///
-  bool IsCost = true;
+  bool IsIncome = true;
 
   ///
   String MoneyIntegerStr = "";

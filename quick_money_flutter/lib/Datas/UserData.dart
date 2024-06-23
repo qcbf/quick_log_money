@@ -21,7 +21,7 @@ class UserData {
 
 class UserProvider with ChangeNotifier {
   ///
-  static bool IsLogined = LocalDB.containsKey("User");
+  static bool get IsLogined => LocalDB.containsKey("User");
   UserData _Data = UserData(Id: 0, RegisterDate: DateTime(0));
 
   UserProvider() {
@@ -42,9 +42,9 @@ class UserProvider with ChangeNotifier {
   }
 
   ///
-  void SetData(UserData data) {
+  Future SetData(UserData data) async {
     _Data = data;
-    LocalDB.put("User", data.ToJson());
+    await LocalDB.put("User", data.ToJson());
     notifyListeners();
   }
 }

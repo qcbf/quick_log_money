@@ -112,7 +112,7 @@ class RecordKeyboard extends StatelessWidget {
                     child: TextButton(
                       style: styleFrom,
                       onPressed: () {},
-                      child: Text("保存", style: TextStyle(color: value.IsCost ? Colors.red : Colors.green)),
+                      child: Text("保存", style: TextStyle(color: value.IsIncome ? Colors.green : Colors.red)),
                     ),
                   ),
                 )),

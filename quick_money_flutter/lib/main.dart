@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,14 +6,14 @@ import 'package:provider/provider.dart';
 import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
 import 'package:quick_log_money/Utilities/LocalDB.dart';
+import 'package:quick_log_money/Utilities/Pages.dart';
 import 'package:quick_log_money/Utilities/Preference.dart';
-import 'package:quick_log_money/pages/HomePage.dart';
-import 'package:quick_log_money/pages/LoginPage.dart';
-import 'package:quick_log_money/pages/RecordMoney/RecordPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await LocalDBHelper.Init();
+  BotToast.defaultOption.customLoading.duration = BotToast.defaultOption.loading.duration = const Duration(seconds: 10);
+  
+  await LocalDBHelper.OpenLocalDB();
   await Preference.InitGlobal();
   runApp(const MainApp());
 }
@@ -29,26 +30,28 @@ class MainApp extends StatelessWidget {
     return CreateApp();
   }
 
-  static MaterialApp CreateApp({ThemeMode? themeMode}) {
-    late Widget firstPage;
-    if (UserProvider.IsLogined) {
-      firstPage = GlobalPreference.IsFirstPageIsRecord ? const RecordPage() : const HomePage();
-    } else {
-      firstPage = const LoginPage();
-    }
-
+  static Widget CreateApp({ThemeMode? themeMode}) {
+    ///
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        themeMode: themeMode,
-        theme: _GetTheme(Brightness.light),
-        darkTheme: _GetTheme(Brightness.dark),
-        home: MultiProvider(
+      debugShowCheckedModeBanner: false,
+      themeMode: themeMode,
+      theme: _GetTheme(Brightness.light),
+      darkTheme: _GetTheme(Brightness.dark),
+      onGenerateRoute: Pages.Router,
+      initialRoute: GlobalPreference.IsFirstPageIsRecord ? Pages.Record : Pages.Home,
+      navigatorObservers: [BotToastNavigatorObserver()],
+      builder: (context, child) {
+        child = BotToastInit()(context, child);
+        child = MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (context) => UserProvider()),
             ChangeNotifierProvider(create: (context) => LedgerProvider(), lazy: false),
           ],
-          child: firstPage,
-        ));
+          child: child,
+        );
+        return child;
+      },
+    );
   }
 
   static ThemeData _GetTheme(Brightness brightness) {

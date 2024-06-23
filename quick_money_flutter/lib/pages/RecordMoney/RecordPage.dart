@@ -57,7 +57,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
   /// 设置是否消费记账
   void SetIsCost(BuildContext context) {
     var data = context.read<EntryEditingProvider>();
-    data.IsCost = _TabCtrl.index == 0;
+    data.IsIncome = _TabCtrl.index == 1;
     data.SetDirty();
   }
 

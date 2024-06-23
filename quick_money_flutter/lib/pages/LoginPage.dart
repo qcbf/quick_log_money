@@ -3,7 +3,7 @@ import "package:provider/provider.dart";
 import "package:quick_log_money/Datas/Ledger/LedgerData.dart";
 import "package:quick_log_money/Datas/UserData.dart";
 import "package:quick_log_money/Utilities/Def.dart";
-import "package:quick_log_money/pages/HomePage.dart";
+import "package:quick_log_money/Utilities/Pages.dart";
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -118,9 +118,9 @@ class _LoginPageState extends State<LoginPage> {
               final user = UserData(Id: DateTime.now().millisecondsSinceEpoch, Name: "临时用户", RegisterDate: DateTime.now());
               final ledgerData = await LedgerData.CreateFromTemplate(user.Id, Name: "临时账本");
               if (!mounted) return;
-              context.read<UserProvider>().SetData(user);
-              context.read<LedgerProvider>().SetLedgerFromData(ledgerData);
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+              await Future.wait([context.read<UserProvider>().SetData(user), context.read<LedgerProvider>().SetLedgerFromData(ledgerData)]);
+              if (!mounted) return;
+              Navigator.pushReplacementNamed(context, Pages.Home);
             },
             child: const Text("试用一下")),
       );

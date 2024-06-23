@@ -49,31 +49,29 @@ class LedgerProvider with ChangeNotifier {
   LedgerProvider() {
     LocalDB.get("Ledger").then((v) {
       if (v == null) return;
-      final data = LedgerData.fromJson(jsonDecode(v));
-      Future.delayed(Durations.extralong4, () => SetLedgerFromData(data));
-      // SetLedgerFromData(data);
+      SetLedgerFromData(LedgerData.fromJson(jsonDecode(v)));
     });
   }
 
   ///
-  SetLedger(LedgerBase v) {
+  Future SetLedger(LedgerBase v) async {
     print("set ledger: ${v.Data?.Id} ${v.Data?.Name}");
     _Ledger = v;
     if (v.Data == null) {
-      LocalDB.delete("Ledger");
+      await LocalDB.delete("Ledger");
     } else {
-      LocalDB.put("Ledger", jsonEncode(v.Data!.toJson()));
+      await LocalDB.put("Ledger", jsonEncode(v.Data!.toJson()));
     }
     notifyListeners();
   }
 
-  SetLedgerFromData(LedgerData data) {
+  Future SetLedgerFromData(LedgerData data) async {
     switch (data.Type) {
       case 1:
-        SetLedger(LocalLedger(data));
+        await SetLedger(LocalLedger(data));
         return true;
       case 2:
-        SetLedger(ServerLedger(data));
+        await SetLedger(ServerLedger(data));
         return true;
     }
   }

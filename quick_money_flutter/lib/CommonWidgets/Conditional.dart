@@ -1,28 +1,36 @@
 import 'package:flutter/material.dart';
 
-/// Conditional rendering class
-class Conditional {
-  static Widget Function(BuildContext context) GlobalFallback = (context) => Text("LOADING...", style: Theme.of(context).textTheme.labelSmall);
+typedef ViewBuilder = Widget Function(BuildContext context);
 
-  static Widget Single(BuildContext context, bool Function(BuildContext context) conditionBuilder, Widget Function(BuildContext context) widgetBuilder,
-      {Widget Function(BuildContext context)? fallbackBuilder}) {
-    if (conditionBuilder(context) == true) {
+class Conditional {
+  static ViewBuilder GlobalFallback = (context) => Text("LOADING...", style: Theme.of(context).textTheme.labelSmall);
+
+  static Widget Single(BuildContext context, bool Function(BuildContext context) condition, ViewBuilder widgetBuilder, {ViewBuilder? fallbackBuilder}) {
+    if (condition(context) == true) {
       return widgetBuilder(context);
     } else {
       return fallbackBuilder?.call(context) ?? GlobalFallback(context);
     }
   }
 
-  // static List<Widget> list({
-  //   required BuildContext context,
-  //   required bool Function(BuildContext context) conditionBuilder,
-  //   required List<Widget> Function(BuildContext context) widgetBuilder,
-  //   List<Widget> Function(BuildContext context)? fallbackBuilder,
-  // }) {
-  //   if (conditionBuilder(context) == true) {
-  //     return widgetBuilder(context);
-  //   } else {
-  //     return fallbackBuilder?.call(context) ?? [];
-  //   }
-  // }
+  ///
+  static Widget SwitchIndex(BuildContext context, int Function(BuildContext context) condition, List<ViewBuilder> views, {ViewBuilder? fallbackBuilder}) {
+    final result = condition(context);
+    if (result < 0 || result > views.length) {
+      return fallbackBuilder?.call(context) ?? GlobalFallback(context);
+    } else {
+      return views[result](context);
+    }
+  }
+
+  ///
+  static Widget SwitchName(BuildContext context, String Function(BuildContext context) condition, Map<String, ViewBuilder> views,
+      {ViewBuilder? fallbackBuilder}) {
+    final result = condition(context);
+    if (views.containsKey(result)) {
+      return views[result]!(context);
+    } else {
+      return fallbackBuilder?.call(context) ?? GlobalFallback(context);
+    }
+  }
 }
