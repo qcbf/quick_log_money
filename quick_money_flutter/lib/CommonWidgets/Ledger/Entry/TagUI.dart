@@ -4,40 +4,25 @@ import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
 class TagUI extends StatelessWidget {
   final TagData Data;
   final VoidCallback OnPressed;
-  final bool IsSelected;
-  const TagUI(this.OnPressed, this.Data, {this.IsSelected = false, super.key});
+  final ButtonStyle? Style;
+
+  const TagUI(this.Data, this.OnPressed, {super.key, this.Style});
 
   @override
   Widget build(BuildContext context) {
-    var style = const ButtonStyle(
-        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 12, horizontal: 2)), shape: WidgetStatePropertyAll(RoundedRectangleBorder()));
-    if (IsSelected) {
-      var theme = Theme.of(context);
-      style = style.copyWith(side: WidgetStatePropertyAll(BorderSide(color: theme.colorScheme.primary, width: 1)));
-    }
-    return Padding(
-      padding: const EdgeInsets.all(1),
-      child: SizedBox(
-        width: 62,
-        height: 48,
-        child: TextButton(
-          onPressed: OnPressed,
-          style: style,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.home,
-                size: 20,
-              ),
-              FittedBox(
-                child: Text(
-                  Data.Name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ),
-            ],
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(1),
+        child: SizedBox(
+          height: 38,
+          child: TextButton(
+            onPressed: OnPressed,
+            style: const ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.only(bottom: 10)), shape: WidgetStatePropertyAll(RoundedRectangleBorder()))
+                .merge(Style),
+            child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+              const Icon(Icons.apple, size: 18),
+              FittedBox(child: Text(Data.Name, style: const TextStyle(fontSize: 12))),
+            ]),
           ),
         ),
       ),

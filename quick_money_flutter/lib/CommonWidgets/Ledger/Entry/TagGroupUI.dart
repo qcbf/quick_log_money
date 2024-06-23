@@ -13,28 +13,28 @@ class TagGroupUI extends StatefulWidget {
 }
 
 class _TagGroupUIState extends State<TagGroupUI> {
-  int _SelectedIndex = 0;
+  // int _SelectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<EntryEditingProvider>(builder: (context, value, child) {
-      return Align(
-        alignment: widget.IsReverseLayout ? Alignment.centerLeft : Alignment.centerRight,
-        child: Wrap(
-          verticalDirection: VerticalDirection.up,
-          textDirection: widget.IsReverseLayout ? TextDirection.ltr : TextDirection.rtl,
-          children: List.generate(
-            widget.Datas.length,
-            BuildTagItem,
-          ),
-        ),
-      );
-    });
+    return Consumer<EntryEditingProvider>(
+        builder: (context, value, child) => const Column(children: [
+              Row(
+                children: [Placeholder()],
+              )
+            ]));
+    // Align(
+    //       alignment: widget.IsReverseLayout ? Alignment.centerLeft : Alignment.centerRight,
+    //       child: Wrap(
+    //         verticalDirection: VerticalDirection.up,
+    //         textDirection: widget.IsReverseLayout ? TextDirection.ltr : TextDirection.rtl,
+    //         children: List.generate(
+    //           widget.Datas.length,
+    //           BuildTagItem,
+    //         ),
+    //       ),
+    //     ));
   }
 
-  Widget BuildTagItem(index) => TagUI(() {
-        setState(() {
-          _SelectedIndex = index;
-        });
-      }, widget.Datas[index], IsSelected: _SelectedIndex == index);
+  Widget BuildTagItem(index) => TagUI(widget.Datas[index], () {});
 }

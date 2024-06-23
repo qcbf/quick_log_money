@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagGroupUI.dart';
+import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagUI.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
 
 class RecordRecentTag extends StatelessWidget {
@@ -9,7 +9,19 @@ class RecordRecentTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TagGroupUI(List<TagData>.generate(8, (index) => TagData(index, Name: index == 1 ? "[$index]啊啊" : "[$index]啊啊啊啊")),
-        IsReverseLayout: _IsReverseLayout);
+    return Column(children: [
+      Row(children: [
+        TagUI(const TagData(0, Name: "吃喝"), () {}),
+        TagUI(const TagData(0, Name: "出去游玩"), () {}),
+        TagUI(const TagData(0, Name: "房屋水电气费"), () {}),
+        TagUI(const TagData(0, Name: "交通开车"), () {})
+      ]),
+      Row(children: [
+        TagUI(const TagData(0, Name: "吃喝"), () {}),
+        TagUI(const TagData(0, Name: "出去游玩"), () {}),
+        TagUI(const TagData(0, Name: "房屋水电气费"), () {}),
+        TagUI(const TagData(0, Name: "交通开车"), () {})
+      ]),
+    ]);
   }
 }
