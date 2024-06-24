@@ -34,7 +34,7 @@ class RecordKeyboard extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        RecordRecentTag(IsReverseLayout),
+        Expanded(child: RecordRecentTag(IsReverseLayout)),
         Expanded(
           child: Row(children: children),
         ),

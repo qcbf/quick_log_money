@@ -2,6 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
@@ -9,13 +10,15 @@ import 'package:quick_log_money/Utilities/LocalDB.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'package:quick_log_money/Utilities/Preference.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   BotToast.defaultOption.customLoading.duration = BotToast.defaultOption.loading.duration = const Duration(seconds: 10);
-  
-  await LocalDBHelper.OpenLocalDB();
-  await Preference.InitGlobal();
-  runApp(const MainApp());
+  getApplicationSupportDirectory().then((dir) {
+    Future.wait([
+      LocalDBHelper.OpenLocalDB(dir.path),
+      Preference.Create("Global").then((value) => GlobalPreference = value),
+    ]).then((value) => runApp(const MainApp()));
+  });
 }
 
 ///
@@ -38,7 +41,7 @@ class MainApp extends StatelessWidget {
       theme: _GetTheme(Brightness.light),
       darkTheme: _GetTheme(Brightness.dark),
       onGenerateRoute: Pages.Router,
-      initialRoute: GlobalPreference.IsFirstPageIsRecord ? Pages.Record : Pages.Home,
+      initialRoute: GlobalPreference.IsFirstPageToRecord.value ? Pages.Record : Pages.Home,
       navigatorObservers: [BotToastNavigatorObserver()],
       builder: (context, child) {
         child = BotToastInit()(context, child);

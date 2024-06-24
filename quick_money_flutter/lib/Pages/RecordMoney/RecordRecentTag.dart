@@ -9,19 +9,21 @@ class RecordRecentTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Row(children: [
-        TagUI(const TagData(0, Name: "吃喝"), () {}),
-        TagUI(const TagData(0, Name: "出去游玩"), () {}),
-        TagUI(const TagData(0, Name: "房屋水电气费"), () {}),
-        TagUI(const TagData(0, Name: "交通开车"), () {})
-      ]),
-      Row(children: [
-        TagUI(const TagData(0, Name: "吃喝"), () {}),
-        TagUI(const TagData(0, Name: "出去游玩"), () {}),
-        TagUI(const TagData(0, Name: "房屋水电气费"), () {}),
-        TagUI(const TagData(0, Name: "交通开车"), () {})
-      ]),
-    ]);
+    return GridView.count(crossAxisCount: 2, children: [SizedBox(width: 100, height: 100)]);
+
+    // return Column(children: [
+    //   Row(children: [
+    //     TagUI(const TagData(0, Name: "a"), () {}),
+    //     TagUI(const TagData(0, Name: "a"), () {}),
+    //     TagUI(const TagData(0, Name: "a"), () {}),
+    //     TagUI(const TagData(0, Name: "a"), () {})
+    //   ]),
+    //   Row(children: [
+    //     TagUI(const TagData(0, Name: "a"), () {}),
+    //     TagUI(const TagData(0, Name: "a"), () {}),
+    //     TagUI(const TagData(0, Name: "a"), () {}),
+    //     TagUI(const TagData(0, Name: "a"), () {})
+    //   ]),
+    // ]);
   }
 }
