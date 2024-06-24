@@ -6,6 +6,9 @@ class EntryEditingProvider with ChangeNotifier {
   final EntryData Data = EntryData();
 
   ///
+  int? TagId;
+
+  ///
   bool IsIncome = false;
 
   ///

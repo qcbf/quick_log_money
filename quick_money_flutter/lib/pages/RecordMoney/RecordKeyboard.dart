@@ -30,11 +30,11 @@ class RecordKeyboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var children = [Expanded(flex: 35, child: _BuildLeftMenu(context)), Expanded(flex: 10, child: _BuildRightMenu())];
-    if (IsReverseLayout) children = children.reversed.toList();
+    // if (IsReverseLayout) children = children.reversed.toList();
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Flexible(flex: 10, child: RecordRecentTag(IsReverseLayout)),
+        const Flexible(flex: 10, child: RecordRecentTag()),
         Expanded(flex: 25, child: Row(children: children)),
       ],
     );

@@ -5,7 +5,12 @@ late Preference GlobalPreference;
 
 class Preference {
   late Box DB;
+
+  /// 是否首个页面打开记录账单页面
   late final PreferenceItem<bool> IsFirstPageToRecord = PreferenceItem(this, "IsFirstPageToRecord", false);
+
+  /// 最近记账标签
+  late final PreferenceItem<List<int>> RecentTags = PreferenceItem(this, "RecentTags", List<int>.empty());
 
   Preference._(this.DB);
 

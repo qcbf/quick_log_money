@@ -17,7 +17,8 @@ class LedgerData {
   final String Name;
   final String Icon;
   final bool IsHided;
-  final Map<String, List<TagData>> Tags;
+  @JsonKey(fromJson: _TagsFromJson, toJson: _TagsToJson)
+  final Map<String, Map<int, TagData>> Tags;
   final List<int>? MoreUsers;
   const LedgerData(
       {required this.Id,
@@ -35,7 +36,24 @@ class LedgerData {
     final jsonMap = jsonDecode(await rootBundle.loadString(DefaultLedgerPath));
     jsonMap["OwnerUser"] = OwnerUser;
     if (Name != null) jsonMap["Name"] = Name;
+    int index = 0;
+    final tags = jsonMap["Tags"] as Map<String, dynamic>;
+    tags.forEach((key, value) {
+      for (List item in value) {
+        item.insert(0, ++index);
+      }
+    });
     return LedgerData.fromJson(jsonMap);
+  }
+
+  static Map<String, Map<int, TagData>> _TagsFromJson(Map<String, dynamic> json) {
+    return json.map((key, value) {
+      return MapEntry(key, {for (var element in value) element[0]: TagData(element[0], Icon: element[1], Name: element[2])});
+    });
+  }
+
+  static Map<String, List<List>> _TagsToJson(Map<String, Map<int, TagData>> data) {
+    return Map();
   }
 }
 
@@ -55,13 +73,9 @@ class LedgerProvider with ChangeNotifier {
 
   ///
   Future SetLedger(LedgerBase v) async {
-    print("set ledger: ${v.Data?.Id} ${v.Data?.Name}");
+    print("set ledger: ${v.Data.Id} ${v.Data.Name}");
     _Ledger = v;
-    if (v.Data == null) {
-      await LocalDB.delete("Ledger");
-    } else {
-      await LocalDB.put("Ledger", jsonEncode(v.Data!.toJson()));
-    }
+    await LocalDB.put("Ledger", jsonEncode(v.Data.toJson()));
     notifyListeners();
   }
 
@@ -79,7 +93,7 @@ class LedgerProvider with ChangeNotifier {
 
 /// 账本基类
 abstract class LedgerBase<TData extends LedgerData> {
-  final TData? Data;
+  final TData Data;
   // List<EntryData> Entries = List.empty();
 
   const LedgerBase(this.Data);

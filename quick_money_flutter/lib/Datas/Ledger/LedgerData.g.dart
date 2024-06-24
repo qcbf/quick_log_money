@@ -16,14 +16,7 @@ LedgerData _$LedgerDataFromJson(Map json) => LedgerData(
           ?.map((e) => (e as num).toInt())
           .toList(),
       IsHided: json['IsHided'] as bool? ?? false,
-      Tags: (json['Tags'] as Map).map(
-        (k, e) => MapEntry(
-            k as String,
-            (e as List<dynamic>)
-                .map((e) =>
-                    TagData.fromJson(Map<String, dynamic>.from(e as Map)))
-                .toList()),
-      ),
+      Tags: LedgerData._TagsFromJson(json['Tags'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$LedgerDataToJson(LedgerData instance) =>
@@ -34,6 +27,6 @@ Map<String, dynamic> _$LedgerDataToJson(LedgerData instance) =>
       'Name': instance.Name,
       'Icon': instance.Icon,
       'IsHided': instance.IsHided,
-      'Tags': instance.Tags,
+      'Tags': LedgerData._TagsToJson(instance.Tags),
       'MoreUsers': instance.MoreUsers,
     };

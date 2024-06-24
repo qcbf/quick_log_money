@@ -81,7 +81,7 @@ class DrawerMenu extends StatelessWidget {
       onTap: () async {
         final cancel = BotToast.showLoading();
         Navigator.pushNamedAndRemoveUntil(context, Pages.Login, (_) => false);
-        await LocalDB.clear();
+        Future.wait([LocalDB.clear(), GlobalPreference.DB.clear()]);
         cancel();
       },
     );
