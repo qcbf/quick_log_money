@@ -48,7 +48,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const RecordDescription())),
+            // Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const RecordDescription())),
             const SizedBox(height: 330, child: RecordBottom()),
           ],
         ),

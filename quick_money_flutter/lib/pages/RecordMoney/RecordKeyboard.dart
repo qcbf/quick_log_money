@@ -34,10 +34,8 @@ class RecordKeyboard extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Expanded(child: RecordRecentTag(IsReverseLayout)),
-        Expanded(
-          child: Row(children: children),
-        ),
+        Flexible(flex: 10, child: RecordRecentTag(IsReverseLayout)),
+        Expanded(flex: 25, child: Row(children: children)),
       ],
     );
   }
@@ -45,26 +43,30 @@ class RecordKeyboard extends StatelessWidget {
   Column _BuildLeftMenu(BuildContext context) {
     return Column(
       children: [
-        _KeyboardRow(context, _KeyboardKey.N7, _KeyboardKey.N8, _KeyboardKey.N9),
-        _KeyboardRow(context, _KeyboardKey.N4, _KeyboardKey.N5, _KeyboardKey.N6),
-        _KeyboardRow(context, _KeyboardKey.N1, _KeyboardKey.N2, _KeyboardKey.N3),
-        _KeyboardRow(context, _KeyboardKey.Dot, _KeyboardKey.N0, _KeyboardKey.Back),
-        const Padding(
-          padding: EdgeInsets.only(top: 6, bottom: 6),
-          child: TextField(
-            textInputAction: TextInputAction.done,
-            maxLength: 500,
-            decoration: InputDecoration(
-                hintText: "备注...",
-                hintStyle: TextStyle(letterSpacing: 3),
-                counterText: "",
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-                isDense: true),
-            style: TextStyle(fontSize: 14),
-          ),
-        ),
+        _BuildComment(),
+        _BuildKeyboardRow(context, _KeyboardKey.N7, _KeyboardKey.N8, _KeyboardKey.N9),
+        _BuildKeyboardRow(context, _KeyboardKey.N4, _KeyboardKey.N5, _KeyboardKey.N6),
+        _BuildKeyboardRow(context, _KeyboardKey.N1, _KeyboardKey.N2, _KeyboardKey.N3),
+        _BuildKeyboardRow(context, _KeyboardKey.Dot, _KeyboardKey.N0, _KeyboardKey.Back),
       ],
+    );
+  }
+
+  Padding _BuildComment() {
+    return const Padding(
+      padding: EdgeInsets.only(top: 6, bottom: 6),
+      child: TextField(
+        textInputAction: TextInputAction.done,
+        maxLength: 500,
+        decoration: InputDecoration(
+            hintText: "备注...",
+            hintStyle: TextStyle(letterSpacing: 3),
+            counterText: "",
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+            isDense: true),
+        style: TextStyle(fontSize: 14),
+      ),
     );
   }
 
@@ -120,17 +122,17 @@ class RecordKeyboard extends StatelessWidget {
     );
   }
 
-  Widget _KeyboardRow(BuildContext context, _KeyboardKey k1, _KeyboardKey k2, _KeyboardKey k3) {
+  Widget _BuildKeyboardRow(BuildContext context, _KeyboardKey k1, _KeyboardKey k2, _KeyboardKey k3) {
     return Expanded(
       child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        _NumericButton(context, k1),
-        _NumericButton(context, k2),
-        _NumericButton(context, k3),
+        _BuildNumericButton(context, k1),
+        _BuildNumericButton(context, k2),
+        _BuildNumericButton(context, k3),
       ]),
     );
   }
 
-  Widget _NumericButton(BuildContext context, _KeyboardKey key) {
+  Widget _BuildNumericButton(BuildContext context, _KeyboardKey key) {
     var keyStr = _NumericKeyLabel(key);
     Widget result = key == _KeyboardKey.Back
         ? GestureDetector(onLongPress: () => _OnInputKey(context, _KeyboardKey.LongBack), child: _NumericButtonImpl(context, key, keyStr))

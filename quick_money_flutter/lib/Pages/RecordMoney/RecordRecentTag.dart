@@ -9,21 +9,30 @@ class RecordRecentTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(crossAxisCount: 2, children: [SizedBox(width: 100, height: 100)]);
-
-    // return Column(children: [
-    //   Row(children: [
-    //     TagUI(const TagData(0, Name: "a"), () {}),
-    //     TagUI(const TagData(0, Name: "a"), () {}),
-    //     TagUI(const TagData(0, Name: "a"), () {}),
-    //     TagUI(const TagData(0, Name: "a"), () {})
-    //   ]),
-    //   Row(children: [
-    //     TagUI(const TagData(0, Name: "a"), () {}),
-    //     TagUI(const TagData(0, Name: "a"), () {}),
-    //     TagUI(const TagData(0, Name: "a"), () {}),
-    //     TagUI(const TagData(0, Name: "a"), () {})
-    //   ]),
-    // ]);
+    return Column(children: [
+      Expanded(
+        child: Row(children: [
+          BuildTagUI(const TagData(0, Name: "a")),
+          BuildTagUI(const TagData(0, Name: "a")),
+          BuildTagUI(const TagData(0, Name: "a")),
+          BuildTagUI(const TagData(0, Name: "a")),
+        ]),
+      ),
+      Expanded(
+        child: Row(children: [
+          BuildTagUI(const TagData(0, Name: "a")),
+          BuildTagUI(const TagData(0, Name: "a")),
+          BuildTagUI(const TagData(0, Name: "a")),
+          BuildTagUI(const TagData(0, Name: "a")),
+        ]),
+      ),
+    ]);
   }
+
+  Widget BuildTagUI(TagData data) => Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(1),
+          child: TagUI(data, () {}),
+        ),
+      );
 }
