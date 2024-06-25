@@ -6,7 +6,7 @@ part 'TagGroupData.g.dart';
 class TagGroupData {
   final String Name;
   final List<int> Tags;
-  const TagGroupData(this.Tags, {this.Name = ""});
+  const TagGroupData(this.Name, this.Tags);
 
   Map<String, dynamic> toJson() => _$TagGroupDataToJson(this);
   factory TagGroupData.fromJson(Map<String, dynamic> json) => _$TagGroupDataFromJson(json);

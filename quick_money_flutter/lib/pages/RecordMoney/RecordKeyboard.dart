@@ -4,50 +4,20 @@ import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordRecentTag.dart';
 
-enum _KeyboardKey {
-  N0,
-  N1,
-  N2,
-  N3,
-  N4,
-  N5,
-  N6,
-  N7,
-  N8,
-  N9,
-  Dot,
-  Back,
-  LongBack,
-}
-
 /// 底部输入键盘
 class RecordKeyboard extends StatelessWidget {
-  final bool IsReverseLayout;
-  const RecordKeyboard({this.IsReverseLayout = false, super.key});
-
   final ButtonStyle _BtnStyle = const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder()));
+
+  const RecordKeyboard({super.key});
 
   @override
   Widget build(BuildContext context) {
     var children = [Expanded(flex: 35, child: _BuildLeftMenu(context)), Expanded(flex: 10, child: _BuildRightMenu())];
-    // if (IsReverseLayout) children = children.reversed.toList();
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         const Flexible(flex: 10, child: RecordRecentTag()),
         Expanded(flex: 25, child: Row(children: children)),
-      ],
-    );
-  }
-
-  Column _BuildLeftMenu(BuildContext context) {
-    return Column(
-      children: [
-        _BuildComment(),
-        _BuildKeyboardRow(context, _KeyboardKey.N7, _KeyboardKey.N8, _KeyboardKey.N9),
-        _BuildKeyboardRow(context, _KeyboardKey.N4, _KeyboardKey.N5, _KeyboardKey.N6),
-        _BuildKeyboardRow(context, _KeyboardKey.N1, _KeyboardKey.N2, _KeyboardKey.N3),
-        _BuildKeyboardRow(context, _KeyboardKey.Dot, _KeyboardKey.N0, _KeyboardKey.Back),
       ],
     );
   }
@@ -70,58 +40,6 @@ class RecordKeyboard extends StatelessWidget {
     );
   }
 
-  Widget _BuildRightMenu() {
-    const paddingValue = EdgeInsets.fromLTRB(0, 2, 0, 0);
-    var styleFrom = _BtnStyle.copyWith(padding: const WidgetStatePropertyAll(EdgeInsets.zero));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          flex: 1,
-          child: Padding(
-            padding: paddingValue,
-            child: TextButton(
-              style: styleFrom,
-              onPressed: () {},
-              child: const Icon(Icons.add),
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: Padding(
-            padding: paddingValue,
-            child: TextButton(
-              style: styleFrom,
-              onPressed: () {},
-              child: const Icon(Icons.remove),
-            ),
-          ),
-        ),
-        Padding(
-          padding: paddingValue,
-          child: TextButton(
-            style: styleFrom,
-            onPressed: () {},
-            child: const Text("存模板"),
-          ),
-        ),
-        Consumer<EntryEditingProvider>(
-            builder: (BuildContext context, EntryEditingProvider value, Widget? child) => Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: paddingValue,
-                    child: TextButton(
-                      style: styleFrom,
-                      onPressed: () {},
-                      child: Text("保存", style: TextStyle(color: value.IsIncome ? Colors.green : Colors.red)),
-                    ),
-                  ),
-                )),
-      ],
-    );
-  }
-
   Widget _BuildKeyboardRow(BuildContext context, _KeyboardKey k1, _KeyboardKey k2, _KeyboardKey k3) {
     return Expanded(
       child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -132,12 +50,80 @@ class RecordKeyboard extends StatelessWidget {
     );
   }
 
+  Column _BuildLeftMenu(BuildContext context) {
+    return Column(
+      children: [
+        _BuildComment(),
+        _BuildKeyboardRow(context, _KeyboardKey.N7, _KeyboardKey.N8, _KeyboardKey.N9),
+        _BuildKeyboardRow(context, _KeyboardKey.N4, _KeyboardKey.N5, _KeyboardKey.N6),
+        _BuildKeyboardRow(context, _KeyboardKey.N1, _KeyboardKey.N2, _KeyboardKey.N3),
+        _BuildKeyboardRow(context, _KeyboardKey.Dot, _KeyboardKey.N0, _KeyboardKey.Back),
+      ],
+    );
+  }
+
   Widget _BuildNumericButton(BuildContext context, _KeyboardKey key) {
     var keyStr = _NumericKeyLabel(key);
     Widget result = key == _KeyboardKey.Back
-        ? GestureDetector(onLongPress: () => _OnInputKey(context, _KeyboardKey.LongBack), child: _NumericButtonImpl(context, key, keyStr))
+        ? GestureDetector(
+            onLongPress: () => _OnInputKey(context, _KeyboardKey.LongBack), child: _NumericButtonImpl(context, key, keyStr))
         : _NumericButtonImpl(context, key, keyStr);
     return Expanded(child: result);
+  }
+
+  Widget _BuildRightMenu() {
+    const paddingValue = EdgeInsets.fromLTRB(0, 2, 0, 0);
+    var styleFrom = _BtnStyle.copyWith(padding: const WidgetStatePropertyAll(EdgeInsets.zero));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Consumer<EntryEditingProvider>(
+            builder: (BuildContext context, EntryEditingProvider value, Widget? child) => Expanded(
+                  flex: 20,
+                  child: Padding(
+                    padding: paddingValue,
+                    child: TextButton(
+                      style: styleFrom,
+                      onPressed: () {},
+                      child: Text("保存", style: TextStyle(color: value.IsIncome ? Colors.green : Colors.red)),
+                    ),
+                  ),
+                )),
+        Expanded(
+          flex: 10,
+          child: Padding(
+            padding: paddingValue,
+            child: TextButton(
+              style: styleFrom,
+              onPressed: () {},
+              child: const Text("存模板"),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 12,
+          child: Padding(
+            padding: paddingValue,
+            child: TextButton(
+              style: styleFrom,
+              onPressed: () {},
+              child: const Icon(Icons.add),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 12,
+          child: Padding(
+            padding: paddingValue,
+            child: TextButton(
+              style: styleFrom,
+              onPressed: () {},
+              child: const Icon(Icons.remove),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _NumericButtonImpl(BuildContext context, _KeyboardKey key, Widget keyWidget) => Padding(
@@ -196,4 +182,20 @@ class RecordKeyboard extends StatelessWidget {
       HapticFeedback.lightImpact();
     }
   }
+}
+
+enum _KeyboardKey {
+  N0,
+  N1,
+  N2,
+  N3,
+  N4,
+  N5,
+  N6,
+  N7,
+  N8,
+  N9,
+  Dot,
+  Back,
+  LongBack,
 }

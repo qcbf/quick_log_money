@@ -5,9 +5,10 @@ part 'TagData.g.dart';
 ///
 @JsonSerializable()
 class TagData {
+  static const TagData NotFound = TagData("未找到", 0);
   final int Icon;
   final String Name;
-  const TagData({this.Name = "未命名", this.Icon = 0});
+  const TagData(this.Name, this.Icon);
 
   Map<String, dynamic> toJson() => _$TagDataToJson(this);
   factory TagData.fromJson(Map<String, dynamic> json) => _$TagDataFromJson(json);

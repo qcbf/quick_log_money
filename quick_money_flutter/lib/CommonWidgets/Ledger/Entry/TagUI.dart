@@ -12,10 +12,12 @@ class TagUI extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: OnPressed,
-      style: const ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.only(bottom: 10)), shape: WidgetStatePropertyAll(RoundedRectangleBorder()))
+      style: const ButtonStyle(
+              padding: WidgetStatePropertyAll(EdgeInsets.only(bottom: 10)),
+              shape: WidgetStatePropertyAll(RoundedRectangleBorder()))
           .merge(Style),
       child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-        const Icon(IconData(0xe76b, fontFamily: "Ledger"), size: 18),
+        const Icon(IconData(59261, fontFamily: "Ledger"), size: 18),
         FittedBox(child: Text(Data.Name, style: const TextStyle(fontSize: 12))),
       ]),
     );

@@ -45,12 +45,12 @@ class LedgerData {
     final allTags = <String, dynamic>{};
     final jsonTags = jsonMap["Tags"] as Map<String, dynamic>;
     jsonTags.forEach((key, value) {
-      final tagGroup = TagGroupData(List<int>.filled(value.length, 0));
+      final tagGroup = TagGroupData(key, List<int>.filled(value.length, 0));
       for (var i = 0; i < value.length; i++) {
         final tagJson = value[i] as List;
         final id = ++index;
         tagGroup.Tags[i] = id;
-        allTags[id.toString()] = TagData(Name: tagJson[0], Icon: tagJson[1]).toJson();
+        allTags[id.toString()] = TagData(tagJson[0], tagJson[1]).toJson();
       }
       tagGroups.add(tagGroup.toJson());
     });

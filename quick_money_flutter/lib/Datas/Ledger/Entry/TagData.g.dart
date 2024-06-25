@@ -7,8 +7,8 @@ part of 'TagData.dart';
 // **************************************************************************
 
 TagData _$TagDataFromJson(Map<String, dynamic> json) => TagData(
-      Name: json['Name'] as String? ?? "未命名",
-      Icon: (json['Icon'] as num?)?.toInt() ?? 0,
+      json['Name'] as String,
+      (json['Icon'] as num).toInt(),
     );
 
 Map<String, dynamic> _$TagDataToJson(TagData instance) => <String, dynamic>{

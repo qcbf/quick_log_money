@@ -32,7 +32,7 @@ class _RecordRecentTagState extends State<RecordRecentTag> {
       const maxCount = 8;
       final recentTags = UserPrefs.RecentTags.value;
       var allTags = context.read<LedgerProvider>().Ledger.Data.AllTags;
-      _Tags = recentTags.map((id) => IdTagData(id, allTags[id] ?? const TagData(Name: "未找到")));
+      _Tags = recentTags.map((id) => IdTagData(id, allTags[id] ?? TagData.NotFound));
       if (_Tags.length < maxCount) {
         _Tags = _Tags.followedBy(allTags.entries.take(maxCount - _Tags.length).map((v) => IdTagData(v.key, v.value)));
       }

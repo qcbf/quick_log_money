@@ -7,8 +7,8 @@ part of 'TagGroupData.dart';
 // **************************************************************************
 
 TagGroupData _$TagGroupDataFromJson(Map<String, dynamic> json) => TagGroupData(
+      json['Name'] as String,
       (json['Tags'] as List<dynamic>).map((e) => (e as num).toInt()).toList(),
-      Name: json['Name'] as String? ?? "",
     );
 
 Map<String, dynamic> _$TagGroupDataToJson(TagGroupData instance) =>

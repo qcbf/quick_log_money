@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordKeyboard.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordTags.dart';
 
 /// 底部输入区域
 class RecordBottom extends StatefulWidget {
@@ -16,19 +17,13 @@ class _RecordBottomState extends State<RecordBottom> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     var children = [
       Flexible(flex: 10, child: BuildLeftMenu()),
-      Expanded(
-        flex: 30,
-        child: TabBarView(controller: _TabCtrl, children: [
-          RecordKeyboard(IsReverseLayout: _IsReverseLayout),
-          const Placeholder(),
-          const Placeholder(),
-        ]),
-      ),
+      Expanded(flex: 30, child: BuildRightContent()),
     ];
     if (_IsReverseLayout) children = children.reversed.toList();
     return Card(child: Row(children: children));
   }
 
+  /// 左边菜单，记账，类别什么的
   Widget BuildLeftMenu() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -59,6 +54,15 @@ class _RecordBottomState extends State<RecordBottom> with SingleTickerProviderSt
         ),
       ],
     );
+  }
+
+  /// 右边每个分类的内容
+  Widget BuildRightContent() {
+    return TabBarView(controller: _TabCtrl, children: const [
+      RecordKeyboard(),
+      RecordTags(),
+      Placeholder(),
+    ]);
   }
 
   @override
