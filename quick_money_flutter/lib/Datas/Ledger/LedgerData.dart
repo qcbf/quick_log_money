@@ -46,15 +46,10 @@ class LedgerData {
     return LedgerData.fromJson(jsonMap);
   }
 
-  static Map<String, Map<int, TagData>> _TagsFromJson(Map<String, dynamic> json) {
-    return json.map((key, value) {
-      return MapEntry(key, {for (var element in value) element[0]: TagData(element[0], Icon: element[1], Name: element[2])});
-    });
-  }
-
-  static Map<String, List<List>> _TagsToJson(Map<String, Map<int, TagData>> data) {
-    return Map();
-  }
+  static Map<String, Map<int, TagData>> _TagsFromJson(Map<String, dynamic> json) => json.map((key, value) =>
+      MapEntry(key, {for (var element in value) element[0]: TagData(element[0], Icon: element[1], Name: element[2])}));
+  static Map<String, Iterable<List>> _TagsToJson(Map<String, Map<int, TagData>> data) =>
+      data.map((key, value) => MapEntry(key, value.values.map((v) => [v.Id, v.Icon, v.Name])));
 }
 
 /// 账本事件容器
