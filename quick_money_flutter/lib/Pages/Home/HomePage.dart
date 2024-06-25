@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
       centerTitle: true,
       title: Consumer<LedgerProvider>(
         builder: (context, value, child) =>
-            Conditional.Single(context, (context) => value.IsInited, (context) => Text(value.Ledger.Data.Name, style: const TextStyle(fontSize: 14))),
+            Conditional.Single(() => value.IsInited, () => Text(value.Ledger.Data.Name, style: const TextStyle(fontSize: 14))),
       ),
       actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.widgets))],
     );

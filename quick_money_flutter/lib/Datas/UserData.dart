@@ -50,7 +50,7 @@ class UserProvider with ChangeNotifier {
       _Data = data;
       await LocalDB.put("User", data.ToJson());
       GlobalPrefs.UserUid.value = data.Id;
-      UserPrefsDef.TryInit();
+      UserPrefsDataDef.TryInit();
     }
     notifyListeners();
   }

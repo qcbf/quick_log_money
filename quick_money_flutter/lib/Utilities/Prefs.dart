@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
-GlobalPrefsDef GlobalPrefs = GlobalPrefsDef();
-UserPrefsDef UserPrefs = UserPrefsDef();
+GlobalPrefsDataDef GlobalPrefs = GlobalPrefsDataDef();
+UserPrefsDataDef UserPrefs = UserPrefsDataDef();
 
 /// 全局所有用户首选项
-class GlobalPrefsDef extends Prefs {
+class GlobalPrefsDataDef extends Prefs {
   /// 已经登录的uid
   late final PrefsItem<int> UserUid = PrefsItem(this, "UserUid", 0);
   @override
@@ -13,7 +13,7 @@ class GlobalPrefsDef extends Prefs {
 }
 
 /// 用户首选项
-class UserPrefsDef extends Prefs {
+class UserPrefsDataDef extends Prefs {
   /// 最近记账标签
   late final PrefsItem<List<int>> RecentTags = PrefsItem(this, "RecentTags", List<int>.empty());
 
@@ -27,7 +27,7 @@ class UserPrefsDef extends Prefs {
   ///
   static Future<bool> TryInit() async {
     if (GlobalPrefs.UserUid.value > 0) {
-      UserPrefs = UserPrefsDef();
+      UserPrefs = UserPrefsDataDef();
       return UserPrefs.Init();
     }
     return false;

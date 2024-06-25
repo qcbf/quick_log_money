@@ -18,7 +18,7 @@ void main() {
   getApplicationSupportDirectory().then((dir) {
     Future.wait([
       LocalDBHelper.OpenLocalDB(dir.path),
-      GlobalPrefs.Init().then((_) => UserPrefsDef.TryInit()),
+      GlobalPrefs.Init().then((_) => UserPrefsDataDef.TryInit()),
     ]).then((value) => runApp(const MainApp()));
   });
 

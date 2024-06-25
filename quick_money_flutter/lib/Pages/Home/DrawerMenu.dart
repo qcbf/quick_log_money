@@ -36,7 +36,7 @@ class DrawerMenu extends StatelessWidget {
           children: [
             Text(value.Data.Name, style: Theme.of(context).textTheme.headlineMedium),
             Text("ID:${value.Data.Id}", style: Theme.of(context).textTheme.labelMedium),
-            Conditional.SwitchIndex(context, (context) {
+            Conditional.SwitchIndex(() {
               if (value.Data.Token == null) {
                 return 0;
               } else if (value.Data.VipExpiryDate == null) {
@@ -44,9 +44,9 @@ class DrawerMenu extends StatelessWidget {
               }
               return 2;
             }, [
-              (context) => TextButton(onPressed: () {}, child: const Text("注册正式用户")),
-              (context) => TextButton(onPressed: () {}, child: const Text("开通vip")),
-              (context) => TextButton(onPressed: () {}, child: Text("Vip${Utility.DateToString(value.Data.VipExpiryDate!)}到期")),
+              () => TextButton(onPressed: () {}, child: const Text("注册正式用户")),
+              () => TextButton(onPressed: () {}, child: const Text("开通vip")),
+              () => TextButton(onPressed: () {}, child: Text("Vip${Utility.DateToString(value.Data.VipExpiryDate!)}到期")),
             ]),
           ],
         ),

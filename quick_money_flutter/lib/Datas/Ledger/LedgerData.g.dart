@@ -16,7 +16,14 @@ LedgerData _$LedgerDataFromJson(Map json) => LedgerData(
           ?.map((e) => (e as num).toInt())
           .toList(),
       IsHided: json['IsHided'] as bool? ?? false,
-      Tags: LedgerData._TagsFromJson(json['Tags'] as Map<String, dynamic>),
+      TagGroups: (json['TagGroups'] as List<dynamic>)
+          .map(
+              (e) => TagGroupData.fromJson(Map<String, dynamic>.from(e as Map)))
+          .toList(),
+      AllTags: (json['AllTags'] as Map).map(
+        (k, e) => MapEntry(int.parse(k as String),
+            TagData.fromJson(Map<String, dynamic>.from(e as Map))),
+      ),
     );
 
 Map<String, dynamic> _$LedgerDataToJson(LedgerData instance) =>
@@ -27,6 +34,7 @@ Map<String, dynamic> _$LedgerDataToJson(LedgerData instance) =>
       'Name': instance.Name,
       'Icon': instance.Icon,
       'IsHided': instance.IsHided,
-      'Tags': LedgerData._TagsToJson(instance.Tags),
+      'TagGroups': instance.TagGroups,
+      'AllTags': instance.AllTags.map((k, e) => MapEntry(k.toString(), e)),
       'MoreUsers': instance.MoreUsers,
     };
