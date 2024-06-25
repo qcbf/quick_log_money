@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quick_log_money/Utilities/LocalDB.dart';
+import 'package:quick_log_money/Utilities/Prefs.dart';
 
 part "UserData.g.dart";
 
@@ -21,11 +22,10 @@ class UserData {
 
 class UserProvider with ChangeNotifier {
   ///
-  static bool get IsLogined => LocalDB.containsKey("User");
   UserData _Data = UserData(Id: 0, RegisterDate: DateTime(0));
 
   UserProvider() {
-    if (IsLogined) {
+    if (GlobalPrefs.UserUid.value > 0) {
       LocalDB.get("User").then((json) {
         print("$json");
         SetData(UserData.FromJson(json!));
@@ -42,9 +42,16 @@ class UserProvider with ChangeNotifier {
   }
 
   ///
-  Future SetData(UserData data) async {
-    _Data = data;
-    await LocalDB.put("User", data.ToJson());
+  Future SetData(UserData? data) async {
+    if (data == null) {
+      GlobalPrefs.UserUid.value = 0;
+      UserPrefs.Close();
+    } else {
+      _Data = data;
+      await LocalDB.put("User", data.ToJson());
+      GlobalPrefs.UserUid.value = data.Id;
+      UserPrefsDef.TryInit();
+    }
     notifyListeners();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:quick_log_money/Datas/UserData.dart';
 import 'package:quick_log_money/Pages/Home/HomePage.dart';
+import 'package:quick_log_money/Utilities/Prefs.dart';
 import 'package:quick_log_money/pages/LoginPage.dart';
 import 'package:quick_log_money/pages/RecordMoney/RecordPage.dart';
 
@@ -16,7 +16,7 @@ class Pages {
 
   static MaterialPageRoute? Router(RouteSettings settings) {
     WidgetBuilder? page;
-    if (!UserProvider.IsLogined) {
+    if (GlobalPrefs.UserUid.value == 0) {
       page = Routes[Login];
     } else {
       page = Routes[settings.name];

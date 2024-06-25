@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
-import 'package:quick_log_money/Utilities/LocalDB.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
-import 'package:quick_log_money/Utilities/Preference.dart';
+import 'package:quick_log_money/Utilities/Prefs.dart';
 import 'package:quick_log_money/Utilities/Utility.dart';
 
 ///抽屉菜单
@@ -61,12 +60,12 @@ class DrawerMenu extends StatelessWidget {
       leading: const Icon(Icons.settings),
       title: const Text("first page to record"),
       trailing: ValueListenableBuilder(
-          valueListenable: GlobalPreference.IsFirstPageToRecord,
+          valueListenable: UserPrefs.IsFirstPageToRecord,
           builder: (context, value, child) {
             return Switch(
                 value: value,
                 onChanged: (value) {
-                  GlobalPreference.IsFirstPageToRecord.value = value;
+                  UserPrefs.IsFirstPageToRecord.value = value;
                 });
           }),
     );
@@ -81,7 +80,7 @@ class DrawerMenu extends StatelessWidget {
       onTap: () async {
         final cancel = BotToast.showLoading();
         Navigator.pushNamedAndRemoveUntil(context, Pages.Login, (_) => false);
-        Future.wait([LocalDB.clear(), GlobalPreference.DB.clear()]);
+        await context.read<UserProvider>().SetData(null);
         cancel();
       },
     );

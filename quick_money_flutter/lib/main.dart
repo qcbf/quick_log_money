@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +10,7 @@ import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
 import 'package:quick_log_money/Utilities/LocalDB.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
-import 'package:quick_log_money/Utilities/Preference.dart';
+import 'package:quick_log_money/Utilities/Prefs.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,9 +18,14 @@ void main() {
   getApplicationSupportDirectory().then((dir) {
     Future.wait([
       LocalDBHelper.OpenLocalDB(dir.path),
-      Preference.Create("Global").then((value) => GlobalPreference = value),
+      GlobalPrefs.Init().then((_) => UserPrefsDef.TryInit()),
     ]).then((value) => runApp(const MainApp()));
   });
+
+  WidgetsBinding.instance.addObserver(AppLifecycleListener(onExitRequested: () async {
+    await Future.wait([UserPrefs.Close(), GlobalPrefs.Close(), LocalDB.close()]);
+    return AppExitResponse.exit;
+  }));
 }
 
 ///
@@ -41,7 +48,7 @@ class MainApp extends StatelessWidget {
       theme: _GetTheme(Brightness.light),
       darkTheme: _GetTheme(Brightness.dark),
       onGenerateRoute: Pages.Router,
-      initialRoute: GlobalPreference.IsFirstPageToRecord.value ? Pages.Record : Pages.Home,
+      initialRoute: GlobalPrefs.UserUid.value == 0 ? Pages.Login : (UserPrefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home),
       navigatorObservers: [BotToastNavigatorObserver()],
       builder: (context, child) {
         child = BotToastInit()(context, child);

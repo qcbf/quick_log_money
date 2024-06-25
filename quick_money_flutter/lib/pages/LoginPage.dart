@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
         height: 40,
         child: ElevatedButton(
             onPressed: () async {
-              final user = UserData(Id: DateTime.now().millisecondsSinceEpoch, Name: "临时用户", RegisterDate: DateTime.now());
+              final user = UserData(Id: 1, Name: "临时用户", RegisterDate: DateTime.now());
               final ledgerData = await LedgerData.CreateFromTemplate(user.Id, Name: "临时账本");
               if (!mounted) return;
               await Future.wait([context.read<UserProvider>().SetData(user), context.read<LedgerProvider>().SetLedgerFromData(ledgerData)]);
