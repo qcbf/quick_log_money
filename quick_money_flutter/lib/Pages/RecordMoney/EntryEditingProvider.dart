@@ -1,12 +1,18 @@
+import 'dart:convert';
+
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/EntryData.dart';
 
 /// 编辑时的条目数据
 class EntryEditingProvider with ChangeNotifier {
-  final EntryData Data = EntryData();
+  late EntryData Data;
 
   ///
   int? TagId;
+
+  ///
+  String Comment = "";
 
   ///
   bool IsIncome = false;
@@ -15,20 +21,27 @@ class EntryEditingProvider with ChangeNotifier {
   String MoneyIntegerStr = "";
   String? MoneyDecimalStr;
 
+  EntryEditingProvider() {
+    Data = EntryData(LedgerId: 0, TagId: 0, Date: DateTime.now());
+  }
+
   String GetMoneyString() {
     final integer = MoneyIntegerStr.isEmpty ? "0" : MoneyIntegerStr;
     if (MoneyDecimalStr == null) return integer;
     return "$integer.$MoneyDecimalStr";
   }
 
-  void Done() {
-    Data.Money = (int.tryParse(MoneyIntegerStr) ?? 0) * 100;
+  void Save() {
+    var money = (int.tryParse(MoneyIntegerStr) ?? 0) * 100;
     if (MoneyDecimalStr?.isNotEmpty == true) {
-      Data.Money += int.parse(MoneyDecimalStr!);
+      money += int.parse(MoneyDecimalStr!);
     }
+    Data = Data.CopyWith(IntMoney: money, Comment: Comment);
+
+    BotToast.showSimpleNotification(title: jsonEncode(Data.toJson()));
   }
 
-  void SetDirty() {
+  void Notify() {
     notifyListeners();
   }
 }

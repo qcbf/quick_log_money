@@ -8,8 +8,9 @@ class TagListUI extends StatelessWidget {
   final Iterable<IdTagData> Tags;
   final void Function(int tagId) OnSelectTagHandler;
   final int? SelectTagId;
+  final ScrollPhysics? Physics;
 
-  const TagListUI(this.SelectTagId, this.Tags, this.OnSelectTagHandler, {super.key});
+  const TagListUI(this.SelectTagId, this.Tags, this.OnSelectTagHandler, {super.key, this.Physics});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class TagListUI extends StatelessWidget {
       mainAxisSpacing: 6,
       childAspectRatio: 1.3,
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: Physics,
       children: [for (var tag in Tags) BuildTag(context, tag)],
     );
   }

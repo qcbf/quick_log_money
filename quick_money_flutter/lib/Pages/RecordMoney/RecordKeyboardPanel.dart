@@ -3,12 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordRecentTags.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordSaveBtn.dart';
 
 /// 底部输入键盘
-class RecordKeyboard extends StatelessWidget {
+class RecordKeyboardPanel extends StatelessWidget {
   final ButtonStyle _BtnStyle = const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder()));
 
-  const RecordKeyboard({super.key});
+  const RecordKeyboardPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,20 +23,22 @@ class RecordKeyboard extends StatelessWidget {
     );
   }
 
-  Padding _BuildComment() {
-    return const Padding(
-      padding: EdgeInsets.only(top: 6, bottom: 6),
+  Padding _BuildComment(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 6),
       child: TextField(
         textInputAction: TextInputAction.done,
         maxLength: 500,
-        decoration: InputDecoration(
-            hintText: "备注...",
-            hintStyle: TextStyle(letterSpacing: 3),
-            counterText: "",
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.zero,
-            isDense: true),
-        style: TextStyle(fontSize: 14),
+        style: const TextStyle(fontSize: 14),
+        decoration: const InputDecoration(
+          hintText: "备注...",
+          hintStyle: TextStyle(letterSpacing: 3),
+          counterText: "",
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+          isDense: true,
+        ),
+        onChanged: (text) => context.read<EntryEditingProvider>().Comment = text,
       ),
     );
   }
@@ -53,7 +56,7 @@ class RecordKeyboard extends StatelessWidget {
   Column _BuildLeftMenu(BuildContext context) {
     return Column(
       children: [
-        _BuildComment(),
+        _BuildComment(context),
         _BuildKeyboardRow(context, _KeyboardKey.N7, _KeyboardKey.N8, _KeyboardKey.N9),
         _BuildKeyboardRow(context, _KeyboardKey.N4, _KeyboardKey.N5, _KeyboardKey.N6),
         _BuildKeyboardRow(context, _KeyboardKey.N1, _KeyboardKey.N2, _KeyboardKey.N3),
@@ -73,28 +76,24 @@ class RecordKeyboard extends StatelessWidget {
 
   Widget _BuildRightMenu() {
     const paddingValue = EdgeInsets.fromLTRB(0, 2, 0, 0);
-    var styleFrom = _BtnStyle.copyWith(padding: const WidgetStatePropertyAll(EdgeInsets.zero));
+    var style = _BtnStyle.copyWith(padding: const WidgetStatePropertyAll(EdgeInsets.zero));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Consumer<EntryEditingProvider>(
-            builder: (BuildContext context, EntryEditingProvider value, Widget? child) => Expanded(
-                  flex: 20,
-                  child: Padding(
-                    padding: paddingValue,
-                    child: TextButton(
-                      style: styleFrom,
-                      onPressed: () {},
-                      child: Text("保存", style: TextStyle(color: value.IsIncome ? Colors.green : Colors.red)),
-                    ),
-                  ),
-                )),
+        Expanded(
+          flex: 20,
+          child: Padding(
+            padding: paddingValue,
+            child: Consumer<EntryEditingProvider>(
+                builder: (BuildContext context, EntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
+          ),
+        ),
         Expanded(
           flex: 10,
           child: Padding(
             padding: paddingValue,
             child: TextButton(
-              style: styleFrom,
+              style: style,
               onPressed: () {},
               child: const Text("存模板"),
             ),
@@ -105,7 +104,7 @@ class RecordKeyboard extends StatelessWidget {
           child: Padding(
             padding: paddingValue,
             child: TextButton(
-              style: styleFrom,
+              style: style,
               onPressed: () {},
               child: const Icon(Icons.add),
             ),
@@ -116,7 +115,7 @@ class RecordKeyboard extends StatelessWidget {
           child: Padding(
             padding: paddingValue,
             child: TextButton(
-              style: styleFrom,
+              style: style,
               onPressed: () {},
               child: const Icon(Icons.remove),
             ),
@@ -178,7 +177,7 @@ class RecordKeyboard extends StatelessWidget {
     if (newInteger != data.MoneyIntegerStr || newDecimal != data.MoneyDecimalStr) {
       data.MoneyIntegerStr = newInteger;
       data.MoneyDecimalStr = newDecimal;
-      data.SetDirty();
+      data.Notify();
       HapticFeedback.lightImpact();
     }
   }

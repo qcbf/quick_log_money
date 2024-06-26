@@ -5,24 +5,30 @@ part "EntryData.g.dart";
 @JsonSerializable()
 class EntryData {
   ///
-  late int LedgerId;
+  final int LedgerId;
 
   ///
-  late int TagId;
+  final int TagId;
 
   ///
-  late int Money;
+  final int IntMoney;
 
   ///
-  DateTime Date = DateTime.now();
+  final DateTime Date;
 
   ///
-  late String Comment;
+  final String Comment;
 
-  EntryData();
+  String get MoneyStr => (IntMoney * 0.01).toString();
 
-  String GetMoneyString() {
-    return (Money * 0.01).toString();
+  const EntryData({required this.LedgerId, required this.TagId, required this.Date, this.IntMoney = 0, this.Comment = ""});
+  EntryData CopyWith({int? LedgerId, int? TagId, DateTime? Date, int? IntMoney, String? Comment}) {
+    return EntryData(
+        LedgerId: LedgerId ?? this.LedgerId,
+        TagId: TagId ?? this.TagId,
+        Date: Date ?? this.Date,
+        Comment: Comment ?? this.Comment,
+        IntMoney: IntMoney ?? this.IntMoney);
   }
 
   String GetTagName() {

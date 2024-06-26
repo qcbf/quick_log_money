@@ -12,20 +12,20 @@ import 'package:quick_log_money/Utilities/LocalDB.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   BotToast.defaultOption.customLoading.duration = BotToast.defaultOption.loading.duration = const Duration(seconds: 10);
-  getApplicationSupportDirectory().then((dir) {
-    Future.wait([
-      LocalDBHelper.OpenLocalDB(dir.path),
-      GlobalPrefs.Init().then((_) => UserPrefsDataDef.TryInit()),
-    ]).then((value) => runApp(const MainApp()));
-  });
-
+  final dir = await getApplicationSupportDirectory();
+  await Future.wait([
+    LocalDBHelper.OpenLocalDB(dir.path),
+    GlobalPrefs.Init().then((_) => UserPrefsDataDef.TryInit()),
+  ]);
   WidgetsBinding.instance.addObserver(AppLifecycleListener(onExitRequested: () async {
     await Future.wait([UserPrefs.Close(), GlobalPrefs.Close(), LocalDB.close()]);
     return AppExitResponse.exit;
   }));
+
+  runApp(const MainApp());
 }
 
 ///
@@ -48,7 +48,8 @@ class MainApp extends StatelessWidget {
       theme: _GetTheme(Brightness.light),
       darkTheme: _GetTheme(Brightness.dark),
       onGenerateRoute: Pages.Router,
-      initialRoute: GlobalPrefs.UserUid.value == 0 ? Pages.Login : (UserPrefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home),
+      initialRoute:
+          GlobalPrefs.UserUid.value == 0 ? Pages.Login : (UserPrefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home),
       navigatorObservers: [BotToastNavigatorObserver()],
       builder: (context, child) {
         child = BotToastInit()(context, child);
@@ -65,11 +66,13 @@ class MainApp extends StatelessWidget {
   }
 
   static ThemeData _GetTheme(Brightness brightness) {
-    var colorScheme = ColorScheme.fromSeed(seedColor: Colors.grey, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);
+    var colorScheme =
+        ColorScheme.fromSeed(seedColor: Colors.grey, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);
     return ThemeData(
         colorScheme: colorScheme,
         cardTheme: const CardTheme(margin: EdgeInsets.fromLTRB(0, 4, 0, 4)),
-        textButtonTheme: TextButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(colorScheme.surfaceContainer))));
+        textButtonTheme:
+            TextButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(colorScheme.surfaceContainer))));
   }
 }
 

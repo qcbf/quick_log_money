@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
-import 'package:quick_log_money/Pages/RecordMoney/RecordBottom.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordBottomPanel.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordDescription.dart';
 
 /// 账单记录页面
@@ -49,7 +49,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const RecordDescription())),
-            const SizedBox(height: 350, child: RecordBottom()),
+            const SizedBox(height: 350, child: RecordBottomPanel()),
           ],
         ),
       );
@@ -58,7 +58,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
   void SetIsCost(BuildContext context) {
     var data = context.read<EntryEditingProvider>();
     data.IsIncome = _TabCtrl.index == 1;
-    data.SetDirty();
+    data.Notify();
   }
 
   /// 左右滑动

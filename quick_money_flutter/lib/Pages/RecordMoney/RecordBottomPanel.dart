@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:quick_log_money/Pages/RecordMoney/RecordKeyboard.dart';
-import 'package:quick_log_money/Pages/RecordMoney/RecordTags.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordKeyboardPanel.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordLedgerPanel.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordTagPanel.dart';
 
 /// 底部输入区域
-class RecordBottom extends StatefulWidget {
-  const RecordBottom({super.key});
+class RecordBottomPanel extends StatefulWidget {
+  const RecordBottomPanel({super.key});
   @override
-  State<RecordBottom> createState() => _RecordBottomState();
+  State<RecordBottomPanel> createState() => _RecordBottomPanelState();
 }
 
-class _RecordBottomState extends State<RecordBottom> with SingleTickerProviderStateMixin {
+class _RecordBottomPanelState extends State<RecordBottomPanel> with SingleTickerProviderStateMixin {
   late TabController _TabCtrl;
   bool _IsReverseLayout = false;
 
@@ -59,9 +60,9 @@ class _RecordBottomState extends State<RecordBottom> with SingleTickerProviderSt
   /// 右边每个分类的内容
   Widget BuildRightContent() {
     return TabBarView(controller: _TabCtrl, children: const [
-      RecordKeyboard(),
-      RecordTags(),
-      Placeholder(),
+      RecordKeyboardPanel(),
+      RecordTagPanel(),
+      RecordLedgerPanel(),
     ]);
   }
 
@@ -74,6 +75,6 @@ class _RecordBottomState extends State<RecordBottom> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    _TabCtrl = TabController(length: 3, vsync: this);
+    _TabCtrl = TabController(length: 3, vsync: this, animationDuration: Durations.short2);
   }
 }

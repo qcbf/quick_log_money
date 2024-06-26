@@ -38,8 +38,11 @@ class _RecordRecentTagsState extends State<RecordRecentTags> {
       }
       context.read<EntryEditingProvider>().TagId ??= _Tags.first.Id;
     }
-
-    return TagListUI(context.read<EntryEditingProvider>().TagId, _Tags,
-        (tagId) => setState(() => context.read<EntryEditingProvider>().TagId = tagId));
+    return TagListUI(
+      context.read<EntryEditingProvider>().TagId,
+      _Tags,
+      (tagId) => setState(() => context.read<EntryEditingProvider>().TagId = tagId),
+      Physics: null,
+    );
   }
 }
