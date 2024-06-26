@@ -7,14 +7,14 @@ import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
 import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
 
-class RecordRecentTag extends StatefulWidget {
-  const RecordRecentTag({super.key});
+class RecordRecentTagGroup extends StatefulWidget {
+  const RecordRecentTagGroup({super.key});
 
   @override
-  State<RecordRecentTag> createState() => _RecordRecentTagState();
+  State<RecordRecentTagGroup> createState() => _RecordRecentTagGroupState();
 }
 
-class _RecordRecentTagState extends State<RecordRecentTag> {
+class _RecordRecentTagGroupState extends State<RecordRecentTagGroup> {
   ///
   late Iterable<IdTagData> _Tags = const Iterable.empty();
 
@@ -28,6 +28,7 @@ class _RecordRecentTagState extends State<RecordRecentTag> {
   ///
   Widget BuildTags(LedgerProvider ledger) {
     ///首次时构建所需的数据
+    print("xxxxxxxxxx");
     if (_Tags.isEmpty) {
       const maxCount = 8;
       final recentTags = UserPrefs.RecentTags.value;

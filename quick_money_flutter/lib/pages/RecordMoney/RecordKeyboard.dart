@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
-import 'package:quick_log_money/Pages/RecordMoney/RecordRecentTag.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordRecentTagGroup.dart';
 
 /// 底部输入键盘
 class RecordKeyboard extends StatelessWidget {
@@ -16,7 +16,7 @@ class RecordKeyboard extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        const Flexible(flex: 10, child: RecordRecentTag()),
+        const Flexible(flex: 10, child: RecordRecentTagGroup()),
         Expanded(flex: 25, child: Row(children: children)),
       ],
     );

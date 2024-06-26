@@ -1,40 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagUI.dart';
+import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagListUI.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
-import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
 
-class TagGroupUI extends StatefulWidget {
-  final List<TagData> Datas;
-  final bool IsReverseLayout;
-  const TagGroupUI(this.Datas, {super.key, this.IsReverseLayout = false});
-  @override
-  State<TagGroupUI> createState() => _TagGroupUIState();
-}
+/// 标签组
+class TagGroupUI extends StatelessWidget {
+  ///
+  final Map<String, Iterable<IdTagData>> TagGroupDatas;
+  final void Function(int tagId) OnSelectTagHandler;
+  final int? SelectTagId;
 
-class _TagGroupUIState extends State<TagGroupUI> {
-  // int _SelectedIndex = 0;
+  const TagGroupUI(this.SelectTagId, this.TagGroupDatas, this.OnSelectTagHandler, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<EntryEditingProvider>(
-        builder: (context, value, child) => const Column(children: [
-              Row(
-                children: [Placeholder()],
-              )
-            ]));
-    // Align(
-    //       alignment: widget.IsReverseLayout ? Alignment.centerLeft : Alignment.centerRight,
-    //       child: Wrap(
-    //         verticalDirection: VerticalDirection.up,
-    //         textDirection: widget.IsReverseLayout ? TextDirection.ltr : TextDirection.rtl,
-    //         children: List.generate(
-    //           widget.Datas.length,
-    //           BuildTagItem,
-    //         ),
-    //       ),
-    //     ));
+    return ListView(
+      children: [for (var tagGroup in TagGroupDatas.entries) BuildTagGroup(context, tagGroup.key, tagGroup.value)],
+    );
   }
 
-  Widget BuildTagItem(index) => TagUI(widget.Datas[index], () {});
+  ///
+  Widget BuildTagGroup(BuildContext context, String groupName, Iterable<IdTagData> tags) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Text(groupName, style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.outline, height: 2)),
+        TagListUI(SelectTagId, tags, OnSelectTagHandler),
+      ]),
+    );
+  }
 }
