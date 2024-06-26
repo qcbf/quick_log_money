@@ -48,9 +48,14 @@ class UserProvider with ChangeNotifier {
       UserPrefs.Close();
     } else {
       _Data = data;
-      await LocalDB.put("User", data.ToJson());
-      GlobalPrefs.UserUid.value = data.Id;
-      UserPrefsDataDef.TryInit();
+      if (_Data.Id != GlobalPrefs.UserUid.value) {
+        await LocalDB.put("User", data.ToJson());
+        GlobalPrefs.UserUid.value = data.Id;
+        UserPrefsDataDef.TryInit();
+      }
+      else{
+        //TODO: 登录错误
+      }
     }
     notifyListeners();
   }

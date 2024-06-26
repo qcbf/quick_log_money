@@ -17,6 +17,9 @@ class UserPrefsDataDef extends Prefs {
   /// 最近记账标签
   late final PrefsItem<List<int>> RecentTags = PrefsItem(this, "RecentTags", List<int>.empty());
 
+  /// 最近记账标签最大数量
+  late final PrefsItem<int> RecentTagMaxCount = PrefsItem(this, "RecentTagMaxCount", 8);
+
   /// 是否首个页面打开记录账单页面
   late final PrefsItem<bool> IsFirstPageToRecord = PrefsItem(this, "IsFirstPageToRecord", false);
 
@@ -70,6 +73,7 @@ class PrefsItem<T> extends ChangeNotifier implements ValueListenable<T> {
   }
 
   set value(T newValue) {
+    if (_Value == newValue) return;
     _Value = newValue;
     Parent._LocalDB?.put(Name, _Value);
     notifyListeners();
