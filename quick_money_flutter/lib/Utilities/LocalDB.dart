@@ -1,10 +1,16 @@
-import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
-late LazyBox LocalDB;
+late SqliteDatabase LocalDB;
 
 class LocalDBHelper {
-  static Future OpenLocalDB(String dir) async {
-    Hive.init(dir);
-    LocalDB = await Hive.openLazyBox("data");
+  static Future OpenLocalDB(String name) async {
+    final dir = await getApplicationSupportDirectory();
+    final magrations = SqliteMigrations()..add(SqliteMigration(1, (tx) {
+      
+    }));
+
+    LocalDB = SqliteDatabase(path: "${dir.path}/$name");
+    magrations.migrate(LocalDB);
   }
 }
