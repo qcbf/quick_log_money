@@ -11,6 +11,7 @@ import 'package:quick_log_money/Datas/UserData.dart';
 import 'package:quick_log_money/Utilities/LocalDB.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,10 @@ void main() async {
     await Future.wait([UserPrefs.Close(), GlobalPrefs.Close(), LocalDB.close()]);
     return AppExitResponse.exit;
   }));
+
+  final db = SqliteDatabase(path: "test.db");
+  db.execute("CREATE TABLE test(id INTERAGER PRIMARY KEY, data TXEXT)");
+  await db.close();
 
   runApp(const MainApp());
 }
