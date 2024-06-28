@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quick_log_money/Utilities/LocalDB.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 part "UserData.g.dart";
 
@@ -24,20 +25,12 @@ class UserProvider with ChangeNotifier {
   ///
   UserData _Data = UserData(Id: 0, RegisterDate: DateTime(0));
 
-  UserProvider() {
-    if (GlobalPrefs.UserUid.value > 0) {
-      LocalDB.get("User").then((json) {
-        print("$json");
-        SetData(UserData.FromJson(json!));
-      });
-    }
-  }
-
   ///
   UserData get Data => _Data;
 
   ///
   Future Login() async {
+    
     await Future.delayed(Durations.short1);
   }
 
@@ -52,8 +45,7 @@ class UserProvider with ChangeNotifier {
         await LocalDB.put("User", data.ToJson());
         GlobalPrefs.UserUid.value = data.Id;
         UserPrefsDataDef.TryInit();
-      }
-      else{
+      } else {
         //todo: 登录错误
       }
     }

@@ -14,6 +14,9 @@ class GlobalPrefsDataDef extends Prefs {
 
 /// 用户首选项
 class UserPrefsDataDef extends Prefs {
+  /// 用户数据
+  late final PrefsItem<Map> UserData = PrefsItem<Map>(this, "UserData", Map.identity());
+
   /// 最近记账标签
   late final PrefsItem<List<int>> RecentTags = PrefsItem(this, "RecentTags", List<int>.empty());
 
@@ -80,4 +83,8 @@ class PrefsItem<T> extends ChangeNotifier implements ValueListenable<T> {
   }
 
   PrefsItem(this.Parent, this.Name, this._Value);
+}
+
+class PrefsUserData extends PrefsItem<Map> {
+  PrefsUserData(super.Parent, "User", super.Value);
 }

@@ -4,7 +4,6 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
@@ -14,11 +13,9 @@ import 'package:quick_log_money/Utilities/Prefs.dart';
 import 'package:sqlite_async/sqlite_async.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   BotToast.defaultOption.customLoading.duration = BotToast.defaultOption.loading.duration = const Duration(seconds: 10);
-  final dir = await getApplicationSupportDirectory();
   await Future.wait([
-    LocalDBHelper.OpenLocalDB(dir.path),
+    LocalDBInitializer.Init(),
     GlobalPrefs.Init().then((_) => UserPrefsDataDef.TryInit()),
   ]);
   WidgetsBinding.instance.addObserver(AppLifecycleListener(onExitRequested: () async {
