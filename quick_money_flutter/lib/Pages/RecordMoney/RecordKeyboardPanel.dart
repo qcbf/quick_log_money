@@ -56,11 +56,11 @@ class RecordKeyboardPanel extends StatelessWidget {
   Column _BuildLeftMenu(BuildContext context) {
     return Column(
       children: [
-        _BuildComment(context),
         _BuildKeyboardRow(context, _KeyboardKey.N7, _KeyboardKey.N8, _KeyboardKey.N9),
         _BuildKeyboardRow(context, _KeyboardKey.N4, _KeyboardKey.N5, _KeyboardKey.N6),
         _BuildKeyboardRow(context, _KeyboardKey.N1, _KeyboardKey.N2, _KeyboardKey.N3),
         _BuildKeyboardRow(context, _KeyboardKey.Dot, _KeyboardKey.N0, _KeyboardKey.Back),
+        _BuildComment(context),
       ],
     );
   }
@@ -81,7 +81,7 @@ class RecordKeyboardPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-          flex: 20,
+          flex: 258,
           child: Padding(
             padding: paddingValue,
             child: Consumer<EntryEditingProvider>(
@@ -89,7 +89,7 @@ class RecordKeyboardPanel extends StatelessWidget {
           ),
         ),
         Expanded(
-          flex: 10,
+          flex: 80,
           child: Padding(
             padding: paddingValue,
             child: TextButton(
@@ -100,7 +100,7 @@ class RecordKeyboardPanel extends StatelessWidget {
           ),
         ),
         Expanded(
-          flex: 12,
+          flex: 120,
           child: Padding(
             padding: paddingValue,
             child: TextButton(
@@ -111,7 +111,7 @@ class RecordKeyboardPanel extends StatelessWidget {
           ),
         ),
         Expanded(
-          flex: 12,
+          flex: 120,
           child: Padding(
             padding: paddingValue,
             child: TextButton(

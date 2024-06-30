@@ -1,7 +1,7 @@
 {
 	"Id": 0,
-	"Type": 1,
-	"Name": "本地账户",
+	"Type": 3,
+	"Name": "匿名账户",
 	"Icon": "0",
 	"IsHided": false,
 	"Entries": [],

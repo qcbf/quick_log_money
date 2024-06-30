@@ -1,8 +1,6 @@
-import 'dart:convert';
-
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/EntryData.dart';
+import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
 
 /// 编辑时的条目数据
 class EntryEditingProvider with ChangeNotifier {
@@ -36,9 +34,7 @@ class EntryEditingProvider with ChangeNotifier {
     if (MoneyDecimalStr?.isNotEmpty == true) {
       money += int.parse(MoneyDecimalStr!);
     }
-    Data = Data.CopyWith(IntMoney: money, Comment: Comment);
-
-    BotToast.showSimpleNotification(title: jsonEncode(Data.toJson()));
+    LedgerProvider.Global.value.InteractivePushEntry(Data.CopyWith(IntMoney: money, Comment: Comment));
   }
 
   void Notify() {
