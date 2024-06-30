@@ -1,6 +1,5 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
@@ -82,7 +81,7 @@ class DrawerMenu extends StatelessWidget {
       onTap: () async {
         final cancel = BotToast.showLoading();
         Navigator.pushNamedAndRemoveUntil(context, Pages.Login, (_) => false);
-        await context.read<UserDataProvider>().SetValue(null);
+        await UserDataProvider.Global.SetValue(null);
         cancel();
       },
     );

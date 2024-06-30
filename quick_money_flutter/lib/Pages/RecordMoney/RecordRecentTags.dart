@@ -20,10 +20,8 @@ class _RecordRecentTagsState extends State<RecordRecentTags> {
 
   @override
   Widget build(BuildContext context) {
-    return Conditional.Single(
-      () => LedgerProvider.Global.IsInited,
-      () => ValueListenableBuilder(valueListenable: LedgerProvider.Global, builder: (context, value, child) => BuildTags()),
-    );
+    return ConditionalValueListener(
+        LedgerProvider.Global, () => LedgerProvider.Global.IsInited, (context, value, child) => BuildTags());
   }
 
   ///

@@ -1,3 +1,4 @@
+import "package:bot_toast/bot_toast.dart";
 import "package:flutter/material.dart";
 import "package:quick_log_money/Datas/Ledger/LedgerData.dart";
 import "package:quick_log_money/Datas/UserData.dart";
@@ -116,13 +117,22 @@ class _LoginPageState extends State<LoginPage> {
         height: 40,
         child: ElevatedButton(
             onPressed: () async {
-              const id = 1;
-              final ledgerData = await LedgerData.CreateFromTemplate(id, id, Name: "临时账本");
-              final user = UserData(Id: id, LedgerId: id, Name: "临时用户", RegisterDate: DateTime.now());
-              if (!mounted) return;
-              await Future.wait([UserDataProvider.Global.SetValue(user), LedgerProvider.Global.SetLedgerFromData(ledgerData)]);
-              if (!mounted) return;
-              Navigator.pushReplacementNamed(context, Pages.Home);
+              try {
+                const id = 1;
+                final ledgerData = await LedgerData.CreateFromTemplate(id, id, Name: "临时账本");
+                final user = UserData(Id: id, LedgerId: id, Name: "临时用户", RegisterDate: DateTime.now());
+                if (!mounted) return;
+                await Future.wait([
+                  UserDataProvider.Global.SetValue(user),
+                  LedgerProvider.Global.SetLedger(LedgerProvider.CreateLedgerFromData(ledgerData)),
+                ]);
+                if (!mounted) return;
+                Navigator.pushReplacementNamed(context, Pages.Home);
+              } catch (ex) {
+                UserDataProvider.Global.SetValue(null);
+                LedgerProvider.Global.SetLedger(null);
+                BotToast.showSimpleNotification(title: "error", subTitle: ex.toString());
+              }
             },
             child: const Text("试用一下")),
       );

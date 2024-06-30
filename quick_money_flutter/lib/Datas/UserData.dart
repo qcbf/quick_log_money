@@ -43,14 +43,10 @@ class UserDataProvider with ChangeNotifier implements ValueListenable<UserData> 
   ///
   Future Init() async {
     final db = await _OpenDB();
-    try {
-      Id = await db.get("Id", defaultValue: 0);
-      db.get("Data").then((dataJson) {
-        if (dataJson != null) SetValue(UserData.FromJson(dataJson));
-      });
-    } finally {
-      db.close();
-    }
+    Id = await db.get("Id", defaultValue: 0);
+    db.get("Data").then((dataJson) {
+      if (dataJson != null) SetValue(UserData.FromJson(dataJson));
+    });
   }
 
   ///获取本地数据库
@@ -65,22 +61,23 @@ class UserDataProvider with ChangeNotifier implements ValueListenable<UserData> 
 
   ///
   Future SetValue(UserData? val) async {
+    print("Set User: ${val?.ToJson()}");
     if (val == null) {
       Id = 0;
       UserPrefs.Close();
-      _Value = UserData(Id: 0, RegisterDate: DateTime(0));
+      _Value = UserData(Id: Id, RegisterDate: DateTime(0));
     } else {
-      if (Id != val.Id) {
+      if (_Value.Id != val.Id) {
         _Value = val;
         Id = val.Id;
-        final db = await _OpenDB();
-        await db.putAll({"Id": Id, "Data": val.ToJson()});
-        await db.close();
         UserPrefsDataDef.TryInit();
       } else {
         //todo: 登录错误
       }
     }
+    final db = await _OpenDB();
+    await db.putAll({"Id": Id, "Data": _Value.ToJson()});
+    await db.close();
     notifyListeners();
   }
 }

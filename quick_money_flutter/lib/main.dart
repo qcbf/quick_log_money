@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
@@ -16,13 +17,18 @@ import 'package:path_provider/path_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  BotToast.defaultOption.customLoading.duration = BotToast.defaultOption.loading.duration = const Duration(seconds: 10);
+  var botOpt = BotToast.defaultOption;
+  botOpt.simpleNotification.duration =
+      botOpt.notification.duration = botOpt.customNotification.duration = const Duration(seconds: 8);
+  botOpt.customLoading.duration = botOpt.loading.duration = const Duration(seconds: 10);
+
   Def.LocalPath = "${(await getApplicationSupportDirectory()).path}${Platform.pathSeparator}";
   print("SetPath${Def.LocalPath}");
   Hive.init(Def.LocalPath);
 
   await UserDataProvider.Global.Init();
   await UserPrefsDataDef.TryInit();
+  LedgerProvider.Global.TryInit();
 
   WidgetsBinding.instance.addObserver(AppLifecycleListener(onExitRequested: () async {
     await UserPrefs.Close();

@@ -1,10 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagGroupData.dart';
+import 'package:quick_log_money/Datas/UserData.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
 
 part 'LedgerData.g.dart';
@@ -65,45 +67,59 @@ class LedgerData {
 /// 账本事件容器
 class LedgerProvider with ChangeNotifier implements ValueListenable<LedgerBase> {
   static LedgerProvider Global = LedgerProvider();
-  LedgerBase? _Ledger;
+  LedgerBase<LedgerData>? _Value;
 
   @override
-  LedgerBase<LedgerData> get value => _Ledger!;
+  LedgerBase<LedgerData> get value => _Value!;
 
-  // final SqliteDatabase DB;
+  bool get IsInited => _Value != null;
 
-  bool get IsInited => _Ledger != null;
-
-  LedgerProvider() {
-    // LocalDB.get("Ledger").then((v) {
-    //   if (v == null) return;
-    //   SetLedgerFromData(LedgerData.fromJson(jsonDecode(v)));
-    // });
+  ///
+  static Future<LazyBox> _OpenDB() async {
+    final box = await Hive.openLazyBox("ledger");
+    return box;
   }
 
   ///
-  // static SqliteDatabase _CreateDB(SqliteDatabase db) async {
-  //   final migrations = SqliteMigrations()..createDatabase = SqliteMigration(1, (ctx) async => await ctx.execute("CREATE TABLE "));
-  //   return migrations.migrate(db);
-  // }
-
-  ///
-  Future SetLedger(LedgerBase v) async {
-    print("set ledger: ${v.Data.Id} ${v.Data.Name}");
-    _Ledger = v;
-    // await LocalDB.put("Ledger", jsonEncode(v.Data.toJson()));
-    notifyListeners();
-  }
-
-  Future SetLedgerFromData(LedgerData data) async {
-    switch (data.Type) {
-      case 1:
-        await SetLedger(LocalLedger(data));
-        return true;
-      case 2:
-        await SetLedger(ServerLedger(data));
-        return true;
+  Future TryInit() async {
+    final db = await _OpenDB();
+    try {
+      final ledgerRawData = await db.get(UserDataProvider.Global.Id);
+      if (ledgerRawData != null) {
+        final ledger = CreateLedgerFromData(LedgerData.fromJson(jsonDecode(ledgerRawData)));
+        _Value = ledger;
+        notifyListeners();
+      }
+    } finally {
+      db.close();
     }
+  }
+
+  ///
+  Future SetLedger(LedgerBase? newValue) async {
+    if (newValue == _Value) return;
+    print("set ledger: ${newValue?.Data.Id} ${newValue?.Data.Name}");
+    _Value = newValue;
+    notifyListeners();
+    final db = await _OpenDB();
+    try {
+      if (newValue == null) {
+        await db.delete(UserDataProvider.Global.Id);
+      } else {
+        await db.put(UserDataProvider.Global.Id, jsonEncode(newValue.Data.toJson()));
+      }
+    } finally {
+      await db.close();
+    }
+  }
+
+  ///
+  static LedgerBase CreateLedgerFromData(LedgerData data) {
+    return switch (data.Type) {
+      1 => LocalLedger(data),
+      2 => ServerLedger(data),
+      _ => throw Exception(""),
+    };
   }
 }
 

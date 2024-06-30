@@ -46,7 +46,7 @@ abstract class Prefs {
   ///
   Future<bool> Init() async {
     if (Name != null) {
-      DB = await Hive.openBox("Prefs-$Name");
+      DB = await Hive.openBox("Prefs.$Name");
       return true;
     }
     return false;

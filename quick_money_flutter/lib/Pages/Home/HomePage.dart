@@ -40,12 +40,8 @@ class _HomePageState extends State<HomePage> {
   PreferredSizeWidget BuildTop() {
     return AppBar(
       centerTitle: true,
-      title: Conditional.Single(
-          () => LedgerProvider.Global.IsInited,
-          () => ValueListenableBuilder(
-                valueListenable: LedgerProvider.Global,
-                builder: (context, value, child) => Text(value.Data.Name, style: const TextStyle(fontSize: 14)),
-              )),
+      title: ConditionalValueListener(LedgerProvider.Global, () => LedgerProvider.Global.IsInited,
+          (context, value, child) => Text(value.Data.Name, style: const TextStyle(fontSize: 14))),
       actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.widgets))],
     );
   }
