@@ -27,31 +27,33 @@ class DrawerMenu extends StatelessWidget {
   }
 
   ///
-  Consumer<UserProvider> BuildUserInfo() {
-    return Consumer<UserProvider>(builder: (context, value, child) {
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(value.Data.Name, style: Theme.of(context).textTheme.headlineMedium),
-            Text("ID:${value.Data.Id}", style: Theme.of(context).textTheme.labelMedium),
-            Conditional.SwitchIndex(() {
-              if (value.Data.Token == null) {
-                return 0;
-              } else if (value.Data.VipExpiryDate == null) {
-                return 1;
-              }
-              return 2;
-            }, [
-              () => TextButton(onPressed: () {}, child: const Text("注册正式用户")),
-              () => TextButton(onPressed: () {}, child: const Text("开通vip")),
-              () => TextButton(onPressed: () {}, child: Text("Vip${Utility.DateToString(value.Data.VipExpiryDate!)}到期")),
-            ]),
-          ],
-        ),
-      );
-    });
+  Widget BuildUserInfo() {
+    return ValueListenableBuilder(
+        valueListenable: UserDataProvider.Global,
+        builder: (context, value, child) {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(value.Name, style: Theme.of(context).textTheme.headlineMedium),
+                Text("ID:${value.Id}", style: Theme.of(context).textTheme.labelMedium),
+                Conditional.SwitchIndex(() {
+                  if (value.Token == null) {
+                    return 0;
+                  } else if (value.VipExpiryDate == null) {
+                    return 1;
+                  }
+                  return 2;
+                }, [
+                  () => TextButton(onPressed: () {}, child: const Text("注册正式用户")),
+                  () => TextButton(onPressed: () {}, child: const Text("开通vip")),
+                  () => TextButton(onPressed: () {}, child: Text("Vip${Utility.DateToString(value.VipExpiryDate!)}到期")),
+                ]),
+              ],
+            ),
+          );
+        });
   }
 
   ///
@@ -80,7 +82,7 @@ class DrawerMenu extends StatelessWidget {
       onTap: () async {
         final cancel = BotToast.showLoading();
         Navigator.pushNamedAndRemoveUntil(context, Pages.Login, (_) => false);
-        await context.read<UserProvider>().SetData(null);
+        await context.read<UserDataProvider>().SetValue(null);
         cancel();
       },
     );

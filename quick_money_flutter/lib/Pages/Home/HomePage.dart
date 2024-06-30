@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
@@ -41,10 +40,12 @@ class _HomePageState extends State<HomePage> {
   PreferredSizeWidget BuildTop() {
     return AppBar(
       centerTitle: true,
-      title: Consumer<LedgerProvider>(
-        builder: (context, value, child) =>
-            Conditional.Single(() => value.IsInited, () => Text(value.Ledger.Data.Name, style: const TextStyle(fontSize: 14))),
-      ),
+      title: Conditional.Single(
+          () => LedgerProvider.Global.IsInited,
+          () => ValueListenableBuilder(
+                valueListenable: LedgerProvider.Global,
+                builder: (context, value, child) => Text(value.Data.Name, style: const TextStyle(fontSize: 14)),
+              )),
       actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.widgets))],
     );
   }

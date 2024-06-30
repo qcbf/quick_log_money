@@ -20,18 +20,19 @@ class _RecordRecentTagsState extends State<RecordRecentTags> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<LedgerProvider>(builder: (context, value, child) {
-      return Conditional.Single(() => value.IsInited, () => BuildTags(value));
-    });
+    return Conditional.Single(
+      () => LedgerProvider.Global.IsInited,
+      () => ValueListenableBuilder(valueListenable: LedgerProvider.Global, builder: (context, value, child) => BuildTags()),
+    );
   }
 
   ///
-  Widget BuildTags(LedgerProvider ledger) {
+  Widget BuildTags() {
     ///首次时构建所需的数据
     if (_Tags.isEmpty) {
       final maxCount = UserPrefs.RecentTagMaxCount.value;
       final recentTags = UserPrefs.RecentTags.value;
-      var allTags = context.read<LedgerProvider>().Ledger.Data.AllTags;
+      var allTags = LedgerProvider.Global.value.Data.AllTags;
       _Tags = recentTags.map((id) => IdTagData(id, allTags[id] ?? TagData.NotFound));
       if (_Tags.length < maxCount) {
         _Tags = _Tags.followedBy(allTags.entries.take(maxCount - _Tags.length).map((v) => IdTagData(v.key, v.value)));

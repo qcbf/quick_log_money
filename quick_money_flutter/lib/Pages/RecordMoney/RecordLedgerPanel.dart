@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordSaveBtn.dart';
 
@@ -15,11 +14,10 @@ class RecordLedgerPanel extends StatelessWidget {
   }
 
   Widget BuildLedgerList(BuildContext context) {
-    final ledger = context.read<LedgerProvider>().Ledger;
     return GridView.extent(
       maxCrossAxisExtent: 200,
       children: [
-        Text(ledger.Data.Name),
+        Text(LedgerProvider.Global.value.Data.Name),
       ],
     );
   }

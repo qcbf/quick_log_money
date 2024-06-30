@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:provider/provider.dart";
 import "package:quick_log_money/Datas/Ledger/LedgerData.dart";
 import "package:quick_log_money/Datas/UserData.dart";
 import "package:quick_log_money/Utilities/Def.dart";
@@ -36,7 +35,9 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 30),
               _BuildLogin(context),
               const SizedBox(height: 10),
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [_BuildAnonymLogin(), const SizedBox(width: 6), _BuildRegister()]),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [_BuildAnonymLogin(), const SizedBox(width: 6), _BuildRegister()]),
               const SizedBox(height: 40),
               _BuildOtherLogin(),
             ],
@@ -115,10 +116,11 @@ class _LoginPageState extends State<LoginPage> {
         height: 40,
         child: ElevatedButton(
             onPressed: () async {
-              final user = UserData(Id: 1, Name: "临时用户", RegisterDate: DateTime.now());
-              final ledgerData = await LedgerData.CreateFromTemplate(user.Id, Name: "临时账本");
+              const id = 1;
+              final ledgerData = await LedgerData.CreateFromTemplate(id, id, Name: "临时账本");
+              final user = UserData(Id: id, LedgerId: id, Name: "临时用户", RegisterDate: DateTime.now());
               if (!mounted) return;
-              await Future.wait([context.read<UserProvider>().SetData(user), context.read<LedgerProvider>().SetLedgerFromData(ledgerData)]);
+              await Future.wait([UserDataProvider.Global.SetValue(user), LedgerProvider.Global.SetLedgerFromData(ledgerData)]);
               if (!mounted) return;
               Navigator.pushReplacementNamed(context, Pages.Home);
             },
@@ -169,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _BuildTitleLogo() => Padding(
       padding: const EdgeInsets.all(8),
       child: Image.asset(
-        IconPath,
+        Def.IconPath,
         width: 64,
         height: 64,
         color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.15 : 0),

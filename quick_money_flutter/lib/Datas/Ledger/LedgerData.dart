@@ -1,11 +1,11 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagGroupData.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
-import 'package:quick_log_money/Utilities/LocalDB.dart';
 
 part 'LedgerData.g.dart';
 
@@ -36,8 +36,9 @@ class LedgerData {
   factory LedgerData.fromJson(Map json) => _$LedgerDataFromJson(json);
 
   ///从配置模板创建数据
-  static Future<LedgerData> CreateFromTemplate(int OwnerUser, {String? Name}) async {
-    final jsonMap = jsonDecode(await rootBundle.loadString(DefaultLedgerPath)) as Map;
+  static Future<LedgerData> CreateFromTemplate(int id, int OwnerUser, {String? Name}) async {
+    final jsonMap = jsonDecode(await rootBundle.loadString(Def.LedgerTemplatePath)) as Map;
+    jsonMap["Id"] = id;
     jsonMap["OwnerUser"] = OwnerUser;
     if (Name != null) jsonMap["Name"] = Name;
     int index = 0;
@@ -62,24 +63,35 @@ class LedgerData {
 }
 
 /// 账本事件容器
-class LedgerProvider with ChangeNotifier {
+class LedgerProvider with ChangeNotifier implements ValueListenable<LedgerBase> {
+  static LedgerProvider Global = LedgerProvider();
   LedgerBase? _Ledger;
-  LedgerBase get Ledger => _Ledger!;
+
+  @override
+  LedgerBase<LedgerData> get value => _Ledger!;
+
+  // final SqliteDatabase DB;
 
   bool get IsInited => _Ledger != null;
 
   LedgerProvider() {
-    LocalDB.get("Ledger").then((v) {
-      if (v == null) return;
-      SetLedgerFromData(LedgerData.fromJson(jsonDecode(v)));
-    });
+    // LocalDB.get("Ledger").then((v) {
+    //   if (v == null) return;
+    //   SetLedgerFromData(LedgerData.fromJson(jsonDecode(v)));
+    // });
   }
+
+  ///
+  // static SqliteDatabase _CreateDB(SqliteDatabase db) async {
+  //   final migrations = SqliteMigrations()..createDatabase = SqliteMigration(1, (ctx) async => await ctx.execute("CREATE TABLE "));
+  //   return migrations.migrate(db);
+  // }
 
   ///
   Future SetLedger(LedgerBase v) async {
     print("set ledger: ${v.Data.Id} ${v.Data.Name}");
     _Ledger = v;
-    await LocalDB.put("Ledger", jsonEncode(v.Data.toJson()));
+    // await LocalDB.put("Ledger", jsonEncode(v.Data.toJson()));
     notifyListeners();
   }
 
@@ -98,8 +110,6 @@ class LedgerProvider with ChangeNotifier {
 /// 账本基类
 abstract class LedgerBase<TData extends LedgerData> {
   final TData Data;
-  // List<EntryData> Entries = List.empty();
-
   const LedgerBase(this.Data);
 }
 

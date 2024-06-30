@@ -1,22 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:quick_log_money/Datas/UserData.dart';
 
-GlobalPrefsDataDef GlobalPrefs = GlobalPrefsDataDef();
+// GlobalPrefsDataDef GlobalPrefs = GlobalPrefsDataDef();
 UserPrefsDataDef UserPrefs = UserPrefsDataDef();
 
-/// 全局所有用户首选项
-class GlobalPrefsDataDef extends Prefs {
-  /// 已经登录的uid
-  late final PrefsItem<int> UserUid = PrefsItem(this, "UserUid", 0);
-  @override
-  String? get Name => "";
-}
+// /// 全局所有用户首选项
+// class GlobalPrefsDataDef extends Prefs {
+//   /// 已经登录的uid
+//   late final PrefsItem<int> UserUid = PrefsItem(this, "UserUid", 0);
+//   @override
+//   String? get Name => "static";
+// }
 
 /// 用户首选项
 class UserPrefsDataDef extends Prefs {
-  /// 用户数据
-  late final PrefsItem<Map> UserData = PrefsItem<Map>(this, "UserData", Map.identity());
-
   /// 最近记账标签
   late final PrefsItem<List<int>> RecentTags = PrefsItem(this, "RecentTags", List<int>.empty());
 
@@ -28,11 +26,11 @@ class UserPrefsDataDef extends Prefs {
 
 //========================================================================================================================
   @override
-  String? get Name => GlobalPrefs.UserUid.value > 0 ? GlobalPrefs.UserUid.value.toString() : null;
+  String? get Name => UserDataProvider.Global.Id > 0 ? UserDataProvider.Global.Id.toString() : null;
 
   ///
   static Future<bool> TryInit() async {
-    if (GlobalPrefs.UserUid.value > 0) {
+    if (UserDataProvider.Global.Id > 0) {
       UserPrefs = UserPrefsDataDef();
       return UserPrefs.Init();
     }
@@ -40,14 +38,15 @@ class UserPrefsDataDef extends Prefs {
   }
 }
 
+/// 首选项容器
 abstract class Prefs {
-  late final Box? _LocalDB;
+  late final Box? DB;
   String? get Name;
 
   ///
   Future<bool> Init() async {
     if (Name != null) {
-      _LocalDB = await Hive.openBox("Prefs$Name");
+      DB = await Hive.openBox("Prefs-$Name");
       return true;
     }
     return false;
@@ -55,10 +54,11 @@ abstract class Prefs {
 
   ///
   Future Close() async {
-    await _LocalDB?.close();
+    await DB?.close();
   }
 }
 
+/// 首选项每个项目
 class PrefsItem<T> extends ChangeNotifier implements ValueListenable<T> {
   final Prefs Parent;
   final String Name;
@@ -67,8 +67,8 @@ class PrefsItem<T> extends ChangeNotifier implements ValueListenable<T> {
 
   @override
   T get value {
-    if (!_IsInited && Parent._LocalDB != null) {
-      final newValue = Parent._LocalDB!.get(Name);
+    if (!_IsInited && Parent.DB != null) {
+      final newValue = Parent.DB!.get(Name);
       if (newValue != null) _Value = newValue;
       _IsInited = true;
     }
@@ -78,13 +78,9 @@ class PrefsItem<T> extends ChangeNotifier implements ValueListenable<T> {
   set value(T newValue) {
     if (_Value == newValue) return;
     _Value = newValue;
-    Parent._LocalDB?.put(Name, _Value);
+    Parent.DB?.put(Name, _Value);
     notifyListeners();
   }
 
   PrefsItem(this.Parent, this.Name, this._Value);
-}
-
-class PrefsUserData extends PrefsItem<Map> {
-  PrefsUserData(super.Parent, "User", super.Value);
 }

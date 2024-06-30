@@ -9,6 +9,7 @@ part of 'UserData.dart';
 UserData _$UserDataFromJson(Map json) => UserData(
       Id: (json['Id'] as num).toInt(),
       Name: json['Name'] as String? ?? "",
+      LedgerId: (json['LedgerId'] as num?)?.toInt() ?? 0,
       RegisterDate: DateTime.parse(json['RegisterDate'] as String),
       Token: json['Token'] as String?,
       Icon: json['Icon'] as String?,
@@ -24,4 +25,5 @@ Map<String, dynamic> _$UserDataToJson(UserData instance) => <String, dynamic>{
       'Icon': instance.Icon,
       'VipExpiryDate': instance.VipExpiryDate?.toIso8601String(),
       'RegisterDate': instance.RegisterDate.toIso8601String(),
+      'LedgerId': instance.LedgerId,
     };

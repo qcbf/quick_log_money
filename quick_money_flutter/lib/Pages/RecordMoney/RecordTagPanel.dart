@@ -12,7 +12,7 @@ class RecordTagPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ledgerData = context.read<LedgerProvider>().Ledger.Data;
+    final ledgerData = LedgerProvider.Global.value.Data;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

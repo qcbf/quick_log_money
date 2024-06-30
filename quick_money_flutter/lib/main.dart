@@ -1,36 +1,38 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
+import 'package:hive/hive.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
-import 'package:quick_log_money/Utilities/LocalDB.dart';
+import 'package:quick_log_money/Utilities/Def.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
-import 'package:sqlite_async/sqlite_async.dart';
+import 'package:path_provider/path_provider.dart';
 
+// entry
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   BotToast.defaultOption.customLoading.duration = BotToast.defaultOption.loading.duration = const Duration(seconds: 10);
-  await Future.wait([
-    LocalDBInitializer.Init(),
-    GlobalPrefs.Init().then((_) => UserPrefsDataDef.TryInit()),
-  ]);
+  Def.LocalPath = "${(await getApplicationSupportDirectory()).path}${Platform.pathSeparator}";
+  print("SetPath${Def.LocalPath}");
+  Hive.init(Def.LocalPath);
+
+  await UserDataProvider.Global.Init();
+  await UserPrefsDataDef.TryInit();
+
   WidgetsBinding.instance.addObserver(AppLifecycleListener(onExitRequested: () async {
-    await Future.wait([UserPrefs.Close(), GlobalPrefs.Close(), LocalDB.close()]);
+    await UserPrefs.Close();
     return AppExitResponse.exit;
   }));
-
-  final db = SqliteDatabase(path: "test.db");
-  db.execute("CREATE TABLE test(id INTERAGER PRIMARY KEY, data TXEXT)");
-  await db.close();
 
   runApp(const MainApp());
 }
 
-///
+/// app root ui
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -51,17 +53,10 @@ class MainApp extends StatelessWidget {
       darkTheme: _GetTheme(Brightness.dark),
       onGenerateRoute: Pages.Router,
       initialRoute:
-          GlobalPrefs.UserUid.value == 0 ? Pages.Login : (UserPrefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home),
+          UserDataProvider.Global.Id == 0 ? Pages.Login : (UserPrefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home),
       navigatorObservers: [BotToastNavigatorObserver()],
       builder: (context, child) {
         child = BotToastInit()(context, child);
-        child = MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (context) => UserProvider()),
-            ChangeNotifierProvider(create: (context) => LedgerProvider(), lazy: false),
-          ],
-          child: child,
-        );
         return child;
       },
     );
@@ -78,7 +73,16 @@ class MainApp extends StatelessWidget {
   }
 }
 
-///
+/*
+
+
+
+
+
+
+*/
+
+/// 调试模式包一层做一些调试设置
 final class _DebugCreateApp extends StatefulWidget {
   const _DebugCreateApp();
 
