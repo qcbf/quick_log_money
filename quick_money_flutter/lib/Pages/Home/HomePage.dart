@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
-import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
+import 'package:quick_log_money/Datas/Ledger/LedgerEntity.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'DrawerMenu.dart';
 

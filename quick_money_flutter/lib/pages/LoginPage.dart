@@ -1,6 +1,8 @@
 import "package:bot_toast/bot_toast.dart";
 import "package:flutter/material.dart";
+import "package:quick_log_money/Datas/Ledger/LedgerDao.dart";
 import "package:quick_log_money/Datas/Ledger/LedgerData.dart";
+import "package:quick_log_money/Datas/Ledger/LedgerEntity.dart";
 import "package:quick_log_money/Datas/UserData.dart";
 import "package:quick_log_money/Utilities/Def.dart";
 import "package:quick_log_money/Utilities/Pages.dart";
@@ -118,17 +120,24 @@ class _LoginPageState extends State<LoginPage> {
         child: ElevatedButton(
             onPressed: () async {
               try {
-                const id = 1;
-                final ledgerData = await LedgerData.CreateFromTemplate(id, id, Name: "临时账本");
-                final user = UserData(Id: id, LedgerId: id, Name: "临时用户", RegisterDate: DateTime.now());
+                const userId = 1;
+                // 写入临时账本
+                var ledgerData = await LedgerData.CreateFromTemplate(userId, Name: "临时账本");
+                ledgerData = ledgerData.copyWith(Id: await LedgerDao.AddLedger(ledgerData.toJson()));
+                // 写入临时用户
+                final user = UserData(Id: userId, LedgerId: ledgerData.Id, Name: "临时用户", RegisterDate: DateTime.now());
+
                 if (!mounted) return;
+
                 await Future.wait([
                   UserDataProvider.Global.SetValue(user),
                   LedgerProvider.Global.SetLedger(LedgerProvider.CreateLedgerFromData(ledgerData)),
                 ]);
+
                 if (!mounted) return;
                 Navigator.pushReplacementNamed(context, Pages.Home);
               } catch (ex) {
+                LedgerDao.DeleteAllDatas();
                 UserDataProvider.Global.SetValue(null);
                 LedgerProvider.Global.SetLedger(null);
                 BotToast.showSimpleNotification(title: "error", subTitle: ex.toString());

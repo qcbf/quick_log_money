@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/EntryData.dart';
-import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
+import 'package:quick_log_money/Datas/Ledger/LedgerEntity.dart';
 
 /// 编辑时的条目数据
 class EntryEditingProvider with ChangeNotifier {

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagGroupUI.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
 import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
+import 'package:quick_log_money/Datas/Ledger/LedgerEntity.dart';
 import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordSaveBtn.dart';
 
