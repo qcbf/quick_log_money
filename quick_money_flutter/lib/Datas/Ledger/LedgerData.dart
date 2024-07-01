@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/EntryData.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagGroupData.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 part 'LedgerData.g.dart';
 
@@ -77,12 +77,6 @@ class LedgerProvider with ChangeNotifier implements ValueListenable<LedgerBase> 
   bool get IsInited => _Value != null;
 
   ///
-  static Future<LazyBox> _OpenDB() async {
-    final box = await Hive.openLazyBox("ledger");
-    return box;
-  }
-
-  ///
   Future TryInit() async {
     final db = await _OpenDB();
     try {
@@ -124,6 +118,17 @@ class LedgerProvider with ChangeNotifier implements ValueListenable<LedgerBase> 
       _ => throw Exception(""),
     };
   }
+}
+
+class _LedgerDao {
+  static final SqliteDatabase _DB = SqliteDatabase(path: "${Def.LocalPath}${UserDataProvider.Global.Id}");
+  static final SqliteMigrations _Migrations = SqliteMigrations()
+    ..createDatabase = SqliteMigration(1, (cxt) async => await cxt.execute("sql"))
+    ..migrate(_DB);
+  void Sql(stri){
+    
+  }
+  
 }
 
 /// 账本基类

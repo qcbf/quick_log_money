@@ -11,17 +11,17 @@ part "UserData.g.dart";
 @JsonSerializable(anyMap: true)
 class UserData {
   final int Id;
+  final int LedgerId;
   final String Name;
   final String? Token;
   final String? Icon;
   final DateTime? VipExpiryDate;
   final DateTime RegisterDate;
-  final int LedgerId;
 
   const UserData(
       {required this.Id,
-      this.Name = "",
       this.LedgerId = 0,
+      this.Name = "",
       required this.RegisterDate,
       this.Token,
       this.Icon,
@@ -33,25 +33,28 @@ class UserData {
 
 /// 用户数据提供者
 class UserDataProvider with ChangeNotifier implements ValueListenable<UserData> {
+  ///
   static final UserDataProvider Global = UserDataProvider();
-  int Id = 0;
+
+  ///
   UserData _Value = UserData(Id: 0, RegisterDate: DateTime(0));
 
+  ///
+  int get Id => _Value.Id;
+
+  ///
   @override
   UserData get value => _Value;
 
   ///
   Future Init() async {
     final db = await _OpenDB();
-    Id = await db.get("Id", defaultValue: 0);
-    db.get("Data").then((dataJson) {
-      if (dataJson != null) SetValue(UserData.FromJson(dataJson));
-    });
+    _Value = UserData.FromJson(db.getAt(0));
   }
 
   ///获取本地数据库
-  Future<LazyBox> _OpenDB() async {
-    return await Hive.openLazyBox("~");
+  Future<Box> _OpenDB() async {
+    return await Hive.openBox("~");
   }
 
   ///登录
@@ -63,20 +66,14 @@ class UserDataProvider with ChangeNotifier implements ValueListenable<UserData> 
   Future SetValue(UserData? val) async {
     print("Set User: ${val?.ToJson()}");
     if (val == null) {
-      Id = 0;
       UserPrefs.Close();
-      _Value = UserData(Id: Id, RegisterDate: DateTime(0));
+      _Value = UserData(Id: 0, RegisterDate: DateTime(0));
     } else {
-      if (_Value.Id != val.Id) {
-        _Value = val;
-        Id = val.Id;
-        UserPrefsDataDef.TryInit();
-      } else {
-        //todo: 登录错误
-      }
+      _Value = val;
+      UserPrefsDataDef.TryInit();
     }
     final db = await _OpenDB();
-    await db.putAll({"Id": Id, "Data": _Value.ToJson()});
+    db.putAt(0, _Value.ToJson());
     await db.close();
     notifyListeners();
   }
