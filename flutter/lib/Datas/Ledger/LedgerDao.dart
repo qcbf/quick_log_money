@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:bot_toast/bot_toast.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
 import 'package:quick_log_money/Utilities/SqlGenerator.dart';
@@ -9,16 +8,16 @@ import 'package:sqlite_async/sqlite_async.dart';
 
 ///
 class LedgerDao {
-  static final SqliteDatabase DB = CreateDB();
-  static bool IsInited = false;
-  static FutureOr<void> get InitedWating => IsInited ? null : Future.doWhile(() => !LedgerDao.IsInited);
+  static SqliteDatabase? _DB;
+  static SqliteDatabase get DB => _DB!;
 
-  ///
-  static SqliteDatabase CreateDB() {
-    final db = SqliteDatabase(path: "${Def.LocalPath}${UserDataProvider.Global.Id}");
+  static FutureOr Init() async {
+    if (_DB != null) return;
+    _DB = SqliteDatabase(path: "${Def.LocalPath}${UserDataProvider.Global.Id}");
     final migrations = SqliteMigrations()
+      ..add(SqliteMigration(1, (cxt) {}))
       ..createDatabase = SqliteMigration(1, (cxt) async {
-        await cxt.execute("""
+        await cxt.executeBatch("""
 CREATE TABLE Ledgers(Id INTEGER PRIMARY KEY AUTOINCREMENT, Json TEXT);
 CREATE TABLE LedgerRecentTags(Id INTEGER PRIMARY KEY AUTOINCREMENT, TagId INTEGER);
 CREATE TABLE LedgerEntries (
@@ -31,17 +30,9 @@ CREATE TABLE LedgerEntries (
   FOREIGN KEY (LedgerId) REFERENCES Ledgers (Id) ON DELETE CASCADE
 );
 CREATE INDEX LedgerEntriesIdx ON LedgerEntries (LedgerId, TagId);
-        """);
+        """, []);
       });
-    migrations
-        .migrate(db)
-        .then((_) => IsInited = true, onError: (_) => BotToast.showSimpleNotification(title: "init ledger error"));
-    return db;
-  }
-
-  ///
-  static Future DeleteAllDatas() async {
-    DB.execute("DROP TABLE LedgerEntries; DROP TABLE Ledgers; DROP TABLE LedgerRecentTags;");
+    await migrations.migrate(DB);
   }
 
   ///

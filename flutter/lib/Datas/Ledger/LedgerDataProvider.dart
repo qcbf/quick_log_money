@@ -18,7 +18,7 @@ class LedgerDataProvider with ChangeNotifier implements ValueListenable<LedgerDa
   ///
   Future Init() async {
     if (UserDataProvider.Global.value.Id == 0) return;
-    await LedgerDao.InitedWating;
+    await LedgerDao.Init();
     final ledgerJson = await LedgerDao.GetLedger(UserDataProvider.Global.value.LedgerId);
     if (ledgerJson != null) {
       SetValue(LedgerData.fromJson(ledgerJson));

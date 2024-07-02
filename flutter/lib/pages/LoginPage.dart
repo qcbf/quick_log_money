@@ -123,21 +123,19 @@ class _LoginPageState extends State<LoginPage> {
                 await UserDataProvider.Global.SetValue(UserData(Id: 1, Name: "临时用户", RegisterDate: DateTime.now()));
 
                 // 写入临时账本
-                var ledgerData = await LedgerData.CreateFromTemplate(userId, Name: "临时账本");
-                ledgerData = ledgerData.copyWith(Id: await LedgerDao.AddLedger(ledgerData.toJson()));
-                // 写入临时用户
+                var ledgerData = await LedgerData.CreateFromTemplate(UserDataProvider.Global.Id, Name: "临时账本");
+                ledgerData = ledgerData.copyWith(Id: await LedgerDao.AddLedger(ledgerData.toJson()));                
 
                 if (!mounted) return;
 
                 await Future.wait([
-                  UserDataProvider.Global.SetValue(user),
+                  // UserDataProvider.Global.SetValue(user),
                   LedgerDataProvider.Global.SetValue(ledgerData),
                 ]);
 
                 if (!mounted) return;
                 Navigator.pushReplacementNamed(context, Pages.Home);
               } catch (ex) {
-                LedgerDao.DeleteAllDatas();
                 UserDataProvider.Global.SetValue(null);
                 LedgerDataProvider.Global.SetValue(null);
                 BotToast.showSimpleNotification(title: "error", subTitle: ex.toString());
