@@ -35,7 +35,7 @@ class UserData {
 
 /// 用户数据提供者
 class UserDataProvider with ChangeNotifier implements ValueListenable<UserData> {
-  static const String DBName = "~";
+  static const String _DBName = "~";
 
   ///
   static final UserDataProvider Global = UserDataProvider();
@@ -52,7 +52,7 @@ class UserDataProvider with ChangeNotifier implements ValueListenable<UserData> 
 
   ///
   Future Init() async {
-    final db = await Hive.openBox(DBName);
+    final db = await Hive.openBox(_DBName);
     try {
       if (db.isNotEmpty) _Value = UserData.FromJson(db.getAt(0));
     } catch (ex) {
@@ -75,7 +75,7 @@ class UserDataProvider with ChangeNotifier implements ValueListenable<UserData> 
       _Value = val;
       UserPrefsDataDef.TryInit();
     }
-    final db = await Hive.openLazyBox(DBName);
+    final db = await Hive.openLazyBox(_DBName);
     await db.putAt(0, _Value.ToJson());
     notifyListeners();
   }

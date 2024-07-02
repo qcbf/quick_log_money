@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:quick_log_money/Datas/Ledger/LedgerDao.dart';
 import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
@@ -15,6 +16,16 @@ class LedgerDataProvider with ChangeNotifier implements ValueListenable<LedgerDa
   LedgerData get value => _Value!;
 
   ///
+  Future Init() async {
+    if (UserDataProvider.Global.value.Id == 0) return;
+    await LedgerDao.InitedWating;
+    final ledgerJson = await LedgerDao.GetLedger(UserDataProvider.Global.value.LedgerId);
+    if (ledgerJson != null) {
+      SetValue(LedgerData.fromJson(ledgerJson));
+    }
+  }
+
+  ///
   Future SetValue(LedgerData? newValue) async {
     if (newValue?.Id == _Value?.Id) return;
     print("set ledger: ${newValue?.Id} ${newValue?.Name} ${newValue?.Type}");
@@ -25,13 +36,8 @@ class LedgerDataProvider with ChangeNotifier implements ValueListenable<LedgerDa
     }
   }
 
-  ///
-  Future TryInit() async {
-    if (UserDataProvider.Global.value.Id == 0) return;
-    await LedgerDao.InitedWating;
-    final ledgerJson = await LedgerDao.GetLedger(UserDataProvider.Global.value.LedgerId);
-    if (ledgerJson != null) {
-      SetValue(LedgerData.fromJson(ledgerJson));
-    }
+  Future Create(LedgerData data) async {
+    var ledgerData = await LedgerData.CreateFromTemplate(UserDataProvider.Global.Id, Name: "临时账本");
+    ledgerData = ledgerData.copyWith(Id: await LedgerDao.AddLedger(ledgerData.toJson()));
   }
 }

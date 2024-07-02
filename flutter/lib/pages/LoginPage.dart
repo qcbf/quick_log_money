@@ -120,12 +120,12 @@ class _LoginPageState extends State<LoginPage> {
         child: ElevatedButton(
             onPressed: () async {
               try {
-                const userId = 1;
+                await UserDataProvider.Global.SetValue(UserData(Id: 1, Name: "临时用户", RegisterDate: DateTime.now()));
+
                 // 写入临时账本
                 var ledgerData = await LedgerData.CreateFromTemplate(userId, Name: "临时账本");
                 ledgerData = ledgerData.copyWith(Id: await LedgerDao.AddLedger(ledgerData.toJson()));
                 // 写入临时用户
-                final user = UserData(Id: userId, LedgerId: ledgerData.Id, Name: "临时用户", RegisterDate: DateTime.now());
 
                 if (!mounted) return;
 
@@ -141,6 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                 UserDataProvider.Global.SetValue(null);
                 LedgerDataProvider.Global.SetValue(null);
                 BotToast.showSimpleNotification(title: "error", subTitle: ex.toString());
+                rethrow;
               }
             },
             child: const Text("试用一下")),

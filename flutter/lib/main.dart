@@ -28,12 +28,7 @@ void main() async {
 
   await UserDataProvider.Global.Init();
   await UserPrefsDataDef.TryInit();
-  LedgerDataProvider.Global.TryInit();
-
-  WidgetsBinding.instance.addObserver(AppLifecycleListener(onExitRequested: () async {
-    await UserPrefs.Close();
-    return AppExitResponse.exit;
-  }));
+  LedgerDataProvider.Global.Init();
 
   runApp(const MainApp());
 }

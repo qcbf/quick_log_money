@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
@@ -53,7 +55,7 @@ abstract class Prefs {
   }
 
   ///
-  Future Close() async {
+  FutureOr Close() async {
     await DB?.close();
   }
 }
