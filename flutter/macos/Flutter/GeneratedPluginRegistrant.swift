@@ -7,7 +7,7 @@ import Foundation
 
 import package_info_plus
 import path_provider_foundation
-import sqlite3_flutter_libs
+import sqlcipher_flutter_libs
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))

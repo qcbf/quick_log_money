@@ -1,89 +1,125 @@
-import 'dart:async';
-import 'dart:convert';
+import 'dart:ffi';
+import 'dart:io';
 
-import 'package:quick_log_money/Datas/UserData.dart';
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
-import 'package:quick_log_money/Utilities/SqlGenerator.dart';
-import 'package:sqlite_async/sqlite_async.dart';
+import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
+import 'package:sqlite3/open.dart';
+import 'package:sqlite3/sqlite3.dart';
+// import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
+
+part 'LedgerDao.g.dart';
+
+late final LedgerDatabaseConnector LedgerDatabase;
 
 ///
-class LedgerDao {
-  static SqliteDatabase? _DB;
-  static SqliteDatabase get DB => _DB!;
+enum ELedgerOption {
+  Hide,
+}
 
-  static FutureOr Init() async {
-    if (_DB != null) return;
-    _DB = SqliteDatabase(path: "${Def.LocalPath}${UserDataProvider.Global.Id}");
-    final migrations = SqliteMigrations()
-      ..add(SqliteMigration(1, (cxt) {}))
-      ..createDatabase = SqliteMigration(1, (cxt) async {
-        await cxt.executeBatch("""
-CREATE TABLE Ledgers(Id INTEGER PRIMARY KEY AUTOINCREMENT, Json TEXT);
-CREATE TABLE LedgerRecentTags(Id INTEGER PRIMARY KEY AUTOINCREMENT, TagId INTEGER);
-CREATE TABLE LedgerEntries (
-  Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  LedgerId INTEGER NOT NULL,
-  TagId INTEGER NOT NULL,
-  IntMoney integer DEFAULT 0,
-  Date integer,
-  Comment TEXT,
-  FOREIGN KEY (LedgerId) REFERENCES Ledgers (Id) ON DELETE CASCADE
-);
-CREATE INDEX LedgerEntriesIdx ON LedgerEntries (LedgerId, TagId);
-        """, []);
+///
+enum EOwnerRole {
+  Anim,
+  Member,
+}
+
+///
+class LedgerInfos extends Table {
+  IntColumn get Id => integer().autoIncrement()();
+  TextColumn get Name => text()();
+  TextColumn get Icon => text()();
+  TextColumn get Options => textEnum<ELedgerOption>().nullable()();
+}
+
+///
+@TableIndex(name: "Entry.TagId", columns: {#TagId})
+@TableIndex(name: "Entry.Date", columns: {#Date})
+class LedgerEntries extends Table {
+  IntColumn get Id => integer().autoIncrement()();
+  IntColumn get TagId => integer()();
+  IntColumn get IntMoney => integer()();
+  DateTimeColumn get Date => dateTime()();
+  TextColumn get Comment => text()();
+}
+
+///
+@TableIndex(name: "TagGroup.TagId", columns: {#TagId})
+class LedgerTagGroups extends Table {
+  IntColumn get Id => integer().autoIncrement()();
+  IntColumn get TagId => integer()();
+  TextColumn get Name => text()();
+}
+
+class LedgerTags extends Table {
+  IntColumn get Id => integer().autoIncrement()();
+  TextColumn get Name => text()();
+}
+
+///
+class LedgerRecentTags extends Table {
+  IntColumn get Id => integer().autoIncrement()();
+  IntColumn get TagId => integer().autoIncrement()();
+}
+
+///
+@TableIndex(name: "Owner.UserId", columns: {#UserId})
+class LedgerOwners extends Table {
+  IntColumn get Id => integer().autoIncrement()();
+  IntColumn get UserId => integer()();
+  TextColumn get Role => textEnum<EOwnerRole>()();
+}
+
+///
+class LedgerFlags {}
+
+///
+@DriftDatabase(tables: [LedgerInfos, LedgerEntries, LedgerTags, LedgerRecentTags, LedgerOwners])
+class LedgerDatabaseConnector extends _$LedgerDatabaseConnector {
+  LedgerDatabaseConnector(String name) : super(_OpenConnection(name));
+
+  @override
+  int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (m) => m.createAll(),
+      onUpgrade: (m, from, to) async {
+        await customStatement('PRAGMA foreign_keys = OFF');
+      },
+      beforeOpen: (details) async {
+        await customStatement('PRAGMA foreign_keys = ON');
+        // if (kDebugMode) {
+        //   final m = Migrator(this);
+        //   for (final table in allTables) {
+        //     await m.deleteTable(table.actualTableName);
+        //     await m.createTable(table);
+        //   }
+        // }
+      },
+    );
+  }
+
+  ///
+  static LazyDatabase _OpenConnection(String name) {
+    return LazyDatabase(() async {
+      // await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
+      sqlite3.tempDirectory = (await getTemporaryDirectory()).path;
+
+      return NativeDatabase.createInBackground(File("${Def.LocalPath}$name"), isolateSetup: () async {
+        open
+          ..overrideFor(OperatingSystem.android, openCipherOnAndroid)
+          ..overrideFor(OperatingSystem.linux, () => DynamicLibrary.open('libsqlcipher.so'))
+          ..overrideFor(OperatingSystem.windows, () => DynamicLibrary.open('sqlcipher.dll'));
+      }, setup: (db) {
+        final result = db.select('pragma cipher_version');
+        if (result.isEmpty) {
+          throw UnsupportedError('This database needs to run with SQLCipher, but that library is not available!');
+        }
+        db.execute("pragma key = '$name.f'");
       });
-    await migrations.migrate(DB);
-  }
-
-  ///
-  static Future<bool> DeleteLedger(int id) async {
-    final rs = await DB.execute("DELETE FROM Ledgers WHERE Id=$id");
-    return rs.isNotEmpty;
-  }
-
-  ///
-  static Future<Map?> GetLedger(int id) async {
-    final row = await DB.get("SELECT * FROM Ledgers WHERE Id=$id");
-    if (row.isEmpty) return null;
-    final rs = jsonDecode(row["Json"]);
-    rs["Id"] = row["Id"];
-    return rs;
-  }
-
-  ///
-  static Future<int> AddLedger(Map ledgerData) async {
-    final rs = await DB.execute("INSERT INTO Ledgers (Json) VALUES(${jsonEncode(ledgerData)})");
-    if (rs.isEmpty) {
-      throw Exception("put ledger error");
-    }
-    return rs.first["Id"];
-  }
-
-  ///
-  static Future UpdateLedger(Map ledgerData) async {
-    final id = ledgerData.remove("Id");
-    if (id == null) throw Exception("not found key: Id");
-    final rs = await DB.execute("UPDATE Ledgers SET Json=${jsonEncode(ledgerData)} WHERE Id=$id");
-    if (rs.isEmpty) {
-      throw Exception("not found ledger:$id");
-    }
-  }
-
-  ///
-  static Future AddEntry(Map entryData) async {
-    entryData.remove("Id");
-    await DB.execute("INSERT INTO LedgerEntries (${entryData.keys.join(",")}) VALUES(?)", entryData.values.toList());
-  }
-
-  ///
-  static Future DeleteEntry(int id) async {
-    await DB.execute("DELETE FROM LedgerEntries WHERE Id=$id");
-  }
-
-  ///
-  static Future UpdateEntry(Map<String, dynamic> entryData) async {
-    final id = entryData.remove("Id");
-    if (id == null) throw Exception("not found key: Id");
-    DB.execute(SqlGenerator.Update("LedgerEntries", entryData, {"Id": id}));
+    });
   }
 }

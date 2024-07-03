@@ -124,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // 写入临时账本
                 var ledgerData = await LedgerData.CreateFromTemplate(UserDataProvider.Global.Id, Name: "临时账本");
-                ledgerData = ledgerData.copyWith(Id: await LedgerDao.AddLedger(ledgerData.toJson()));                
+                // ledgerData = ledgerData.copyWith(Id: await LedgerDao.AddLedger(ledgerData.toJson()));                
 
                 if (!mounted) return;
 

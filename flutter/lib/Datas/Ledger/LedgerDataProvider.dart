@@ -18,11 +18,11 @@ class LedgerDataProvider with ChangeNotifier implements ValueListenable<LedgerDa
   ///
   Future Init() async {
     if (UserDataProvider.Global.value.Id == 0) return;
-    await LedgerDao.Init();
-    final ledgerJson = await LedgerDao.GetLedger(UserDataProvider.Global.value.LedgerId);
-    if (ledgerJson != null) {
-      SetValue(LedgerData.fromJson(ledgerJson));
-    }
+    // await LedgerDao.Init();
+    // final ledgerJson = await LedgerDao.GetLedger(UserDataProvider.Global.value.LedgerId);
+    // if (ledgerJson != null) {
+    //   SetValue(LedgerData.fromJson(ledgerJson));
+    // }
   }
 
   ///
@@ -38,6 +38,6 @@ class LedgerDataProvider with ChangeNotifier implements ValueListenable<LedgerDa
 
   Future Create(LedgerData data) async {
     var ledgerData = await LedgerData.CreateFromTemplate(UserDataProvider.Global.Id, Name: "临时账本");
-    ledgerData = ledgerData.copyWith(Id: await LedgerDao.AddLedger(ledgerData.toJson()));
+    // ledgerData = ledgerData.copyWith(Id: await LedgerDao.AddLedger(ledgerData.toJson()));
   }
 }

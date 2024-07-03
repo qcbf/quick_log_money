@@ -22,9 +22,9 @@ class RecordDescription extends StatelessWidget {
         TextSpan(text: IsIncome ? " 收入 " : " 花费 "),
         TextSpan(style: actionTextStyle.apply(color: IsIncome ? Colors.green : Colors.red, fontSizeDelta: 12), text: "${value.GetMoneyString()}￥"),
         TextSpan(text: IsIncome ? " 来自 " : " 用于 "),
-        TextSpan(style: actionTextStyle, text: value.Data.GetTagName()),
+        // TextSpan(style: actionTextStyle, text: value.Data.GetTagName()),
         const TextSpan(text: " 记录到 "),
-        TextSpan(style: actionTextStyle, text: value.Data.GetBookName()),
+        // TextSpan(style: actionTextStyle, text: value.Data.GetBookName()),
       ])),
     );
   }

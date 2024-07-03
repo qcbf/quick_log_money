@@ -1,11 +1,10 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:quick_log_money/Datas/Ledger/Entry/EntryData.dart';
 import 'package:quick_log_money/Datas/Ledger/LedgerDao.dart';
 
 /// 编辑时的条目数据
 class EntryEditingProvider with ChangeNotifier {
-  late EntryData Data;
+  late LedgerEntry Data;
 
   ///
   int? TagId;
@@ -21,7 +20,7 @@ class EntryEditingProvider with ChangeNotifier {
   String? MoneyDecimalStr;
 
   EntryEditingProvider() {
-    Data = EntryData(LedgerId: 0, TagId: 0, Date: DateTime.now());
+    Data = LedgerEntry.fromJson({});
   }
 
   String GetMoneyString() {
@@ -37,7 +36,8 @@ class EntryEditingProvider with ChangeNotifier {
     }
     Data = Data.copyWith(IntMoney: money, Comment: Comment);
     final loadingCancel = BotToast.showLoading();
-    await LedgerDao.AddEntry(Data.toJson());
+
+    // LedgerDatabase.managers.ledgerEntries.create((o) => o());
     BotToast.showSimpleNotification(title: "保存成功", duration: Durations.long2);
     loadingCancel();
   }

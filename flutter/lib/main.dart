@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'package:bot_toast/bot_toast.dart';
-import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'package:quick_log_money/Datas/Ledger/LedgerDao.dart';
 import 'package:quick_log_money/Datas/Ledger/LedgerDataProvider.dart';
 import 'package:quick_log_money/Datas/UserData.dart';
-import 'package:quick_log_money/TestData.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
@@ -26,16 +25,15 @@ void main() async {
   print("Set Local Path: ${Def.LocalPath}");
   Hive.init(Def.LocalPath);
 
+// test begin
+  LedgerDatabase.managers.ledgerInfos.create((o) => LedgerInfo.fromJson({}).toCompanion(false));
+
+  return;
+//test end
+
   await UserDataProvider.Global.Init();
   await UserPrefsDataDef.TryInit();
   LedgerDataProvider.Global.Init();
-
-  // test begin
-  final db = MyDatabase();
-  final id =
-      await db.into(db.testTable).insert(TestTableCompanion.insert(Value2: 22, MyValue: 1, Name: DateTime.now().toString()));
-  print(id);
-  // test end
 
   runApp(const MainApp());
 }

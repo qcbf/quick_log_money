@@ -669,6 +669,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.10.0"
+  sqlcipher_flutter_libs:
+    dependency: "direct main"
+    description:
+      name: sqlcipher_flutter_libs
+      sha256: "672e7f9d8a19896c3bfc44ca5f6fd8ee978970c5946817eeedf5e59c176aacf1"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.6.3"
   sqlite3:
     dependency: "direct main"
     description:
@@ -677,14 +685,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.4.4"
-  sqlite3_flutter_libs:
-    dependency: "direct main"
-    description:
-      name: sqlite3_flutter_libs
-      sha256: "62bbb4073edbcdf53f40c80775f33eea01d301b7b81417e5b3fb7395416258c1"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.5.24"
   sqlite_async:
     dependency: "direct main"
     description:
