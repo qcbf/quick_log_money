@@ -1,6 +1,12 @@
 # This file controls Flutter-level build steps. It should not be edited.
 cmake_minimum_required(VERSION 3.14)
 
+# 设置OpenSSL根目录
+set(ENV{OPENSSL_ROOT_DIR} "${CMAKE_SOURCE_DIR}/openssl/")
+set(ENV{OPENSSL_CRYPTO_LIBRARY} "$ENV{OPENSSL_ROOT_DIR}libcrypto.lib")
+set(ENV{OPENSSL_INCLUDE_DIR} $ENV{OPENSSL_ROOT_DIR}include/)
+
+
 set(EPHEMERAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ephemeral")
 
 # Configuration provided via flutter tool.

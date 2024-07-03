@@ -27,7 +27,8 @@ void main() async {
 
 // test begin
   LedgerDatabase.managers.ledgerInfos.create((o) => LedgerInfo.fromJson({}).toCompanion(false));
-
+  
+  print("start");
   return;
 //test end
 

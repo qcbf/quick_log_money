@@ -105,9 +105,8 @@ class LedgerDatabaseConnector extends _$LedgerDatabaseConnector {
   ///
   static LazyDatabase _OpenConnection(String name) {
     return LazyDatabase(() async {
-      // await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
       sqlite3.tempDirectory = (await getTemporaryDirectory()).path;
-
+      await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
       return NativeDatabase.createInBackground(File("${Def.LocalPath}$name"), isolateSetup: () async {
         open
           ..overrideFor(OperatingSystem.android, openCipherOnAndroid)
