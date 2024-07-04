@@ -1,6 +1,6 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:quick_log_money/Datas/Ledger/LedgerDao.dart';
+import 'package:quick_log_money/Database/LedgerDB.dart';
 
 /// 编辑时的条目数据
 class EntryEditingProvider with ChangeNotifier {

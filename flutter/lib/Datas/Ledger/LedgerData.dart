@@ -1,18 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/services.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
 import 'package:quick_log_money/Datas/Ledger/Entry/TagGroupData.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
 
-part 'LedgerData.g.dart';
-
 /// 账本数据
 @JsonSerializable(anyMap: true)
-@CopyWith()
 class LedgerData {
   final int Id;
   final int Type;
@@ -33,9 +29,6 @@ class LedgerData {
       this.IsHided = false,
       required this.TagGroups,
       required this.AllTags});
-
-  factory LedgerData.fromJson(Map json) => _$LedgerDataFromJson(json);
-  Map<String, dynamic> toJson() => _$LedgerDataToJson(this);
 
   ///从配置模板创建数据
   static Future<LedgerData> CreateFromTemplate(int OwnerUser, {String? Name}) async {

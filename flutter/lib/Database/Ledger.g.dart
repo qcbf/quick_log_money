@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'LedgerDao.dart';
+part of 'LedgerDB.dart';
 
 // ignore_for_file: type=lint
 class $LedgerInfosTable extends LedgerInfos
@@ -727,18 +727,14 @@ class $LedgerRecentTagsTable extends LedgerRecentTags
       'id', aliasedName, false,
       hasAutoIncrement: true,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _TagIdMeta = const VerificationMeta('TagId');
   @override
   late final GeneratedColumn<int> TagId = GeneratedColumn<int>(
       'tag_id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      type: DriftSqlType.int, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [Id, TagId];
   @override
@@ -753,8 +749,6 @@ class $LedgerRecentTagsTable extends LedgerRecentTags
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_IdMeta, Id.isAcceptableOrUnknown(data['id']!, _IdMeta));
-    } else if (isInserting) {
-      context.missing(_IdMeta);
     }
     if (data.containsKey('tag_id')) {
       context.handle(
@@ -766,7 +760,7 @@ class $LedgerRecentTagsTable extends LedgerRecentTags
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {Id, TagId};
+  Set<GeneratedColumn> get $primaryKey => {Id};
   @override
   LedgerRecentTag map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -846,36 +840,28 @@ class LedgerRecentTag extends DataClass implements Insertable<LedgerRecentTag> {
 class LedgerRecentTagsCompanion extends UpdateCompanion<LedgerRecentTag> {
   final Value<int> Id;
   final Value<int> TagId;
-  final Value<int> rowid;
   const LedgerRecentTagsCompanion({
     this.Id = const Value.absent(),
     this.TagId = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   LedgerRecentTagsCompanion.insert({
-    required int Id,
+    this.Id = const Value.absent(),
     required int TagId,
-    this.rowid = const Value.absent(),
-  })  : Id = Value(Id),
-        TagId = Value(TagId);
+  }) : TagId = Value(TagId);
   static Insertable<LedgerRecentTag> custom({
     Expression<int>? Id,
     Expression<int>? TagId,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
       if (TagId != null) 'tag_id': TagId,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
-  LedgerRecentTagsCompanion copyWith(
-      {Value<int>? Id, Value<int>? TagId, Value<int>? rowid}) {
+  LedgerRecentTagsCompanion copyWith({Value<int>? Id, Value<int>? TagId}) {
     return LedgerRecentTagsCompanion(
       Id: Id ?? this.Id,
       TagId: TagId ?? this.TagId,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -888,9 +874,6 @@ class LedgerRecentTagsCompanion extends UpdateCompanion<LedgerRecentTag> {
     if (TagId.present) {
       map['tag_id'] = Variable<int>(TagId.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -898,8 +881,7 @@ class LedgerRecentTagsCompanion extends UpdateCompanion<LedgerRecentTag> {
   String toString() {
     return (StringBuffer('LedgerRecentTagsCompanion(')
           ..write('Id: $Id, ')
-          ..write('TagId: $TagId, ')
-          ..write('rowid: $rowid')
+          ..write('TagId: $TagId')
           ..write(')'))
         .toString();
   }
@@ -1501,15 +1483,13 @@ class $$LedgerTagsTableOrderingComposer
 
 typedef $$LedgerRecentTagsTableInsertCompanionBuilder
     = LedgerRecentTagsCompanion Function({
-  required int Id,
+  Value<int> Id,
   required int TagId,
-  Value<int> rowid,
 });
 typedef $$LedgerRecentTagsTableUpdateCompanionBuilder
     = LedgerRecentTagsCompanion Function({
   Value<int> Id,
   Value<int> TagId,
-  Value<int> rowid,
 });
 
 class $$LedgerRecentTagsTableTableManager extends RootTableManager<
@@ -1535,22 +1515,18 @@ class $$LedgerRecentTagsTableTableManager extends RootTableManager<
           getUpdateCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
             Value<int> TagId = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
           }) =>
               LedgerRecentTagsCompanion(
             Id: Id,
             TagId: TagId,
-            rowid: rowid,
           ),
           getInsertCompanionBuilder: ({
-            required int Id,
+            Value<int> Id = const Value.absent(),
             required int TagId,
-            Value<int> rowid = const Value.absent(),
           }) =>
               LedgerRecentTagsCompanion.insert(
             Id: Id,
             TagId: TagId,
-            rowid: rowid,
           ),
         ));
 }

@@ -1,11 +1,9 @@
 import "package:bot_toast/bot_toast.dart";
 import "package:flutter/material.dart";
-import "package:quick_log_money/Datas/Ledger/LedgerDao.dart";
-import "package:quick_log_money/Datas/Ledger/LedgerData.dart";
-import "package:quick_log_money/Datas/Ledger/LedgerDataProvider.dart";
-import "package:quick_log_money/Datas/UserData.dart";
+import "package:quick_log_money/Database/UserDB.dart";
 import "package:quick_log_money/Utilities/Def.dart";
 import "package:quick_log_money/Utilities/Pages.dart";
+import "package:quick_log_money/Utilities/Prefs.dart";
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -38,9 +36,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 30),
               _BuildLogin(context),
               const SizedBox(height: 10),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [_BuildAnonymLogin(), const SizedBox(width: 6), _BuildRegister()]),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [_BuildAnonymLogin(), const SizedBox(width: 6), _BuildRegister()]),
               const SizedBox(height: 40),
               _BuildOtherLogin(),
             ],
@@ -119,28 +115,12 @@ class _LoginPageState extends State<LoginPage> {
         height: 40,
         child: ElevatedButton(
             onPressed: () async {
-              try {
-                await UserDataProvider.Global.SetValue(UserData(Id: 1, Name: "临时用户", RegisterDate: DateTime.now()));
-
-                // 写入临时账本
-                var ledgerData = await LedgerData.CreateFromTemplate(UserDataProvider.Global.Id, Name: "临时账本");
-                // ledgerData = ledgerData.copyWith(Id: await LedgerDao.AddLedger(ledgerData.toJson()));                
-
-                if (!mounted) return;
-
-                await Future.wait([
-                  // UserDataProvider.Global.SetValue(user),
-                  LedgerDataProvider.Global.SetValue(ledgerData),
-                ]);
-
-                if (!mounted) return;
-                Navigator.pushReplacementNamed(context, Pages.Home);
-              } catch (ex) {
-                UserDataProvider.Global.SetValue(null);
-                LedgerDataProvider.Global.SetValue(null);
-                BotToast.showSimpleNotification(title: "error", subTitle: ex.toString());
-                rethrow;
-              }
+              final cancel = BotToast.showLoading();
+              await UserDBHelper.LoginAnonym();
+              GlobalPrefs.LoginUid.
+              cancel();
+              if (!mounted) return;
+              Navigator.pushReplacementNamed(context, Pages.Home);
             },
             child: const Text("试用一下")),
       );
