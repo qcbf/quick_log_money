@@ -3,7 +3,6 @@ import "package:flutter/material.dart";
 import "package:quick_log_money/Database/UserDB.dart";
 import "package:quick_log_money/Utilities/Def.dart";
 import "package:quick_log_money/Utilities/Pages.dart";
-import "package:quick_log_money/Utilities/Prefs.dart";
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -117,7 +116,6 @@ class _LoginPageState extends State<LoginPage> {
             onPressed: () async {
               final cancel = BotToast.showLoading();
               await UserDBHelper.LoginAnonym();
-              GlobalPrefs.LoginUid.
               cancel();
               if (!mounted) return;
               Navigator.pushReplacementNamed(context, Pages.Home);

@@ -10,7 +10,7 @@ import 'package:quick_log_money/Utilities/Prefs.dart';
 part 'UserDB.g.dart';
 
 late final UserDBHelper UserDB;
-late final User? LoginUser;
+late final User UserData;
 
 ///
 class Users extends Table {
@@ -54,12 +54,25 @@ class UserDBHelper extends _$UserDBHelper {
   ///
   static Future Init() async {
     UserDB = UserDBHelper("users");
-    if (GlobalPrefs.LoginUid.IsDefault) return;
-    LoginUser = await UserDB.managers.users.filter((f) => f.Id(GlobalPrefs.LoginUid.value)).getSingleOrNull();
+    if (Prefs.IsNotUserId) return;
+    try {
+      _OnLoginFinish(await UserDB.managers.users.filter((f) => f.Id(Prefs.UserId)).getSingle());
+    } catch (e) {
+      Prefs.SetNotUserId();
+      rethrow;
+    }
+  }
+
+  static Future Loginout() async {
+    Prefs.SetNotUserId();
+    UserData = User(Id: 0, LedgerId: 0, Name: "", Icon: "", RegisterDate: DateTime(0));
+    await LedgerDBHelper.Uninit();
   }
 
   ///
-  static Future Login(String username, String password) async {}
+  static Future Login(String username, String password) async {
+    // _OnLoginFinish();
+  }
 
   ///
   static Future LoginAnonym() async {
@@ -72,18 +85,26 @@ class UserDBHelper extends _$UserDBHelper {
       }
     }
 
-    await UserDB.transaction(() async {
+    await _OnLoginFinish(await UserDB.transaction<User>(() async {
       final ledgerId = await LedgerDB.managers.ledgerInfos.create((o) => ledgerInfo);
       for (var tag in tags) {
         final id = await LedgerDB.managers.ledgerTags.create((o) => tag.$2);
         await LedgerDB.managers.ledgerTagGroups.create((o) => o(Name: tag.$1, TagId: id));
       }
 
-      await UserDB.managers.users.createReturning((o) => o(
+      final user = await UserDB.managers.users.createReturning((o) => o(
             Name: "游客",
             Icon: "",
             LedgerId: ledgerId,
           ));
-    });
+      return user;
+    }));
+  }
+
+  ///
+  static Future _OnLoginFinish(User u) async {
+    UserData = u;
+    Prefs.UserId = UserData.Id;
+    await LedgerDBHelper.Init();
   }
 }

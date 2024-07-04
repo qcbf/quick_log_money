@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
-import 'package:quick_log_money/Datas/Ledger/LedgerDataProvider.dart';
+import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'DrawerMenu.dart';
 
@@ -40,8 +40,7 @@ class _HomePageState extends State<HomePage> {
   PreferredSizeWidget BuildTop() {
     return AppBar(
       centerTitle: true,
-      title: ConditionalValueListener(LedgerDataProvider.Global, () => LedgerDataProvider.Global.IsInited,
-          (context, value, child) => Text(value.Name, style: const TextStyle(fontSize: 14))),
+      title: ConditionalValueListener.AsyncValue(Ledger.Info, (context, value, child) => Text(value.Name, style: const TextStyle(fontSize: 14))),
       actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.widgets))],
     );
   }

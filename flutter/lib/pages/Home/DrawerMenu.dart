@@ -1,7 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
-import 'package:quick_log_money/Datas/UserData.dart';
+import 'package:quick_log_money/Database/UserDB.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
 import 'package:quick_log_money/Utilities/Utility.dart';
@@ -26,34 +26,28 @@ class DrawerMenu extends StatelessWidget {
   }
 
   ///
-  Widget BuildUserInfo() {
-    return ValueListenableBuilder(
-        valueListenable: UserDataProvider.Global,
-        builder: (context, value, child) {
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value.Name, style: Theme.of(context).textTheme.headlineMedium),
-                Text("ID:${value.Id}", style: Theme.of(context).textTheme.labelMedium),
-                Conditional.SwitchIndex(() {
-                  if (value.Token == null) {
-                    return 0;
-                  } else if (value.VipExpiryDate == null) {
-                    return 1;
-                  }
-                  return 2;
-                }, [
-                  () => TextButton(onPressed: () {}, child: const Text("注册正式用户")),
-                  () => TextButton(onPressed: () {}, child: const Text("开通vip")),
-                  () => TextButton(onPressed: () {}, child: Text("Vip${Utility.DateToString(value.VipExpiryDate!)}到期")),
-                ]),
-              ],
-            ),
-          );
-        });
-  }
+  Widget BuildUserInfo() => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(UserData.Name, style: Theme.of(context).textTheme.headlineMedium),
+            Text("ID:${UserData.Id}", style: Theme.of(context).textTheme.labelMedium),
+            Conditional.SwitchIndex(() {
+              if (UserData.Token == null) {
+                return 0;
+              } else if (UserData.VipExpiryDate == null) {
+                return 1;
+              }
+              return 2;
+            }, [
+              () => TextButton(onPressed: () {}, child: const Text("注册正式用户")),
+              () => TextButton(onPressed: () {}, child: const Text("开通vip")),
+              () => TextButton(onPressed: () {}, child: Text("Vip${Utility.DateToString(UserData.VipExpiryDate!)}到期")),
+            ]),
+          ],
+        ),
+      );
 
   ///
   ListTile BuildFirstPageToRecord() {
@@ -61,12 +55,12 @@ class DrawerMenu extends StatelessWidget {
       leading: const Icon(Icons.settings),
       title: const Text("first page to record"),
       trailing: ValueListenableBuilder(
-          valueListenable: UserPrefs.IsFirstPageToRecord,
+          valueListenable: Prefs.IsFirstPageToRecord,
           builder: (context, value, child) {
             return Switch(
                 value: value,
                 onChanged: (value) {
-                  UserPrefs.IsFirstPageToRecord.value = value;
+                  Prefs.IsFirstPageToRecord.value = value;
                 });
           }),
     );
@@ -81,7 +75,7 @@ class DrawerMenu extends StatelessWidget {
       onTap: () async {
         final cancel = BotToast.showLoading();
         Navigator.pushNamedAndRemoveUntil(context, Pages.Login, (_) => false);
-        await UserDataProvider.Global.SetValue(null);
+        await UserDBHelper.Loginout();
         cancel();
       },
     );

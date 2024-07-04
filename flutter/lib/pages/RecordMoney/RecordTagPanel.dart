@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagGroupUI.dart';
-import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
-import 'package:quick_log_money/Datas/Ledger/LedgerData.dart';
-import 'package:quick_log_money/Datas/Ledger/LedgerDataProvider.dart';
+import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordSaveBtn.dart';
 
@@ -13,21 +11,20 @@ class RecordTagPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ledgerData = LedgerDataProvider.Global.value;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const RecordSaveBtn(),
-        Expanded(child: BuildTagGroup(context, ledgerData)),
+        Expanded(child: BuildTagGroup(context)),
       ],
     );
   }
 
   ///
-  TagGroupUI BuildTagGroup(BuildContext context, LedgerData ledgerData) {
+  TagGroupUI BuildTagGroup(BuildContext context) {
     return TagGroupUI(
       context.read<EntryEditingProvider>().TagId,
-      {for (var v in ledgerData.TagGroups) v.Name: v.Tags.map((id) => IdTagData(id, ledgerData.AllTags[id] ?? TagData.NotFound))},
+      {for (var v in Ledger.Tag.value.TagGroups) v.Name: v.Tags.map((id) => IdTagData(id, ledgerData.AllTags[id] ?? TagData.NotFound))},
       (tagId) {
         context.read<EntryEditingProvider>().TagId = tagId;
         (context as Element).markNeedsBuild();

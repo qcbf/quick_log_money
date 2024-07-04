@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quick_log_money/Datas/Ledger/LedgerDataProvider.dart';
+import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordSaveBtn.dart';
 
 class RecordLedgerPanel extends StatelessWidget {
@@ -17,7 +17,7 @@ class RecordLedgerPanel extends StatelessWidget {
     return GridView.extent(
       maxCrossAxisExtent: 200,
       children: [
-        Text(LedgerDataProvider.Global.value.Name),
+        Text(Ledger.Info.value.Name),
       ],
     );
   }

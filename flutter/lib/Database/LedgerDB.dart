@@ -1,9 +1,43 @@
 import 'package:drift/drift.dart';
 import 'package:quick_log_money/Database/DatabaseConnector.dart';
+import 'package:quick_log_money/Database/UserDB.dart';
+import 'package:quick_log_money/Utilities/AsyncValue.dart';
+import 'package:quick_log_money/Utilities/Prefs.dart';
 
 part 'LedgerDB.g.dart';
 
 late final LedgerDBHelper LedgerDB;
+late final UserLedgerDao Ledger;
+
+///
+class UserLedgerDao {
+  final AsyncValue<LedgerInfo> Info;
+  final AsyncValue<LedgerTagDao> Tag;
+  UserLedgerDao({required this.Info, required this.Tag});
+  static Future<UserLedgerDao> Create() async {
+    return UserLedgerDao(
+      Info: AsyncValue(LedgerDB.managers.ledgerInfos.filter((f) => f.Id(UserData.LedgerId)).getSingle()),
+      Tag: AsyncValue(LedgerTagDao.Create()),
+    );
+  }
+}
+
+///
+class LedgerTagDao {
+  final Map<int, LedgerTag> AllTags;
+  final List<(String, LedgerTag)> TagGroups;
+  final List<LedgerTag> RecentTags;
+  LedgerTagDao({required this.AllTags, required this.TagGroups, required this.RecentTags});
+  static Future<LedgerTagDao> Create() async {
+    final allTags = Map.fromEntries((await LedgerDB.managers.ledgerTags.get()).map((e) => MapEntry(e.Id, e)));
+    final groups = await LedgerDB.select(LedgerDB.ledgerTagGroups).map((p0) => (p0.Name, allTags[p0.TagId]!)).get();
+    return LedgerTagDao(
+      AllTags: allTags,
+      TagGroups: groups,
+      RecentTags: await LedgerDB.select(LedgerDB.ledgerRecentTags).map((t) => allTags[t.Id]!).get(),
+    );
+  }
+}
 
 ///
 enum ELedgerOption {
@@ -69,7 +103,10 @@ class LedgerFlags {}
 ///
 @DriftDatabase(tables: [LedgerInfos, LedgerEntries, LedgerTags, LedgerTagGroups, LedgerRecentTags, LedgerOwners])
 class LedgerDBHelper extends _$LedgerDBHelper {
-  LedgerDBHelper(String name) : super(DatabaseConnector.OpenConnection(name));
+  LedgerDBHelper(String name) : super(DatabaseConnector.OpenConnection("lg.${Prefs.UserId}"));
+  LedgerDBHelper.FromUser()
+      : assert(!Prefs.IsNotUserId, "not found UserId"),
+        super(DatabaseConnector.OpenConnection("lg.${Prefs.UserId}"));
 
   @override
   int get schemaVersion => 1;
@@ -92,5 +129,17 @@ class LedgerDBHelper extends _$LedgerDBHelper {
         // }
       },
     );
+  }
+
+  ///
+  static Future Init() async {
+    assert(!Prefs.IsNotUserId, "not found UserId");
+    LedgerDB = LedgerDBHelper.FromUser();
+    Ledger = await UserLedgerDao.Create();
+  }
+
+  ///
+  static Future Uninit() async {
+    await LedgerDB.close();
   }
 }

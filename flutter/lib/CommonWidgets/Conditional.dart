@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:quick_log_money/Utilities/AsyncValue.dart';
 
 typedef ViewBuilderContext = Widget Function(BuildContext context);
 typedef ViewBuilder = Widget Function();
@@ -29,8 +30,7 @@ class Conditional {
   }
 
   ///
-  static Widget SwitchIndexContext(
-      BuildContext context, int Function(BuildContext context) condition, List<ViewBuilderContext> views,
+  static Widget SwitchIndexContext(BuildContext context, int Function(BuildContext context) condition, List<ViewBuilderContext> views,
       {ViewBuilderContext? fallbackBuilder}) {
     final result = condition(context);
     if (result < 0 || result > views.length) {
@@ -41,8 +41,7 @@ class Conditional {
   }
 
   ///
-  static Widget SwitchNameContext(
-      BuildContext context, String Function(BuildContext context) condition, Map<String, ViewBuilderContext> views,
+  static Widget SwitchNameContext(BuildContext context, String Function(BuildContext context) condition, Map<String, ViewBuilderContext> views,
       {ViewBuilderContext? fallbackBuilder}) {
     final result = condition(context);
     if (views.containsKey(result)) {
@@ -76,12 +75,13 @@ class Conditional {
 ///条件事件监听器
 class ConditionalValueListener<T> extends StatefulWidget {
   final ValueListenable<T> Listenable;
-  final ConditionBuilder Condition;
+  final Object? Condition;
   final ValueWidgetBuilder<T> Builder;
   final ViewBuilder? Fallback;
   final Widget? child;
 
   const ConditionalValueListener(this.Listenable, this.Condition, this.Builder, {super.key, this.child, this.Fallback});
+  const ConditionalValueListener.AsyncValue(this.Listenable, this.Builder, {this.Condition, super.key, this.child, this.Fallback});
 
   @override
   State<ConditionalValueListener<T>> createState() => _ConditionalValueListenerState<T>();
@@ -91,11 +91,13 @@ class _ConditionalValueListenerState<T> extends State<ConditionalValueListener<T
   late T value;
   late bool IsInited = false;
 
+  bool CheckCondition() => (widget.Condition as Function?)?.call() ?? (widget.Listenable as AsyncValue? ?? widget.Condition as AsyncValue?)?.IsHasValue == true;
+
   @override
   void initState() {
     super.initState();
     widget.Listenable.addListener(_OnValueChangeEvent);
-    if (widget.Condition()) {
+    if (CheckCondition()) {
       value = widget.Listenable.value;
       IsInited = true;
     }
@@ -119,7 +121,7 @@ class _ConditionalValueListenerState<T> extends State<ConditionalValueListener<T
 
   @override
   Widget build(BuildContext context) {
-    if (widget.Condition()) {
+    if (CheckCondition()) {
       if (!IsInited) {
         IsInited = true;
         value = widget.Listenable.value;

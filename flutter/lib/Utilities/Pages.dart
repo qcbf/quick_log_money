@@ -16,7 +16,7 @@ class Pages {
 
   static MaterialPageRoute? Router(RouteSettings settings) {
     WidgetBuilder? page;
-    if (GlobalPrefs.LoginUid.IsDefault) {
+    if (Prefs.IsNotUserId) {
       page = Routes[Login];
     } else {
       page = Routes[settings.name];

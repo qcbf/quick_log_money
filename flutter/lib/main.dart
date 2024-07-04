@@ -20,8 +20,8 @@ void main() async {
   Def.LocalPath = "${(await getApplicationSupportDirectory()).path}${Platform.pathSeparator}";
   print("Set Local Path: ${Def.LocalPath}");
 
-  await GlobalPrefs.Init("global");
-  UserDBHelper.Init();
+  await Prefs.Init();
+  await UserDBHelper.Init();
 
   runApp(const MainApp());
 }
@@ -46,7 +46,7 @@ class MainApp extends StatelessWidget {
       theme: _GetTheme(Brightness.light),
       darkTheme: _GetTheme(Brightness.dark),
       onGenerateRoute: Pages.Router,
-      initialRoute: GlobalPrefs.LoginUid.value == 0 ? Pages.Login : (UserPrefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home),
+      initialRoute: Prefs.IsNotUserId ? Pages.Login : (Prefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home),
       navigatorObservers: [BotToastNavigatorObserver()],
       builder: (context, child) {
         child = BotToastInit()(context, child);
@@ -56,8 +56,7 @@ class MainApp extends StatelessWidget {
   }
 
   static ThemeData _GetTheme(Brightness brightness) {
-    var colorScheme =
-        ColorScheme.fromSeed(seedColor: Colors.grey, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);
+    var colorScheme = ColorScheme.fromSeed(seedColor: Colors.grey, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);
     return ThemeData(
         colorScheme: colorScheme,
         cardTheme: const CardTheme(margin: EdgeInsets.fromLTRB(0, 4, 0, 4)),

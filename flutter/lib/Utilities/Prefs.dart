@@ -2,49 +2,33 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-late GlobalPrefsFields GlobalPrefs;
-late UserPrefsFields UserPrefs;
-
-///
-class GlobalPrefsFields extends Prefs {
+class Prefs {
   ///
-  late final PrefsItem<int> LoginUid = PrefsItem("LoginUid", this, 0, (name, value) => Prefs.LocalStorager.setInt(name, value));
+  static final PrefsItem<bool> IsFirstPageToRecord = PrefsItem("IsFirstPageToRecord", false, (name, value) => Prefs.LocalStorager.setBool(name, value));
 
-  GlobalPrefsFields() : super("global");
-}
-
-///
-class UserPrefsFields extends Prefs {
-  ///
-  late final PrefsItem<bool> IsFirstPageToRecord = PrefsItem("IsFirstPageToRecord", this, false, (name, value) => Prefs.LocalStorager.setBool(name, value));
-
-  UserPrefsFields(super.Name);
-}
-
-// ======================================================
-
-abstract class Prefs {
+// ======================================================================================
   static late final SharedPreferences LocalStorager;
-  static Future<void> Init() async {
+  static int get UserId => LocalStorager.getInt("UserId") ?? 0;
+  static set UserId(int v) => LocalStorager.setInt("UserId", v);
+  static bool get IsNotUserId => UserId == 0;
+  static void SetNotUserId() => UserId = 0;
+  static Future Init() async {
+    SharedPreferences.setPrefix("f.");
     LocalStorager = await SharedPreferences.getInstance();
   }
-
-  final String Name;
-  Prefs(this.Name);
 }
 
+///
 class PrefsItem<T> extends ChangeNotifier implements ValueListenable<T> {
   final String Name;
-  final Prefs Parent;
   final T DefaultValue;
   final Future<bool> Function(String name, T value) Setter;
-  PrefsItem(this.Name, this.Parent, this.DefaultValue, this.Setter);
-  @override
-  T get value => Prefs.LocalStorager.get(Name) as T;
+  PrefsItem(this.Name, this.DefaultValue, this.Setter);
   bool get IsDefault => value == DefaultValue;
-
+  @override
+  T get value => Prefs.LocalStorager.get("${Prefs.UserId}.$Name") as T;
   set value(T newValue) {
-    Setter(Name, newValue);
+    Setter("${Prefs.UserId}.$Name", newValue);
     notifyListeners();
   }
 }
