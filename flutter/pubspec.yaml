@@ -20,6 +20,7 @@ dependencies:
   # sqlite3_flutter_libs: ^0.5.24
   sqlcipher_flutter_libs: ^0.6.3
   shared_preferences: ^2.2.3
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:

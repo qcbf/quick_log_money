@@ -560,6 +560,11 @@ class $LedgerTagsTable extends LedgerTags
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _GroupMeta = const VerificationMeta('Group');
+  @override
+  late final GeneratedColumn<String> Group = GeneratedColumn<String>(
+      'group', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _NameMeta = const VerificationMeta('Name');
   @override
   late final GeneratedColumn<String> Name = GeneratedColumn<String>(
@@ -571,7 +576,7 @@ class $LedgerTagsTable extends LedgerTags
       'icon', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [Id, Name, Icon];
+  List<GeneratedColumn> get $columns => [Id, Group, Name, Icon];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -584,6 +589,12 @@ class $LedgerTagsTable extends LedgerTags
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_IdMeta, Id.isAcceptableOrUnknown(data['id']!, _IdMeta));
+    }
+    if (data.containsKey('group')) {
+      context.handle(
+          _GroupMeta, Group.isAcceptableOrUnknown(data['group']!, _GroupMeta));
+    } else if (isInserting) {
+      context.missing(_GroupMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -608,6 +619,8 @@ class $LedgerTagsTable extends LedgerTags
     return LedgerTag(
       Id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      Group: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}group'])!,
       Name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       Icon: attachedDatabase.typeMapping
@@ -623,13 +636,19 @@ class $LedgerTagsTable extends LedgerTags
 
 class LedgerTag extends DataClass implements Insertable<LedgerTag> {
   final int Id;
+  final String Group;
   final String Name;
   final String Icon;
-  const LedgerTag({required this.Id, required this.Name, required this.Icon});
+  const LedgerTag(
+      {required this.Id,
+      required this.Group,
+      required this.Name,
+      required this.Icon});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(Id);
+    map['group'] = Variable<String>(Group);
     map['name'] = Variable<String>(Name);
     map['icon'] = Variable<String>(Icon);
     return map;
@@ -638,6 +657,7 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
   LedgerTagsCompanion toCompanion(bool nullToAbsent) {
     return LedgerTagsCompanion(
       Id: Value(Id),
+      Group: Value(Group),
       Name: Value(Name),
       Icon: Value(Icon),
     );
@@ -648,6 +668,7 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LedgerTag(
       Id: serializer.fromJson<int>(json['Id']),
+      Group: serializer.fromJson<String>(json['Group']),
       Name: serializer.fromJson<String>(json['Name']),
       Icon: serializer.fromJson<String>(json['Icon']),
     );
@@ -657,13 +678,16 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'Id': serializer.toJson<int>(Id),
+      'Group': serializer.toJson<String>(Group),
       'Name': serializer.toJson<String>(Name),
       'Icon': serializer.toJson<String>(Icon),
     };
   }
 
-  LedgerTag copyWith({int? Id, String? Name, String? Icon}) => LedgerTag(
+  LedgerTag copyWith({int? Id, String? Group, String? Name, String? Icon}) =>
+      LedgerTag(
         Id: Id ?? this.Id,
+        Group: Group ?? this.Group,
         Name: Name ?? this.Name,
         Icon: Icon ?? this.Icon,
       );
@@ -671,6 +695,7 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
   String toString() {
     return (StringBuffer('LedgerTag(')
           ..write('Id: $Id, ')
+          ..write('Group: $Group, ')
           ..write('Name: $Name, ')
           ..write('Icon: $Icon')
           ..write(')'))
@@ -678,47 +703,58 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
   }
 
   @override
-  int get hashCode => Object.hash(Id, Name, Icon);
+  int get hashCode => Object.hash(Id, Group, Name, Icon);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is LedgerTag &&
           other.Id == this.Id &&
+          other.Group == this.Group &&
           other.Name == this.Name &&
           other.Icon == this.Icon);
 }
 
 class LedgerTagsCompanion extends UpdateCompanion<LedgerTag> {
   final Value<int> Id;
+  final Value<String> Group;
   final Value<String> Name;
   final Value<String> Icon;
   const LedgerTagsCompanion({
     this.Id = const Value.absent(),
+    this.Group = const Value.absent(),
     this.Name = const Value.absent(),
     this.Icon = const Value.absent(),
   });
   LedgerTagsCompanion.insert({
     this.Id = const Value.absent(),
+    required String Group,
     required String Name,
     required String Icon,
-  })  : Name = Value(Name),
+  })  : Group = Value(Group),
+        Name = Value(Name),
         Icon = Value(Icon);
   static Insertable<LedgerTag> custom({
     Expression<int>? Id,
+    Expression<String>? Group,
     Expression<String>? Name,
     Expression<String>? Icon,
   }) {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
+      if (Group != null) 'group': Group,
       if (Name != null) 'name': Name,
       if (Icon != null) 'icon': Icon,
     });
   }
 
   LedgerTagsCompanion copyWith(
-      {Value<int>? Id, Value<String>? Name, Value<String>? Icon}) {
+      {Value<int>? Id,
+      Value<String>? Group,
+      Value<String>? Name,
+      Value<String>? Icon}) {
     return LedgerTagsCompanion(
       Id: Id ?? this.Id,
+      Group: Group ?? this.Group,
       Name: Name ?? this.Name,
       Icon: Icon ?? this.Icon,
     );
@@ -729,6 +765,9 @@ class LedgerTagsCompanion extends UpdateCompanion<LedgerTag> {
     final map = <String, Expression>{};
     if (Id.present) {
       map['id'] = Variable<int>(Id.value);
+    }
+    if (Group.present) {
+      map['group'] = Variable<String>(Group.value);
     }
     if (Name.present) {
       map['name'] = Variable<String>(Name.value);
@@ -743,215 +782,9 @@ class LedgerTagsCompanion extends UpdateCompanion<LedgerTag> {
   String toString() {
     return (StringBuffer('LedgerTagsCompanion(')
           ..write('Id: $Id, ')
+          ..write('Group: $Group, ')
           ..write('Name: $Name, ')
           ..write('Icon: $Icon')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $LedgerTagGroupsTable extends LedgerTagGroups
-    with TableInfo<$LedgerTagGroupsTable, LedgerTagGroup> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $LedgerTagGroupsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _IdMeta = const VerificationMeta('Id');
-  @override
-  late final GeneratedColumn<int> Id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _TagIdMeta = const VerificationMeta('TagId');
-  @override
-  late final GeneratedColumn<int> TagId = GeneratedColumn<int>(
-      'tag_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _NameMeta = const VerificationMeta('Name');
-  @override
-  late final GeneratedColumn<String> Name = GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  @override
-  List<GeneratedColumn> get $columns => [Id, TagId, Name];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'ledger_tag_groups';
-  @override
-  VerificationContext validateIntegrity(Insertable<LedgerTagGroup> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_IdMeta, Id.isAcceptableOrUnknown(data['id']!, _IdMeta));
-    }
-    if (data.containsKey('tag_id')) {
-      context.handle(
-          _TagIdMeta, TagId.isAcceptableOrUnknown(data['tag_id']!, _TagIdMeta));
-    } else if (isInserting) {
-      context.missing(_TagIdMeta);
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-          _NameMeta, Name.isAcceptableOrUnknown(data['name']!, _NameMeta));
-    } else if (isInserting) {
-      context.missing(_NameMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {Id};
-  @override
-  LedgerTagGroup map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LedgerTagGroup(
-      Id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      TagId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}tag_id'])!,
-      Name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-    );
-  }
-
-  @override
-  $LedgerTagGroupsTable createAlias(String alias) {
-    return $LedgerTagGroupsTable(attachedDatabase, alias);
-  }
-}
-
-class LedgerTagGroup extends DataClass implements Insertable<LedgerTagGroup> {
-  final int Id;
-  final int TagId;
-  final String Name;
-  const LedgerTagGroup(
-      {required this.Id, required this.TagId, required this.Name});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(Id);
-    map['tag_id'] = Variable<int>(TagId);
-    map['name'] = Variable<String>(Name);
-    return map;
-  }
-
-  LedgerTagGroupsCompanion toCompanion(bool nullToAbsent) {
-    return LedgerTagGroupsCompanion(
-      Id: Value(Id),
-      TagId: Value(TagId),
-      Name: Value(Name),
-    );
-  }
-
-  factory LedgerTagGroup.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LedgerTagGroup(
-      Id: serializer.fromJson<int>(json['Id']),
-      TagId: serializer.fromJson<int>(json['TagId']),
-      Name: serializer.fromJson<String>(json['Name']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'Id': serializer.toJson<int>(Id),
-      'TagId': serializer.toJson<int>(TagId),
-      'Name': serializer.toJson<String>(Name),
-    };
-  }
-
-  LedgerTagGroup copyWith({int? Id, int? TagId, String? Name}) =>
-      LedgerTagGroup(
-        Id: Id ?? this.Id,
-        TagId: TagId ?? this.TagId,
-        Name: Name ?? this.Name,
-      );
-  @override
-  String toString() {
-    return (StringBuffer('LedgerTagGroup(')
-          ..write('Id: $Id, ')
-          ..write('TagId: $TagId, ')
-          ..write('Name: $Name')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(Id, TagId, Name);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is LedgerTagGroup &&
-          other.Id == this.Id &&
-          other.TagId == this.TagId &&
-          other.Name == this.Name);
-}
-
-class LedgerTagGroupsCompanion extends UpdateCompanion<LedgerTagGroup> {
-  final Value<int> Id;
-  final Value<int> TagId;
-  final Value<String> Name;
-  const LedgerTagGroupsCompanion({
-    this.Id = const Value.absent(),
-    this.TagId = const Value.absent(),
-    this.Name = const Value.absent(),
-  });
-  LedgerTagGroupsCompanion.insert({
-    this.Id = const Value.absent(),
-    required int TagId,
-    required String Name,
-  })  : TagId = Value(TagId),
-        Name = Value(Name);
-  static Insertable<LedgerTagGroup> custom({
-    Expression<int>? Id,
-    Expression<int>? TagId,
-    Expression<String>? Name,
-  }) {
-    return RawValuesInsertable({
-      if (Id != null) 'id': Id,
-      if (TagId != null) 'tag_id': TagId,
-      if (Name != null) 'name': Name,
-    });
-  }
-
-  LedgerTagGroupsCompanion copyWith(
-      {Value<int>? Id, Value<int>? TagId, Value<String>? Name}) {
-    return LedgerTagGroupsCompanion(
-      Id: Id ?? this.Id,
-      TagId: TagId ?? this.TagId,
-      Name: Name ?? this.Name,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (Id.present) {
-      map['id'] = Variable<int>(Id.value);
-    }
-    if (TagId.present) {
-      map['tag_id'] = Variable<int>(TagId.value);
-    }
-    if (Name.present) {
-      map['name'] = Variable<String>(Name.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('LedgerTagGroupsCompanion(')
-          ..write('Id: $Id, ')
-          ..write('TagId: $TagId, ')
-          ..write('Name: $Name')
           ..write(')'))
         .toString();
   }
@@ -1347,8 +1180,6 @@ abstract class _$LedgerDBHelper extends GeneratedDatabase {
   late final $LedgerInfosTable ledgerInfos = $LedgerInfosTable(this);
   late final $LedgerEntriesTable ledgerEntries = $LedgerEntriesTable(this);
   late final $LedgerTagsTable ledgerTags = $LedgerTagsTable(this);
-  late final $LedgerTagGroupsTable ledgerTagGroups =
-      $LedgerTagGroupsTable(this);
   late final $LedgerRecentTagsTable ledgerRecentTags =
       $LedgerRecentTagsTable(this);
   late final $LedgerOwnersTable ledgerOwners = $LedgerOwnersTable(this);
@@ -1356,8 +1187,6 @@ abstract class _$LedgerDBHelper extends GeneratedDatabase {
       'CREATE INDEX "LedgerEntries.TagId" ON ledger_entries (tag_id)');
   late final Index ledgerEntriesDate = Index('LedgerEntries.Date',
       'CREATE INDEX "LedgerEntries.Date" ON ledger_entries (date)');
-  late final Index ledgerTagGroupsTagId = Index('LedgerTagGroups.TagId',
-      'CREATE INDEX "LedgerTagGroups.TagId" ON ledger_tag_groups (tag_id)');
   late final Index ledgerOwnersUserId = Index('LedgerOwners.UserId',
       'CREATE INDEX "LedgerOwners.UserId" ON ledger_owners (user_id)');
   @override
@@ -1368,12 +1197,10 @@ abstract class _$LedgerDBHelper extends GeneratedDatabase {
         ledgerInfos,
         ledgerEntries,
         ledgerTags,
-        ledgerTagGroups,
         ledgerRecentTags,
         ledgerOwners,
         ledgerEntriesTagId,
         ledgerEntriesDate,
-        ledgerTagGroupsTagId,
         ledgerOwnersUserId
       ];
 }
@@ -1641,11 +1468,13 @@ class $$LedgerEntriesTableOrderingComposer
 
 typedef $$LedgerTagsTableInsertCompanionBuilder = LedgerTagsCompanion Function({
   Value<int> Id,
+  required String Group,
   required String Name,
   required String Icon,
 });
 typedef $$LedgerTagsTableUpdateCompanionBuilder = LedgerTagsCompanion Function({
   Value<int> Id,
+  Value<String> Group,
   Value<String> Name,
   Value<String> Icon,
 });
@@ -1671,21 +1500,25 @@ class $$LedgerTagsTableTableManager extends RootTableManager<
               $$LedgerTagsTableProcessedTableManager(p),
           getUpdateCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
+            Value<String> Group = const Value.absent(),
             Value<String> Name = const Value.absent(),
             Value<String> Icon = const Value.absent(),
           }) =>
               LedgerTagsCompanion(
             Id: Id,
+            Group: Group,
             Name: Name,
             Icon: Icon,
           ),
           getInsertCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
+            required String Group,
             required String Name,
             required String Icon,
           }) =>
               LedgerTagsCompanion.insert(
             Id: Id,
+            Group: Group,
             Name: Name,
             Icon: Icon,
           ),
@@ -1712,6 +1545,11 @@ class $$LedgerTagsTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
+  ColumnFilters<String> get Group => $state.composableBuilder(
+      column: $state.table.Group,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
   ColumnFilters<String> get Name => $state.composableBuilder(
       column: $state.table.Name,
       builder: (column, joinBuilders) =>
@@ -1731,6 +1569,11 @@ class $$LedgerTagsTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
+  ColumnOrderings<String> get Group => $state.composableBuilder(
+      column: $state.table.Group,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
   ColumnOrderings<String> get Name => $state.composableBuilder(
       column: $state.table.Name,
       builder: (column, joinBuilders) =>
@@ -1738,112 +1581,6 @@ class $$LedgerTagsTableOrderingComposer
 
   ColumnOrderings<String> get Icon => $state.composableBuilder(
       column: $state.table.Icon,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-}
-
-typedef $$LedgerTagGroupsTableInsertCompanionBuilder = LedgerTagGroupsCompanion
-    Function({
-  Value<int> Id,
-  required int TagId,
-  required String Name,
-});
-typedef $$LedgerTagGroupsTableUpdateCompanionBuilder = LedgerTagGroupsCompanion
-    Function({
-  Value<int> Id,
-  Value<int> TagId,
-  Value<String> Name,
-});
-
-class $$LedgerTagGroupsTableTableManager extends RootTableManager<
-    _$LedgerDBHelper,
-    $LedgerTagGroupsTable,
-    LedgerTagGroup,
-    $$LedgerTagGroupsTableFilterComposer,
-    $$LedgerTagGroupsTableOrderingComposer,
-    $$LedgerTagGroupsTableProcessedTableManager,
-    $$LedgerTagGroupsTableInsertCompanionBuilder,
-    $$LedgerTagGroupsTableUpdateCompanionBuilder> {
-  $$LedgerTagGroupsTableTableManager(
-      _$LedgerDBHelper db, $LedgerTagGroupsTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $$LedgerTagGroupsTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$LedgerTagGroupsTableOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$LedgerTagGroupsTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<int> Id = const Value.absent(),
-            Value<int> TagId = const Value.absent(),
-            Value<String> Name = const Value.absent(),
-          }) =>
-              LedgerTagGroupsCompanion(
-            Id: Id,
-            TagId: TagId,
-            Name: Name,
-          ),
-          getInsertCompanionBuilder: ({
-            Value<int> Id = const Value.absent(),
-            required int TagId,
-            required String Name,
-          }) =>
-              LedgerTagGroupsCompanion.insert(
-            Id: Id,
-            TagId: TagId,
-            Name: Name,
-          ),
-        ));
-}
-
-class $$LedgerTagGroupsTableProcessedTableManager extends ProcessedTableManager<
-    _$LedgerDBHelper,
-    $LedgerTagGroupsTable,
-    LedgerTagGroup,
-    $$LedgerTagGroupsTableFilterComposer,
-    $$LedgerTagGroupsTableOrderingComposer,
-    $$LedgerTagGroupsTableProcessedTableManager,
-    $$LedgerTagGroupsTableInsertCompanionBuilder,
-    $$LedgerTagGroupsTableUpdateCompanionBuilder> {
-  $$LedgerTagGroupsTableProcessedTableManager(super.$state);
-}
-
-class $$LedgerTagGroupsTableFilterComposer
-    extends FilterComposer<_$LedgerDBHelper, $LedgerTagGroupsTable> {
-  $$LedgerTagGroupsTableFilterComposer(super.$state);
-  ColumnFilters<int> get Id => $state.composableBuilder(
-      column: $state.table.Id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<int> get TagId => $state.composableBuilder(
-      column: $state.table.TagId,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<String> get Name => $state.composableBuilder(
-      column: $state.table.Name,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-}
-
-class $$LedgerTagGroupsTableOrderingComposer
-    extends OrderingComposer<_$LedgerDBHelper, $LedgerTagGroupsTable> {
-  $$LedgerTagGroupsTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get Id => $state.composableBuilder(
-      column: $state.table.Id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<int> get TagId => $state.composableBuilder(
-      column: $state.table.TagId,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<String> get Name => $state.composableBuilder(
-      column: $state.table.Name,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
@@ -2055,8 +1792,6 @@ class _$LedgerDBHelperManager {
       $$LedgerEntriesTableTableManager(_db, _db.ledgerEntries);
   $$LedgerTagsTableTableManager get ledgerTags =>
       $$LedgerTagsTableTableManager(_db, _db.ledgerTags);
-  $$LedgerTagGroupsTableTableManager get ledgerTagGroups =>
-      $$LedgerTagGroupsTableTableManager(_db, _db.ledgerTagGroups);
   $$LedgerRecentTagsTableTableManager get ledgerRecentTags =>
       $$LedgerRecentTagsTableTableManager(_db, _db.ledgerRecentTags);
   $$LedgerOwnersTableTableManager get ledgerOwners =>

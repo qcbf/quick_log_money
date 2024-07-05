@@ -28,10 +28,8 @@ class TagListUI extends StatelessWidget {
   ///
   Widget BuildTag(BuildContext context, LedgerTag tagData) {
     return TagUI(
-      Style: tagData.Id == SelectTagId
-          ? ButtonStyle(side: WidgetStatePropertyAll(BorderSide(color: Theme.of(context).colorScheme.primary, width: 1)))
-          : null,
-      tagData.Tag,
+      Style: tagData.Id == SelectTagId ? ButtonStyle(side: WidgetStatePropertyAll(BorderSide(color: Theme.of(context).colorScheme.primary, width: 1))) : null,
+      tagData,
       () => OnSelectTagHandler(tagData.Id),
     );
   }

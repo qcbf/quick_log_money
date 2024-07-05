@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:quick_log_money/Database/DatabaseConnector.dart';
 import 'package:quick_log_money/Database/UserDB.dart';
@@ -25,16 +26,15 @@ class UserLedgerDao {
 ///
 class LedgerTagDao {
   final Map<int, LedgerTag> AllTags;
-  final List<(String, LedgerTag)> TagGroups;
+  final Map<String, List<LedgerTag>> TagGroups;
   final List<LedgerTag> RecentTags;
   LedgerTagDao({required this.AllTags, required this.TagGroups, required this.RecentTags});
   static Future<LedgerTagDao> Create() async {
-    final allTags = Map.fromEntries((await LedgerDB.managers.ledgerTags.get()).map((e) => MapEntry(e.Id, e)));
-    final groups = await LedgerDB.select(LedgerDB.ledgerTagGroups).map((p0) => (p0.Name, allTags[p0.TagId]!)).get();
+    final allTags = await LedgerDB.managers.ledgerTags.get();
     return LedgerTagDao(
-      AllTags: allTags,
-      TagGroups: groups,
-      RecentTags: await LedgerDB.select(LedgerDB.ledgerRecentTags).map((t) => allTags[t.Id]!).get(),
+      AllTags: Map.fromEntries(allTags.map((e) => MapEntry(e.Id, e))),
+      TagGroups: allTags.groupListsBy((e) => e.Group),
+      RecentTags: await LedgerDB.select(LedgerDB.ledgerRecentTags).map((t) => allTags[t.Id]).get(),
     );
   }
 }
@@ -69,16 +69,9 @@ class LedgerEntries extends Table {
   TextColumn get Comment => text()();
 }
 
-///
-@TableIndex(name: "LedgerTagGroups.TagId", columns: {#TagId})
-class LedgerTagGroups extends Table {
-  IntColumn get Id => integer().autoIncrement()();
-  IntColumn get TagId => integer()();
-  TextColumn get Name => text()();
-}
-
 class LedgerTags extends Table {
   IntColumn get Id => integer().autoIncrement()();
+  TextColumn get Group => text()();
   TextColumn get Name => text()();
   TextColumn get Icon => text()();
 }
@@ -101,7 +94,7 @@ class LedgerOwners extends Table {
 class LedgerFlags {}
 
 ///
-@DriftDatabase(tables: [LedgerInfos, LedgerEntries, LedgerTags, LedgerTagGroups, LedgerRecentTags, LedgerOwners])
+@DriftDatabase(tables: [LedgerInfos, LedgerEntries, LedgerTags, LedgerRecentTags, LedgerOwners])
 class LedgerDBHelper extends _$LedgerDBHelper {
   LedgerDBHelper(String name) : super(DatabaseConnector.OpenConnection("lg.${Prefs.UserId}"));
   LedgerDBHelper.FromUser()

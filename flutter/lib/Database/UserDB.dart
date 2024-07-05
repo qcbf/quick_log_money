@@ -81,17 +81,12 @@ class UserDBHelper extends _$UserDBHelper {
     final List<(String, LedgerTagsCompanion)> tags = [];
     for (var tagGroupJson in (ledgerJson["Tags"] as Map<String, dynamic>).entries) {
       for (List tag in tagGroupJson.value) {
-        tags.add((tagGroupJson.key, LedgerTagsCompanion.insert(Name: tag[0], Icon: tag[1])));
+        tags.add((tagGroupJson.key, LedgerTagsCompanion.insert(Name: tag[0], Icon: tag[1], Group: tagGroupJson.key)));
       }
     }
 
     await _OnLoginFinish(await UserDB.transaction<User>(() async {
       final ledgerId = await LedgerDB.managers.ledgerInfos.create((o) => ledgerInfo);
-      for (var tag in tags) {
-        final id = await LedgerDB.managers.ledgerTags.create((o) => tag.$2);
-        await LedgerDB.managers.ledgerTagGroups.create((o) => o(Name: tag.$1, TagId: id));
-      }
-
       final user = await UserDB.managers.users.createReturning((o) => o(
             Name: "游客",
             Icon: "",

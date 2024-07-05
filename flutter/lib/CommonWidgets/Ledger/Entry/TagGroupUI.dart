@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagListUI.dart';
-import 'package:quick_log_money/Datas/Ledger/Entry/TagData.dart';
+import 'package:quick_log_money/Database/LedgerDB.dart';
 
 /// 标签组
 class TagGroupUI extends StatelessWidget {
   ///
-  final Map<String, Iterable<IdTagData>> TagGroupDatas;
+  final Map<String, Iterable<LedgerTag>> TagGroupDatas;
   final void Function(int tagId) OnSelectTagHandler;
   final int? SelectTagId;
 
@@ -19,7 +19,7 @@ class TagGroupUI extends StatelessWidget {
   }
 
   ///
-  Widget BuildTagGroup(BuildContext context, String groupName, Iterable<IdTagData> tags) {
+  Widget BuildTagGroup(BuildContext context, String groupName, Iterable<LedgerTag> tags) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [

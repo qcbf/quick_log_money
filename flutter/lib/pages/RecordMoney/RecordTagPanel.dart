@@ -24,7 +24,7 @@ class RecordTagPanel extends StatelessWidget {
   TagGroupUI BuildTagGroup(BuildContext context) {
     return TagGroupUI(
       context.read<EntryEditingProvider>().TagId,
-      {for (var v in Ledger.Tag.value.TagGroups) v.Name: v.Tags.map((id) => IdTagData(id, ledgerData.AllTags[id] ?? TagData.NotFound))},
+      Ledger.Tag.value.TagGroups,
       (tagId) {
         context.read<EntryEditingProvider>().TagId = tagId;
         (context as Element).markNeedsBuild();
