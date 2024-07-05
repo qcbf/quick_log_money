@@ -17,8 +17,8 @@ class UserLedgerDao {
   UserLedgerDao({required this.Info, required this.Tag});
   static Future<UserLedgerDao> Create() async {
     return UserLedgerDao(
-      Info: AsyncValue(LedgerDB.managers.ledgerInfos.filter((f) => f.Id(UserData.LedgerId)).getSingle()),
-      Tag: AsyncValue(LedgerTagDao.Create()),
+      Info: AsyncValue(() async => await LedgerDB.managers.ledgerInfos.filter((f) => f.Id(UserData.LedgerId)).getSingle()),
+      Tag: AsyncValue(() async => await LedgerTagDao.Create()),
     );
   }
 }
@@ -53,6 +53,7 @@ enum EOwnerRole {
 ///
 class LedgerInfos extends Table {
   IntColumn get Id => integer().autoIncrement()();
+  IntColumn get RecentCount => integer().withDefault(const Constant(8))();
   TextColumn get Name => text()();
   TextColumn get Icon => text()();
   TextColumn get Options => textEnum<ELedgerOption>().nullable()();
@@ -96,10 +97,10 @@ class LedgerFlags {}
 ///
 @DriftDatabase(tables: [LedgerInfos, LedgerEntries, LedgerTags, LedgerRecentTags, LedgerOwners])
 class LedgerDBHelper extends _$LedgerDBHelper {
-  LedgerDBHelper(String name) : super(DatabaseConnector.OpenConnection("lg.${Prefs.UserId}"));
-  LedgerDBHelper.FromUser()
-      : assert(!Prefs.IsNotUserId, "not found UserId"),
-        super(DatabaseConnector.OpenConnection("lg.${Prefs.UserId}"));
+  LedgerDBHelper(String name, int userId) : super(DatabaseConnector.OpenConnection("lg.$userId.sl"));
+  LedgerDBHelper.FromUser(int userId)
+      : assert(userId > 0, "not found UserId"),
+        super(DatabaseConnector.OpenConnection("lg.$userId.sl"));
 
   @override
   int get schemaVersion => 1;
@@ -127,12 +128,21 @@ class LedgerDBHelper extends _$LedgerDBHelper {
   ///
   static Future Init() async {
     assert(!Prefs.IsNotUserId, "not found UserId");
-    LedgerDB = LedgerDBHelper.FromUser();
+    LedgerDB = LedgerDBHelper.FromUser(Prefs.UserId);
     Ledger = await UserLedgerDao.Create();
   }
 
   ///
   static Future Uninit() async {
     await LedgerDB.close();
+  }
+
+  ///
+  static Future<int> CreateLedger(int userId, LedgerDBHelper db, LedgerInfosCompanion info, Iterable<LedgerTagsCompanion> tags) async {
+    final id = await db.managers.ledgerInfos.create((o) => info);
+    await db.managers.ledgerTags.bulkCreate((o) => tags);
+    await db.managers.ledgerOwners.create((o) => o(Role: EOwnerRole.Anim, UserId: userId));
+    await db.managers.ledgerRecentTags.bulkCreate((o) => tags.take(info.RecentCount.value).map((e) => LedgerRecentTagsCompanion(TagId: e.Id)));
+    return id;
   }
 }

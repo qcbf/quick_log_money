@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 ///
@@ -11,8 +13,8 @@ class AsyncValue<T> with ChangeNotifier implements ValueListenable<T> {
     notifyListeners();
   }
 
-  AsyncValue(Future<T> valueFuture) {
-    valueFuture.then((v) {
+  AsyncValue(Future<T> Function() f) {
+    f().then((v) {
       IsHasValue = true;
       value = v;
     });

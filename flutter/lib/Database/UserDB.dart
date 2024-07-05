@@ -76,23 +76,22 @@ class UserDBHelper extends _$UserDBHelper {
 
   ///
   static Future LoginAnonym() async {
+    // 创造账本数据
     final ledgerJson = jsonDecode(await rootBundle.loadString(Def.LedgerTemplatePath, cache: false)) as Map<String, dynamic>;
-    final ledgerInfo = LedgerInfo.fromJson(ledgerJson);
-    final List<(String, LedgerTagsCompanion)> tags = [];
-    for (var tagGroupJson in (ledgerJson["Tags"] as Map<String, dynamic>).entries) {
-      for (List tag in tagGroupJson.value) {
-        tags.add((tagGroupJson.key, LedgerTagsCompanion.insert(Name: tag[0], Icon: tag[1], Group: tagGroupJson.key)));
-      }
-    }
+    final ledgerInfo = LedgerInfosCompanion.insert(Name: ledgerJson["Name"], Icon: ledgerJson["Icon"]);
+    final tags = (ledgerJson["Tags"] as Map<String, dynamic>)
+        .entries
+        .expand((e) => (e.value as List).map((tag) => LedgerTagsCompanion.insert(Group: e.key, Name: tag[0], Icon: tag[1])));
 
     await _OnLoginFinish(await UserDB.transaction<User>(() async {
-      final ledgerId = await LedgerDB.managers.ledgerInfos.create((o) => ledgerInfo);
-      final user = await UserDB.managers.users.createReturning((o) => o(
-            Name: "游客",
-            Icon: "",
-            LedgerId: ledgerId,
-          ));
-      return user;
+      final user = await UserDB.managers.users.createReturning((o) => o(Name: "游客", Icon: "", LedgerId: 0));
+
+      final ledgerDB = LedgerDBHelper.FromUser(user.Id);
+      final ledgerId = await LedgerDBHelper.CreateLedger(user.Id, ledgerDB, ledgerInfo, tags);
+      await ledgerDB.close();
+
+      await UserDB.managers.users.filter((f) => f.Id(user.Id)).update((o) => o(LedgerId: Value(ledgerId)));
+      return user.copyWith(LedgerId: ledgerId);
     }));
   }
 

@@ -26,7 +26,7 @@ class PrefsItem<T> extends ChangeNotifier implements ValueListenable<T> {
   PrefsItem(this.Name, this.DefaultValue, this.Setter);
   bool get IsDefault => value == DefaultValue;
   @override
-  T get value => Prefs.LocalStorager.get("${Prefs.UserId}.$Name") as T;
+  T get value => Prefs.LocalStorager.get("${Prefs.UserId}.$Name") as T? ?? DefaultValue;
   set value(T newValue) {
     Setter("${Prefs.UserId}.$Name", newValue);
     notifyListeners();

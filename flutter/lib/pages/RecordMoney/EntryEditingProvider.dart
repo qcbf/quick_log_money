@@ -4,10 +4,11 @@ import 'package:quick_log_money/Database/LedgerDB.dart';
 
 /// 编辑时的条目数据
 class EntryEditingProvider with ChangeNotifier {
-  late LedgerEntry Data;
+  ///
+  DateTime Date = DateTime.now();
 
   ///
-  int? TagId;
+  int TagId = 0;
 
   ///
   String Comment = "";
@@ -18,10 +19,6 @@ class EntryEditingProvider with ChangeNotifier {
   ///
   String MoneyIntegerStr = "";
   String? MoneyDecimalStr;
-
-  EntryEditingProvider() {
-    Data = LedgerEntry.fromJson({});
-  }
 
   String GetMoneyString() {
     final integer = MoneyIntegerStr.isEmpty ? "0" : MoneyIntegerStr;
@@ -34,10 +31,8 @@ class EntryEditingProvider with ChangeNotifier {
     if (MoneyDecimalStr?.isNotEmpty == true) {
       money += int.parse(MoneyDecimalStr!);
     }
-    Data = Data.copyWith(IntMoney: money, Comment: Comment);
     final loadingCancel = BotToast.showLoading();
-
-    // LedgerDatabase.managers.ledgerEntries.create((o) => o());
+    await LedgerDB.managers.ledgerEntries.create((o) => LedgerEntriesCompanion.insert(TagId: TagId, IntMoney: money, Date: Date, Comment: Comment));
     BotToast.showSimpleNotification(title: "保存成功", duration: Durations.long2);
     loadingCancel();
   }

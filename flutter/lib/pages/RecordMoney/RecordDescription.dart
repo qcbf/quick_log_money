@@ -18,7 +18,7 @@ class RecordDescription extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(22, 10, 22, 10),
       child: RichText(
           text: TextSpan(style: baseTextStyle, children: [
-        TextSpan(style: actionTextStyle, text: Utility.DateToString(value.Data.Date)),
+        TextSpan(style: actionTextStyle, text: Utility.DateToString(value.Date)),
         TextSpan(text: IsIncome ? " 收入 " : " 花费 "),
         TextSpan(style: actionTextStyle.apply(color: IsIncome ? Colors.green : Colors.red, fontSizeDelta: 12), text: "${value.GetMoneyString()}￥"),
         TextSpan(text: IsIncome ? " 来自 " : " 用于 "),

@@ -18,6 +18,14 @@ class $LedgerInfosTable extends LedgerInfos
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _RecentCountMeta =
+      const VerificationMeta('RecentCount');
+  @override
+  late final GeneratedColumn<int> RecentCount = GeneratedColumn<int>(
+      'recent_count', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(8));
   static const VerificationMeta _NameMeta = const VerificationMeta('Name');
   @override
   late final GeneratedColumn<String> Name = GeneratedColumn<String>(
@@ -36,7 +44,7 @@ class $LedgerInfosTable extends LedgerInfos
               type: DriftSqlType.string, requiredDuringInsert: false)
           .withConverter<ELedgerOption?>($LedgerInfosTable.$converterOptionsn);
   @override
-  List<GeneratedColumn> get $columns => [Id, Name, Icon, Options];
+  List<GeneratedColumn> get $columns => [Id, RecentCount, Name, Icon, Options];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -49,6 +57,12 @@ class $LedgerInfosTable extends LedgerInfos
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_IdMeta, Id.isAcceptableOrUnknown(data['id']!, _IdMeta));
+    }
+    if (data.containsKey('recent_count')) {
+      context.handle(
+          _RecentCountMeta,
+          RecentCount.isAcceptableOrUnknown(
+              data['recent_count']!, _RecentCountMeta));
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -74,6 +88,8 @@ class $LedgerInfosTable extends LedgerInfos
     return LedgerInfo(
       Id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      RecentCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}recent_count'])!,
       Name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       Icon: attachedDatabase.typeMapping
@@ -97,15 +113,21 @@ class $LedgerInfosTable extends LedgerInfos
 
 class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
   final int Id;
+  final int RecentCount;
   final String Name;
   final String Icon;
   final ELedgerOption? Options;
   const LedgerInfo(
-      {required this.Id, required this.Name, required this.Icon, this.Options});
+      {required this.Id,
+      required this.RecentCount,
+      required this.Name,
+      required this.Icon,
+      this.Options});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(Id);
+    map['recent_count'] = Variable<int>(RecentCount);
     map['name'] = Variable<String>(Name);
     map['icon'] = Variable<String>(Icon);
     if (!nullToAbsent || Options != null) {
@@ -118,6 +140,7 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
   LedgerInfosCompanion toCompanion(bool nullToAbsent) {
     return LedgerInfosCompanion(
       Id: Value(Id),
+      RecentCount: Value(RecentCount),
       Name: Value(Name),
       Icon: Value(Icon),
       Options: Options == null && nullToAbsent
@@ -131,6 +154,7 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LedgerInfo(
       Id: serializer.fromJson<int>(json['Id']),
+      RecentCount: serializer.fromJson<int>(json['RecentCount']),
       Name: serializer.fromJson<String>(json['Name']),
       Icon: serializer.fromJson<String>(json['Icon']),
       Options: $LedgerInfosTable.$converterOptionsn
@@ -142,6 +166,7 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'Id': serializer.toJson<int>(Id),
+      'RecentCount': serializer.toJson<int>(RecentCount),
       'Name': serializer.toJson<String>(Name),
       'Icon': serializer.toJson<String>(Icon),
       'Options': serializer.toJson<String?>(
@@ -151,11 +176,13 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
 
   LedgerInfo copyWith(
           {int? Id,
+          int? RecentCount,
           String? Name,
           String? Icon,
           Value<ELedgerOption?> Options = const Value.absent()}) =>
       LedgerInfo(
         Id: Id ?? this.Id,
+        RecentCount: RecentCount ?? this.RecentCount,
         Name: Name ?? this.Name,
         Icon: Icon ?? this.Icon,
         Options: Options.present ? Options.value : this.Options,
@@ -164,6 +191,7 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
   String toString() {
     return (StringBuffer('LedgerInfo(')
           ..write('Id: $Id, ')
+          ..write('RecentCount: $RecentCount, ')
           ..write('Name: $Name, ')
           ..write('Icon: $Icon, ')
           ..write('Options: $Options')
@@ -172,12 +200,13 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
   }
 
   @override
-  int get hashCode => Object.hash(Id, Name, Icon, Options);
+  int get hashCode => Object.hash(Id, RecentCount, Name, Icon, Options);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is LedgerInfo &&
           other.Id == this.Id &&
+          other.RecentCount == this.RecentCount &&
           other.Name == this.Name &&
           other.Icon == this.Icon &&
           other.Options == this.Options);
@@ -185,17 +214,20 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
 
 class LedgerInfosCompanion extends UpdateCompanion<LedgerInfo> {
   final Value<int> Id;
+  final Value<int> RecentCount;
   final Value<String> Name;
   final Value<String> Icon;
   final Value<ELedgerOption?> Options;
   const LedgerInfosCompanion({
     this.Id = const Value.absent(),
+    this.RecentCount = const Value.absent(),
     this.Name = const Value.absent(),
     this.Icon = const Value.absent(),
     this.Options = const Value.absent(),
   });
   LedgerInfosCompanion.insert({
     this.Id = const Value.absent(),
+    this.RecentCount = const Value.absent(),
     required String Name,
     required String Icon,
     this.Options = const Value.absent(),
@@ -203,12 +235,14 @@ class LedgerInfosCompanion extends UpdateCompanion<LedgerInfo> {
         Icon = Value(Icon);
   static Insertable<LedgerInfo> custom({
     Expression<int>? Id,
+    Expression<int>? RecentCount,
     Expression<String>? Name,
     Expression<String>? Icon,
     Expression<String>? Options,
   }) {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
+      if (RecentCount != null) 'recent_count': RecentCount,
       if (Name != null) 'name': Name,
       if (Icon != null) 'icon': Icon,
       if (Options != null) 'options': Options,
@@ -217,11 +251,13 @@ class LedgerInfosCompanion extends UpdateCompanion<LedgerInfo> {
 
   LedgerInfosCompanion copyWith(
       {Value<int>? Id,
+      Value<int>? RecentCount,
       Value<String>? Name,
       Value<String>? Icon,
       Value<ELedgerOption?>? Options}) {
     return LedgerInfosCompanion(
       Id: Id ?? this.Id,
+      RecentCount: RecentCount ?? this.RecentCount,
       Name: Name ?? this.Name,
       Icon: Icon ?? this.Icon,
       Options: Options ?? this.Options,
@@ -233,6 +269,9 @@ class LedgerInfosCompanion extends UpdateCompanion<LedgerInfo> {
     final map = <String, Expression>{};
     if (Id.present) {
       map['id'] = Variable<int>(Id.value);
+    }
+    if (RecentCount.present) {
+      map['recent_count'] = Variable<int>(RecentCount.value);
     }
     if (Name.present) {
       map['name'] = Variable<String>(Name.value);
@@ -251,6 +290,7 @@ class LedgerInfosCompanion extends UpdateCompanion<LedgerInfo> {
   String toString() {
     return (StringBuffer('LedgerInfosCompanion(')
           ..write('Id: $Id, ')
+          ..write('RecentCount: $RecentCount, ')
           ..write('Name: $Name, ')
           ..write('Icon: $Icon, ')
           ..write('Options: $Options')
@@ -1208,6 +1248,7 @@ abstract class _$LedgerDBHelper extends GeneratedDatabase {
 typedef $$LedgerInfosTableInsertCompanionBuilder = LedgerInfosCompanion
     Function({
   Value<int> Id,
+  Value<int> RecentCount,
   required String Name,
   required String Icon,
   Value<ELedgerOption?> Options,
@@ -1215,6 +1256,7 @@ typedef $$LedgerInfosTableInsertCompanionBuilder = LedgerInfosCompanion
 typedef $$LedgerInfosTableUpdateCompanionBuilder = LedgerInfosCompanion
     Function({
   Value<int> Id,
+  Value<int> RecentCount,
   Value<String> Name,
   Value<String> Icon,
   Value<ELedgerOption?> Options,
@@ -1241,24 +1283,28 @@ class $$LedgerInfosTableTableManager extends RootTableManager<
               $$LedgerInfosTableProcessedTableManager(p),
           getUpdateCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
+            Value<int> RecentCount = const Value.absent(),
             Value<String> Name = const Value.absent(),
             Value<String> Icon = const Value.absent(),
             Value<ELedgerOption?> Options = const Value.absent(),
           }) =>
               LedgerInfosCompanion(
             Id: Id,
+            RecentCount: RecentCount,
             Name: Name,
             Icon: Icon,
             Options: Options,
           ),
           getInsertCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
+            Value<int> RecentCount = const Value.absent(),
             required String Name,
             required String Icon,
             Value<ELedgerOption?> Options = const Value.absent(),
           }) =>
               LedgerInfosCompanion.insert(
             Id: Id,
+            RecentCount: RecentCount,
             Name: Name,
             Icon: Icon,
             Options: Options,
@@ -1286,6 +1332,11 @@ class $$LedgerInfosTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
+  ColumnFilters<int> get RecentCount => $state.composableBuilder(
+      column: $state.table.RecentCount,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
   ColumnFilters<String> get Name => $state.composableBuilder(
       column: $state.table.Name,
       builder: (column, joinBuilders) =>
@@ -1309,6 +1360,11 @@ class $$LedgerInfosTableOrderingComposer
   $$LedgerInfosTableOrderingComposer(super.$state);
   ColumnOrderings<int> get Id => $state.composableBuilder(
       column: $state.table.Id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get RecentCount => $state.composableBuilder(
+      column: $state.table.RecentCount,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
