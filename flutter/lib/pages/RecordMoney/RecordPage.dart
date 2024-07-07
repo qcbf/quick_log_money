@@ -53,13 +53,8 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
             child: IconButton(
                 onPressed: () async {
                   if (!await Navigator.maybePop(context)) {
-                    if (kDebugMode) {
-                      BotToast.showSimpleNotification(title: "Debug Only>Back Home");
-                      if (!mounted) return;
-                      Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
-                    } else {
-                      exit(0);
-                    }
+                    if (!mounted) return;
+                    Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
                   }
                 },
                 icon: const Icon(Icons.arrow_back)),
