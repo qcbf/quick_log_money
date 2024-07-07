@@ -6,7 +6,7 @@ import 'package:quick_log_money/Database/LedgerDB.dart';
 class TagListUI extends StatelessWidget {
   ///
   final Iterable<LedgerTag> Tags;
-  final void Function(int tagId) OnSelectTagHandler;
+  final void Function(LedgerTag tagId) OnSelectTagHandler;
   final int? SelectTagId;
   final ScrollPhysics? Physics;
 
@@ -26,11 +26,11 @@ class TagListUI extends StatelessWidget {
   }
 
   ///
-  Widget BuildTag(BuildContext context, LedgerTag tagData) {
+  Widget BuildTag(BuildContext context, LedgerTag tag) {
     return TagUI(
-      Style: tagData.Id == SelectTagId ? ButtonStyle(side: WidgetStatePropertyAll(BorderSide(color: Theme.of(context).colorScheme.primary, width: 1))) : null,
-      tagData,
-      () => OnSelectTagHandler(tagData.Id),
+      Style: tag.Id == SelectTagId ? ButtonStyle(side: WidgetStatePropertyAll(BorderSide(color: Theme.of(context).colorScheme.primary, width: 1))) : null,
+      tag,
+      () => OnSelectTagHandler(tag),
     );
   }
 }

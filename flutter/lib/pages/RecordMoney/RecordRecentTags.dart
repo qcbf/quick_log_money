@@ -20,21 +20,18 @@ class _RecordRecentTagsState extends State<RecordRecentTags> {
 
   ///
   Widget BuildTags() {
-    // ///首次时构建所需的数据
-    // if (_Tags.isEmpty) {
-    //   final maxCount = UserPrefs.RecentTagMaxCount.value;
-    //   final recentTags = UserPrefs.RecentTags.value;
-    //   var allTags = LedgerDataProvider.Global.value.AllTags;
-    //   _Tags = recentTags.map((id) => IdTagData(id, allTags[id] ?? TagData.NotFound));
-    //   if (_Tags.length < maxCount) {
-    //     _Tags = _Tags.followedBy(allTags.entries.take(maxCount - _Tags.length).map((v) => IdTagData(v.key, v.value)));
-    //   }
-    //   context.read<EntryEditingProvider>().TagId ??= _Tags.first.Id;
-    // }
+    var entry = context.read<EntryEditingProvider>();
+    if (entry.Tag.Id == 0) {
+      entry.Tag = Ledger.Tag.value.RecentTags.first;
+      Future.delayed(Durations.short1, () => entry.Notify());
+    }
+
     return TagListUI(
-      context.read<EntryEditingProvider>().TagId,
-      Ledger.Tag.value.RecentTags,
-      (tagId) => setState(() => context.read<EntryEditingProvider>().TagId = tagId),
+      entry.Tag.Id,
+      Ledger.Tag.value.RecentTags.reversed,
+      (tag) => setState(() => entry
+        ..Tag = tag
+        ..Notify()),
       Physics: null,
     );
   }

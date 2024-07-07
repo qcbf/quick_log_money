@@ -6,7 +6,7 @@ import 'package:quick_log_money/Database/LedgerDB.dart';
 class TagGroupUI extends StatelessWidget {
   ///
   final Map<String, Iterable<LedgerTag>> TagGroupDatas;
-  final void Function(int tagId) OnSelectTagHandler;
+  final void Function(LedgerTag tagId) OnSelectTagHandler;
   final int? SelectTagId;
 
   const TagGroupUI(this.SelectTagId, this.TagGroupDatas, this.OnSelectTagHandler, {super.key});

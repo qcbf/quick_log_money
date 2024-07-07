@@ -22,11 +22,14 @@ class RecordTagPanel extends StatelessWidget {
 
   ///
   TagGroupUI BuildTagGroup(BuildContext context) {
+    final entry = context.read<EntryEditingProvider>();
     return TagGroupUI(
-      context.read<EntryEditingProvider>().TagId,
+      entry.Tag.Id,
       Ledger.Tag.value.TagGroups,
-      (tagId) {
-        context.read<EntryEditingProvider>().TagId = tagId;
+      (tag) {
+        entry
+          ..Tag = tag
+          ..Notify();
         (context as Element).markNeedsBuild();
       },
     );

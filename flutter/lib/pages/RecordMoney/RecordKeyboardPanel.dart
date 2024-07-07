@@ -68,8 +68,7 @@ class RecordKeyboardPanel extends StatelessWidget {
   Widget _BuildNumericButton(BuildContext context, _KeyboardKey key) {
     var keyStr = _NumericKeyLabel(key);
     Widget result = key == _KeyboardKey.Back
-        ? GestureDetector(
-            onLongPress: () => _OnInputKey(context, _KeyboardKey.LongBack), child: _NumericButtonImpl(context, key, keyStr))
+        ? GestureDetector(onLongPress: () => _OnInputKey(context, _KeyboardKey.LongBack), child: _NumericButtonImpl(context, key, keyStr))
         : _NumericButtonImpl(context, key, keyStr);
     return Expanded(child: result);
   }
@@ -84,8 +83,7 @@ class RecordKeyboardPanel extends StatelessWidget {
           flex: 258,
           child: Padding(
             padding: paddingValue,
-            child: Consumer<EntryEditingProvider>(
-                builder: (BuildContext context, EntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
+            child: Consumer<EntryEditingProvider>(builder: (BuildContext context, EntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
           ),
         ),
         Expanded(
@@ -175,9 +173,10 @@ class RecordKeyboardPanel extends StatelessWidget {
     }
 
     if (newInteger != data.MoneyIntegerStr || newDecimal != data.MoneyDecimalStr) {
-      data.MoneyIntegerStr = newInteger;
-      data.MoneyDecimalStr = newDecimal;
-      data.Notify();
+      data
+        ..MoneyIntegerStr = newInteger
+        ..MoneyDecimalStr = newDecimal
+        ..Notify();
       HapticFeedback.lightImpact();
     }
   }

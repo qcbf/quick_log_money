@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:quick_log_money/Database/UserDB.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
@@ -39,22 +41,22 @@ class MainApp extends StatelessWidget {
     return CreateApp();
   }
 
-  static Widget CreateApp({ThemeMode? themeMode}) {
-    ///
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      themeMode: themeMode,
-      theme: _GetTheme(Brightness.light),
-      darkTheme: _GetTheme(Brightness.dark),
-      onGenerateRoute: Pages.Router,
-      initialRoute: Prefs.IsNotUserId ? Pages.Login : (Prefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home),
-      navigatorObservers: [BotToastNavigatorObserver()],
-      builder: (context, child) {
-        child = BotToastInit()(context, child);
-        return child;
-      },
-    );
-  }
+  static Widget CreateApp({ThemeMode? themeMode}) => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        themeMode: themeMode,
+        theme: _GetTheme(Brightness.light),
+        darkTheme: _GetTheme(Brightness.dark),
+        onGenerateRoute: Pages.Router,
+        onGenerateInitialRoutes: (initialRoute) {
+          var firstPageName = Prefs.IsNotUserId ? Pages.Login : (Prefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home);
+          return [Pages.Router(RouteSettings(name: firstPageName))!];
+        },
+        navigatorObservers: [BotToastNavigatorObserver()],
+        builder: (context, child) {
+          child = BotToastInit()(context, child);
+          return child;
+        },
+      );
 
   static ThemeData _GetTheme(Brightness brightness) {
     var colorScheme = ColorScheme.fromSeed(seedColor: Colors.grey, brightness: brightness, dynamicSchemeVariant: DynamicSchemeVariant.fidelity);

@@ -1,6 +1,5 @@
 analyzer:
   errors:
-    avoid_function_literals_in_foreach_calls: ignore
     avoid_print: ignore
     constant_identifier_names: ignore
     file_names: ignore

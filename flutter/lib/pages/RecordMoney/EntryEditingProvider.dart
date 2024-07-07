@@ -8,7 +8,7 @@ class EntryEditingProvider with ChangeNotifier {
   DateTime Date = DateTime.now();
 
   ///
-  int TagId = 0;
+  LedgerTag Tag = const LedgerTag(Id: 0, Group: "", Name: "", Icon: "");
 
   ///
   String Comment = "";
@@ -32,7 +32,7 @@ class EntryEditingProvider with ChangeNotifier {
       money += int.parse(MoneyDecimalStr!);
     }
     final loadingCancel = BotToast.showLoading();
-    await LedgerDB.managers.ledgerEntries.create((o) => LedgerEntriesCompanion.insert(TagId: TagId, IntMoney: money, Date: Date, Comment: Comment));
+    await LedgerDB.managers.ledgerEntries.create((o) => LedgerEntriesCompanion.insert(TagId: Tag.Id, IntMoney: money, Date: Date, Comment: Comment));
     BotToast.showSimpleNotification(title: "保存成功", duration: Durations.long2);
     loadingCancel();
   }

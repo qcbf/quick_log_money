@@ -109,7 +109,18 @@ class LedgerDBHelper extends _$LedgerDBHelper {
   @override
   MigrationStrategy get migration {
     return MigrationStrategy(
-      onCreate: (m) => m.createAll(),
+      onCreate: (m) async {
+        var db = m.database as LedgerDBHelper;
+        await m.createAll();
+        await customStatement("""
+CREATE TRIGGER RecentTagsLimit
+AFTER INSERT ON ${$LedgerRecentTagsTable.$name}
+WHEN (SELECT COUNT(*) FROM ${$LedgerRecentTagsTable.$name}) > (SELECT ${db.ledgerInfos.RecentCount.name} FROM ${$LedgerInfosTable.$name} LIMIT 1)
+BEGIN
+  DELETE FROM ${$LedgerRecentTagsTable.$name} WHERE Id = (SELECT Id FROM ${$LedgerRecentTagsTable.$name} ORDER BY Id LIMIT 1);
+END;
+""");
+      },
       onUpgrade: (m, from, to) async {
         await customStatement('PRAGMA foreign_keys = OFF');
       },

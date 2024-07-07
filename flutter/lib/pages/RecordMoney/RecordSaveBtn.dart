@@ -11,7 +11,10 @@ class RecordSaveBtn extends StatelessWidget {
   Widget build(BuildContext context) => Consumer<EntryEditingProvider>(
       builder: (BuildContext context, EntryEditingProvider value, Widget? child) => TextButton(
             style: Style,
-            onPressed: () => context.read<EntryEditingProvider>().Save().whenComplete(() => Navigator.pop(context)),
+            onPressed: () => context.read<EntryEditingProvider>().Save().whenComplete(() {
+              final a = Navigator.canPop(context);
+              print(a);
+            }),
             child: Text("保存", style: TextStyle(color: value.IsIncome ? Colors.green : Colors.red)),
           ));
 }

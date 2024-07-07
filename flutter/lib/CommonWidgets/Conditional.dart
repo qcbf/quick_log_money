@@ -133,6 +133,6 @@ class _ConditionalValueListenerState<T> extends State<ConditionalValueListener<T
   }
 
   void _OnValueChangeEvent() {
-    setState(() => value = widget.Listenable.value);
+    if (mounted) setState(() => value = widget.Listenable.value);
   }
 }
