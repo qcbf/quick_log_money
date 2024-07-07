@@ -24,6 +24,7 @@ void main() async {
   await UserDBHelper.Init();
 
   runApp(const MainApp());
+  print("start");
 }
 
 /// app root ui

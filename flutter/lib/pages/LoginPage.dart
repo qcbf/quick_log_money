@@ -115,10 +115,16 @@ class _LoginPageState extends State<LoginPage> {
         child: ElevatedButton(
             onPressed: () async {
               final cancel = BotToast.showLoading();
-              await UserDBHelper.LoginAnonym();
-              cancel();
-              if (!mounted) return;
-              Navigator.pushReplacementNamed(context, Pages.Home);
+              try {
+                await UserDBHelper.LoginAnonym();
+                cancel();
+                if (!mounted) return;
+                Navigator.pushReplacementNamed(context, Pages.Home);
+              } catch (ex) {
+                BotToast.showSimpleNotification(title: ex.toString());
+                cancel();
+                rethrow;
+              }
             },
             child: const Text("试用一下")),
       );

@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
-
 import 'package:drift/drift.dart';
 import 'package:flutter/services.dart';
-import 'package:quick_log_money/Database/DatabaseConnector.dart';
+import 'package:quick_log_money/Database/DatabaseHelper.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
@@ -26,7 +26,7 @@ class Users extends Table {
 ///
 @DriftDatabase(tables: [Users])
 class UserDBHelper extends _$UserDBHelper {
-  UserDBHelper(String name) : super(DatabaseConnector.OpenConnection(name));
+  UserDBHelper(String name) : super(DatabaseHelper.OpenConnection(name));
 
   @override
   int get schemaVersion => 1;
@@ -40,13 +40,6 @@ class UserDBHelper extends _$UserDBHelper {
       },
       beforeOpen: (details) async {
         await customStatement('PRAGMA foreign_keys = ON');
-        // if (kDebugMode) {
-        //   final m = Migrator(this);
-        //   for (final table in allTables) {
-        //     await m.deleteTable(table.actualTableName);
-        //     await m.createTable(table);
-        //   }
-        // }
       },
     );
   }
@@ -54,9 +47,10 @@ class UserDBHelper extends _$UserDBHelper {
   ///
   static Future Init() async {
     UserDB = UserDBHelper("users");
+    await DatabaseHelper.DebugTryResetDatabase(UserDB);
     if (Prefs.IsNotUserId) return;
     try {
-      _OnLoginFinish(await UserDB.managers.users.filter((f) => f.Id(Prefs.UserId)).getSingle());
+      await _OnLoginFinish(await UserDB.managers.users.filter((f) => f.Id(Prefs.UserId)).getSingle());
     } catch (e) {
       Prefs.SetNotUserId();
       rethrow;

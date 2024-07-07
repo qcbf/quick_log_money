@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
-import 'package:quick_log_money/Database/DatabaseConnector.dart';
+import 'package:quick_log_money/Database/DatabaseHelper.dart';
 import 'package:quick_log_money/Database/UserDB.dart';
 import 'package:quick_log_money/Utilities/AsyncValue.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
@@ -80,14 +80,14 @@ class LedgerTags extends Table {
 ///
 class LedgerRecentTags extends Table {
   IntColumn get Id => integer().autoIncrement()();
-  IntColumn get TagId => integer()();
+  IntColumn get TagId => integer().unique()();
 }
 
 ///
 @TableIndex(name: "LedgerOwners.UserId", columns: {#UserId})
 class LedgerOwners extends Table {
   IntColumn get Id => integer().autoIncrement()();
-  IntColumn get UserId => integer()();
+  IntColumn get UserId => integer().unique()();
   TextColumn get Role => textEnum<EOwnerRole>()();
 }
 
@@ -97,10 +97,11 @@ class LedgerFlags {}
 ///
 @DriftDatabase(tables: [LedgerInfos, LedgerEntries, LedgerTags, LedgerRecentTags, LedgerOwners])
 class LedgerDBHelper extends _$LedgerDBHelper {
-  LedgerDBHelper(String name, int userId) : super(DatabaseConnector.OpenConnection("lg.$userId.sl"));
+  static bool _LedgerDBIsConnected = false;
+  LedgerDBHelper(String name, int userId) : super(DatabaseHelper.OpenConnection("lg.$userId.sl"));
   LedgerDBHelper.FromUser(int userId)
       : assert(userId > 0, "not found UserId"),
-        super(DatabaseConnector.OpenConnection("lg.$userId.sl"));
+        super(DatabaseHelper.OpenConnection("lg.$userId.sl"));
 
   @override
   int get schemaVersion => 1;
@@ -114,13 +115,6 @@ class LedgerDBHelper extends _$LedgerDBHelper {
       },
       beforeOpen: (details) async {
         await customStatement('PRAGMA foreign_keys = ON');
-        // if (kDebugMode) {
-        //   final m = Migrator(this);
-        //   for (final table in allTables) {
-        //     await m.deleteTable(table.actualTableName);
-        //     await m.createTable(table);
-        //   }
-        // }
       },
     );
   }
@@ -128,7 +122,10 @@ class LedgerDBHelper extends _$LedgerDBHelper {
   ///
   static Future Init() async {
     assert(!Prefs.IsNotUserId, "not found UserId");
+    if (_LedgerDBIsConnected) LedgerDB.close();
     LedgerDB = LedgerDBHelper.FromUser(Prefs.UserId);
+    _LedgerDBIsConnected = true;
+    await DatabaseHelper.DebugTryResetDatabase(LedgerDB);
     Ledger = await UserLedgerDao.Create();
   }
 
@@ -139,10 +136,17 @@ class LedgerDBHelper extends _$LedgerDBHelper {
 
   ///
   static Future<int> CreateLedger(int userId, LedgerDBHelper db, LedgerInfosCompanion info, Iterable<LedgerTagsCompanion> tags) async {
+    await Future.wait([for (var t in db.allTables) t.deleteAll()]);
+    final recentCount = info.RecentCount.present ? info.RecentCount.value : (db.ledgerInfos.RecentCount.defaultValue as Constant<int>).value!;
     final id = await db.managers.ledgerInfos.create((o) => info);
     await db.managers.ledgerTags.bulkCreate((o) => tags);
     await db.managers.ledgerOwners.create((o) => o(Role: EOwnerRole.Anim, UserId: userId));
-    await db.managers.ledgerRecentTags.bulkCreate((o) => tags.take(info.RecentCount.value).map((e) => LedgerRecentTagsCompanion(TagId: e.Id)));
+    final tagIds = await (db.selectOnly(db.ledgerTags)
+          ..addColumns([db.ledgerTags.Id])
+          ..limit(recentCount))
+        .map((e) => LedgerRecentTagsCompanion.insert(TagId: e.read(db.ledgerTags.Id)!))
+        .get();
+    await db.managers.ledgerRecentTags.bulkCreate((o) => tagIds);
     return id;
   }
 }

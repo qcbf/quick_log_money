@@ -8,7 +8,7 @@ typedef ConditionBuilder = bool Function();
 
 ///
 class Conditional {
-  static ViewBuilder GlobalFallback = () => const Text("LOADING...");
+  static ViewBuilder GlobalFallback = () => const Text("LOADING...", style: TextStyle(fontSize: 10));
 
   ///
   static Widget Single(ConditionBuilder condition, ViewBuilder builder, {ViewBuilder? fallbackBuilder}) {
