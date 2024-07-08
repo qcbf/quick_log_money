@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagListUI.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
+import 'package:quick_log_money/Database/UserDB.dart';
 import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
 
 class RecordRecentTags extends StatefulWidget {

@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
@@ -23,7 +22,7 @@ class RecordSaveBtn extends StatelessWidget {
                   BotToast.showSimpleNotification(title: "Debug Only>Back Home");
                   Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
                 } else {
-                  exit(0);
+                  SystemNavigator.pop(animated: true);
                 }
               }
             }),

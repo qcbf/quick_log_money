@@ -3,11 +3,12 @@
 part of 'UserDB.dart';
 
 // ignore_for_file: type=lint
-class $UsersTable extends Users with TableInfo<$UsersTable, User> {
+class $UserInfosTable extends UserInfos
+    with TableInfo<$UserInfosTable, UserInfo> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $UsersTable(this.attachedDatabase, [this._alias]);
+  $UserInfosTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _IdMeta = const VerificationMeta('Id');
   @override
   late final GeneratedColumn<int> Id = GeneratedColumn<int>(
@@ -23,6 +24,14 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   late final GeneratedColumn<int> LedgerId = GeneratedColumn<int>(
       'ledger_id', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _LedgerRecentCountMeta =
+      const VerificationMeta('LedgerRecentCount');
+  @override
+  late final GeneratedColumn<int> LedgerRecentCount = GeneratedColumn<int>(
+      'ledger_recent_count', aliasedName, true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(8));
   static const VerificationMeta _NameMeta = const VerificationMeta('Name');
   @override
   late final GeneratedColumn<String> Name = GeneratedColumn<String>(
@@ -53,15 +62,23 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
       requiredDuringInsert: false,
       defaultValue: currentDate);
   @override
-  List<GeneratedColumn> get $columns =>
-      [Id, LedgerId, Name, Icon, Token, VipExpiryDate, RegisterDate];
+  List<GeneratedColumn> get $columns => [
+        Id,
+        LedgerId,
+        LedgerRecentCount,
+        Name,
+        Icon,
+        Token,
+        VipExpiryDate,
+        RegisterDate
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'users';
+  static const String $name = 'user_infos';
   @override
-  VerificationContext validateIntegrity(Insertable<User> instance,
+  VerificationContext validateIntegrity(Insertable<UserInfo> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -73,6 +90,12 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
           LedgerId.isAcceptableOrUnknown(data['ledger_id']!, _LedgerIdMeta));
     } else if (isInserting) {
       context.missing(_LedgerIdMeta);
+    }
+    if (data.containsKey('ledger_recent_count')) {
+      context.handle(
+          _LedgerRecentCountMeta,
+          LedgerRecentCount.isAcceptableOrUnknown(
+              data['ledger_recent_count']!, _LedgerRecentCountMeta));
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -108,13 +131,15 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   @override
   Set<GeneratedColumn> get $primaryKey => {Id};
   @override
-  User map(Map<String, dynamic> data, {String? tablePrefix}) {
+  UserInfo map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return User(
+    return UserInfo(
       Id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       LedgerId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}ledger_id'])!,
+      LedgerRecentCount: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}ledger_recent_count']),
       Name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       Icon: attachedDatabase.typeMapping
@@ -129,22 +154,24 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   }
 
   @override
-  $UsersTable createAlias(String alias) {
-    return $UsersTable(attachedDatabase, alias);
+  $UserInfosTable createAlias(String alias) {
+    return $UserInfosTable(attachedDatabase, alias);
   }
 }
 
-class User extends DataClass implements Insertable<User> {
+class UserInfo extends DataClass implements Insertable<UserInfo> {
   final int Id;
   final int LedgerId;
+  final int? LedgerRecentCount;
   final String Name;
   final String Icon;
   final String? Token;
   final DateTime? VipExpiryDate;
   final DateTime RegisterDate;
-  const User(
+  const UserInfo(
       {required this.Id,
       required this.LedgerId,
+      this.LedgerRecentCount,
       required this.Name,
       required this.Icon,
       this.Token,
@@ -155,6 +182,9 @@ class User extends DataClass implements Insertable<User> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(Id);
     map['ledger_id'] = Variable<int>(LedgerId);
+    if (!nullToAbsent || LedgerRecentCount != null) {
+      map['ledger_recent_count'] = Variable<int>(LedgerRecentCount);
+    }
     map['name'] = Variable<String>(Name);
     map['icon'] = Variable<String>(Icon);
     if (!nullToAbsent || Token != null) {
@@ -167,10 +197,13 @@ class User extends DataClass implements Insertable<User> {
     return map;
   }
 
-  UsersCompanion toCompanion(bool nullToAbsent) {
-    return UsersCompanion(
+  UserInfosCompanion toCompanion(bool nullToAbsent) {
+    return UserInfosCompanion(
       Id: Value(Id),
       LedgerId: Value(LedgerId),
+      LedgerRecentCount: LedgerRecentCount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(LedgerRecentCount),
       Name: Value(Name),
       Icon: Value(Icon),
       Token:
@@ -182,12 +215,13 @@ class User extends DataClass implements Insertable<User> {
     );
   }
 
-  factory User.fromJson(Map<String, dynamic> json,
+  factory UserInfo.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return User(
+    return UserInfo(
       Id: serializer.fromJson<int>(json['Id']),
       LedgerId: serializer.fromJson<int>(json['LedgerId']),
+      LedgerRecentCount: serializer.fromJson<int?>(json['LedgerRecentCount']),
       Name: serializer.fromJson<String>(json['Name']),
       Icon: serializer.fromJson<String>(json['Icon']),
       Token: serializer.fromJson<String?>(json['Token']),
@@ -201,6 +235,7 @@ class User extends DataClass implements Insertable<User> {
     return <String, dynamic>{
       'Id': serializer.toJson<int>(Id),
       'LedgerId': serializer.toJson<int>(LedgerId),
+      'LedgerRecentCount': serializer.toJson<int?>(LedgerRecentCount),
       'Name': serializer.toJson<String>(Name),
       'Icon': serializer.toJson<String>(Icon),
       'Token': serializer.toJson<String?>(Token),
@@ -209,17 +244,21 @@ class User extends DataClass implements Insertable<User> {
     };
   }
 
-  User copyWith(
+  UserInfo copyWith(
           {int? Id,
           int? LedgerId,
+          Value<int?> LedgerRecentCount = const Value.absent(),
           String? Name,
           String? Icon,
           Value<String?> Token = const Value.absent(),
           Value<DateTime?> VipExpiryDate = const Value.absent(),
           DateTime? RegisterDate}) =>
-      User(
+      UserInfo(
         Id: Id ?? this.Id,
         LedgerId: LedgerId ?? this.LedgerId,
+        LedgerRecentCount: LedgerRecentCount.present
+            ? LedgerRecentCount.value
+            : this.LedgerRecentCount,
         Name: Name ?? this.Name,
         Icon: Icon ?? this.Icon,
         Token: Token.present ? Token.value : this.Token,
@@ -229,9 +268,10 @@ class User extends DataClass implements Insertable<User> {
       );
   @override
   String toString() {
-    return (StringBuffer('User(')
+    return (StringBuffer('UserInfo(')
           ..write('Id: $Id, ')
           ..write('LedgerId: $LedgerId, ')
+          ..write('LedgerRecentCount: $LedgerRecentCount, ')
           ..write('Name: $Name, ')
           ..write('Icon: $Icon, ')
           ..write('Token: $Token, ')
@@ -242,14 +282,15 @@ class User extends DataClass implements Insertable<User> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(Id, LedgerId, Name, Icon, Token, VipExpiryDate, RegisterDate);
+  int get hashCode => Object.hash(Id, LedgerId, LedgerRecentCount, Name, Icon,
+      Token, VipExpiryDate, RegisterDate);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is User &&
+      (other is UserInfo &&
           other.Id == this.Id &&
           other.LedgerId == this.LedgerId &&
+          other.LedgerRecentCount == this.LedgerRecentCount &&
           other.Name == this.Name &&
           other.Icon == this.Icon &&
           other.Token == this.Token &&
@@ -257,26 +298,29 @@ class User extends DataClass implements Insertable<User> {
           other.RegisterDate == this.RegisterDate);
 }
 
-class UsersCompanion extends UpdateCompanion<User> {
+class UserInfosCompanion extends UpdateCompanion<UserInfo> {
   final Value<int> Id;
   final Value<int> LedgerId;
+  final Value<int?> LedgerRecentCount;
   final Value<String> Name;
   final Value<String> Icon;
   final Value<String?> Token;
   final Value<DateTime?> VipExpiryDate;
   final Value<DateTime> RegisterDate;
-  const UsersCompanion({
+  const UserInfosCompanion({
     this.Id = const Value.absent(),
     this.LedgerId = const Value.absent(),
+    this.LedgerRecentCount = const Value.absent(),
     this.Name = const Value.absent(),
     this.Icon = const Value.absent(),
     this.Token = const Value.absent(),
     this.VipExpiryDate = const Value.absent(),
     this.RegisterDate = const Value.absent(),
   });
-  UsersCompanion.insert({
+  UserInfosCompanion.insert({
     this.Id = const Value.absent(),
     required int LedgerId,
+    this.LedgerRecentCount = const Value.absent(),
     required String Name,
     required String Icon,
     this.Token = const Value.absent(),
@@ -285,9 +329,10 @@ class UsersCompanion extends UpdateCompanion<User> {
   })  : LedgerId = Value(LedgerId),
         Name = Value(Name),
         Icon = Value(Icon);
-  static Insertable<User> custom({
+  static Insertable<UserInfo> custom({
     Expression<int>? Id,
     Expression<int>? LedgerId,
+    Expression<int>? LedgerRecentCount,
     Expression<String>? Name,
     Expression<String>? Icon,
     Expression<String>? Token,
@@ -297,6 +342,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
       if (LedgerId != null) 'ledger_id': LedgerId,
+      if (LedgerRecentCount != null) 'ledger_recent_count': LedgerRecentCount,
       if (Name != null) 'name': Name,
       if (Icon != null) 'icon': Icon,
       if (Token != null) 'token': Token,
@@ -305,17 +351,19 @@ class UsersCompanion extends UpdateCompanion<User> {
     });
   }
 
-  UsersCompanion copyWith(
+  UserInfosCompanion copyWith(
       {Value<int>? Id,
       Value<int>? LedgerId,
+      Value<int?>? LedgerRecentCount,
       Value<String>? Name,
       Value<String>? Icon,
       Value<String?>? Token,
       Value<DateTime?>? VipExpiryDate,
       Value<DateTime>? RegisterDate}) {
-    return UsersCompanion(
+    return UserInfosCompanion(
       Id: Id ?? this.Id,
       LedgerId: LedgerId ?? this.LedgerId,
+      LedgerRecentCount: LedgerRecentCount ?? this.LedgerRecentCount,
       Name: Name ?? this.Name,
       Icon: Icon ?? this.Icon,
       Token: Token ?? this.Token,
@@ -332,6 +380,9 @@ class UsersCompanion extends UpdateCompanion<User> {
     }
     if (LedgerId.present) {
       map['ledger_id'] = Variable<int>(LedgerId.value);
+    }
+    if (LedgerRecentCount.present) {
+      map['ledger_recent_count'] = Variable<int>(LedgerRecentCount.value);
     }
     if (Name.present) {
       map['name'] = Variable<String>(Name.value);
@@ -353,9 +404,10 @@ class UsersCompanion extends UpdateCompanion<User> {
 
   @override
   String toString() {
-    return (StringBuffer('UsersCompanion(')
+    return (StringBuffer('UserInfosCompanion(')
           ..write('Id: $Id, ')
           ..write('LedgerId: $LedgerId, ')
+          ..write('LedgerRecentCount: $LedgerRecentCount, ')
           ..write('Name: $Name, ')
           ..write('Icon: $Icon, ')
           ..write('Token: $Token, ')
@@ -366,29 +418,423 @@ class UsersCompanion extends UpdateCompanion<User> {
   }
 }
 
+class $UserLedgerRecentTagsTable extends UserLedgerRecentTags
+    with TableInfo<$UserLedgerRecentTagsTable, UserLedgerRecentTag> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UserLedgerRecentTagsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _IdMeta = const VerificationMeta('Id');
+  @override
+  late final GeneratedColumn<int> Id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _TagIdMeta = const VerificationMeta('TagId');
+  @override
+  late final GeneratedColumn<int> TagId = GeneratedColumn<int>(
+      'tag_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+  @override
+  List<GeneratedColumn> get $columns => [Id, TagId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'user_ledger_recent_tags';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<UserLedgerRecentTag> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_IdMeta, Id.isAcceptableOrUnknown(data['id']!, _IdMeta));
+    }
+    if (data.containsKey('tag_id')) {
+      context.handle(
+          _TagIdMeta, TagId.isAcceptableOrUnknown(data['tag_id']!, _TagIdMeta));
+    } else if (isInserting) {
+      context.missing(_TagIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {Id};
+  @override
+  UserLedgerRecentTag map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UserLedgerRecentTag(
+      Id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      TagId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}tag_id'])!,
+    );
+  }
+
+  @override
+  $UserLedgerRecentTagsTable createAlias(String alias) {
+    return $UserLedgerRecentTagsTable(attachedDatabase, alias);
+  }
+}
+
+class UserLedgerRecentTag extends DataClass
+    implements Insertable<UserLedgerRecentTag> {
+  final int Id;
+  final int TagId;
+  const UserLedgerRecentTag({required this.Id, required this.TagId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(Id);
+    map['tag_id'] = Variable<int>(TagId);
+    return map;
+  }
+
+  UserLedgerRecentTagsCompanion toCompanion(bool nullToAbsent) {
+    return UserLedgerRecentTagsCompanion(
+      Id: Value(Id),
+      TagId: Value(TagId),
+    );
+  }
+
+  factory UserLedgerRecentTag.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return UserLedgerRecentTag(
+      Id: serializer.fromJson<int>(json['Id']),
+      TagId: serializer.fromJson<int>(json['TagId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'Id': serializer.toJson<int>(Id),
+      'TagId': serializer.toJson<int>(TagId),
+    };
+  }
+
+  UserLedgerRecentTag copyWith({int? Id, int? TagId}) => UserLedgerRecentTag(
+        Id: Id ?? this.Id,
+        TagId: TagId ?? this.TagId,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('UserLedgerRecentTag(')
+          ..write('Id: $Id, ')
+          ..write('TagId: $TagId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(Id, TagId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is UserLedgerRecentTag &&
+          other.Id == this.Id &&
+          other.TagId == this.TagId);
+}
+
+class UserLedgerRecentTagsCompanion
+    extends UpdateCompanion<UserLedgerRecentTag> {
+  final Value<int> Id;
+  final Value<int> TagId;
+  const UserLedgerRecentTagsCompanion({
+    this.Id = const Value.absent(),
+    this.TagId = const Value.absent(),
+  });
+  UserLedgerRecentTagsCompanion.insert({
+    this.Id = const Value.absent(),
+    required int TagId,
+  }) : TagId = Value(TagId);
+  static Insertable<UserLedgerRecentTag> custom({
+    Expression<int>? Id,
+    Expression<int>? TagId,
+  }) {
+    return RawValuesInsertable({
+      if (Id != null) 'id': Id,
+      if (TagId != null) 'tag_id': TagId,
+    });
+  }
+
+  UserLedgerRecentTagsCompanion copyWith({Value<int>? Id, Value<int>? TagId}) {
+    return UserLedgerRecentTagsCompanion(
+      Id: Id ?? this.Id,
+      TagId: TagId ?? this.TagId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (Id.present) {
+      map['id'] = Variable<int>(Id.value);
+    }
+    if (TagId.present) {
+      map['tag_id'] = Variable<int>(TagId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserLedgerRecentTagsCompanion(')
+          ..write('Id: $Id, ')
+          ..write('TagId: $TagId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $UserCardsTable extends UserCards
+    with TableInfo<$UserCardsTable, UserCard> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UserCardsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _IdMeta = const VerificationMeta('Id');
+  @override
+  late final GeneratedColumn<int> Id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _PlaceMeta = const VerificationMeta('Place');
+  @override
+  late final GeneratedColumn<int> Place = GeneratedColumn<int>(
+      'place', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _ParamsMeta = const VerificationMeta('Params');
+  @override
+  late final GeneratedColumn<String> Params = GeneratedColumn<String>(
+      'params', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [Id, Place, Params];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'user_cards';
+  @override
+  VerificationContext validateIntegrity(Insertable<UserCard> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_IdMeta, Id.isAcceptableOrUnknown(data['id']!, _IdMeta));
+    }
+    if (data.containsKey('place')) {
+      context.handle(
+          _PlaceMeta, Place.isAcceptableOrUnknown(data['place']!, _PlaceMeta));
+    } else if (isInserting) {
+      context.missing(_PlaceMeta);
+    }
+    if (data.containsKey('params')) {
+      context.handle(_ParamsMeta,
+          Params.isAcceptableOrUnknown(data['params']!, _ParamsMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {Id};
+  @override
+  UserCard map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UserCard(
+      Id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      Place: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}place'])!,
+      Params: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}params']),
+    );
+  }
+
+  @override
+  $UserCardsTable createAlias(String alias) {
+    return $UserCardsTable(attachedDatabase, alias);
+  }
+}
+
+class UserCard extends DataClass implements Insertable<UserCard> {
+  final int Id;
+  final int Place;
+  final String? Params;
+  const UserCard({required this.Id, required this.Place, this.Params});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(Id);
+    map['place'] = Variable<int>(Place);
+    if (!nullToAbsent || Params != null) {
+      map['params'] = Variable<String>(Params);
+    }
+    return map;
+  }
+
+  UserCardsCompanion toCompanion(bool nullToAbsent) {
+    return UserCardsCompanion(
+      Id: Value(Id),
+      Place: Value(Place),
+      Params:
+          Params == null && nullToAbsent ? const Value.absent() : Value(Params),
+    );
+  }
+
+  factory UserCard.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return UserCard(
+      Id: serializer.fromJson<int>(json['Id']),
+      Place: serializer.fromJson<int>(json['Place']),
+      Params: serializer.fromJson<String?>(json['Params']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'Id': serializer.toJson<int>(Id),
+      'Place': serializer.toJson<int>(Place),
+      'Params': serializer.toJson<String?>(Params),
+    };
+  }
+
+  UserCard copyWith(
+          {int? Id,
+          int? Place,
+          Value<String?> Params = const Value.absent()}) =>
+      UserCard(
+        Id: Id ?? this.Id,
+        Place: Place ?? this.Place,
+        Params: Params.present ? Params.value : this.Params,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('UserCard(')
+          ..write('Id: $Id, ')
+          ..write('Place: $Place, ')
+          ..write('Params: $Params')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(Id, Place, Params);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is UserCard &&
+          other.Id == this.Id &&
+          other.Place == this.Place &&
+          other.Params == this.Params);
+}
+
+class UserCardsCompanion extends UpdateCompanion<UserCard> {
+  final Value<int> Id;
+  final Value<int> Place;
+  final Value<String?> Params;
+  const UserCardsCompanion({
+    this.Id = const Value.absent(),
+    this.Place = const Value.absent(),
+    this.Params = const Value.absent(),
+  });
+  UserCardsCompanion.insert({
+    this.Id = const Value.absent(),
+    required int Place,
+    this.Params = const Value.absent(),
+  }) : Place = Value(Place);
+  static Insertable<UserCard> custom({
+    Expression<int>? Id,
+    Expression<int>? Place,
+    Expression<String>? Params,
+  }) {
+    return RawValuesInsertable({
+      if (Id != null) 'id': Id,
+      if (Place != null) 'place': Place,
+      if (Params != null) 'params': Params,
+    });
+  }
+
+  UserCardsCompanion copyWith(
+      {Value<int>? Id, Value<int>? Place, Value<String?>? Params}) {
+    return UserCardsCompanion(
+      Id: Id ?? this.Id,
+      Place: Place ?? this.Place,
+      Params: Params ?? this.Params,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (Id.present) {
+      map['id'] = Variable<int>(Id.value);
+    }
+    if (Place.present) {
+      map['place'] = Variable<int>(Place.value);
+    }
+    if (Params.present) {
+      map['params'] = Variable<String>(Params.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserCardsCompanion(')
+          ..write('Id: $Id, ')
+          ..write('Place: $Place, ')
+          ..write('Params: $Params')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$UserDBHelper extends GeneratedDatabase {
   _$UserDBHelper(QueryExecutor e) : super(e);
   _$UserDBHelperManager get managers => _$UserDBHelperManager(this);
-  late final $UsersTable users = $UsersTable(this);
+  late final $UserInfosTable userInfos = $UserInfosTable(this);
+  late final $UserLedgerRecentTagsTable userLedgerRecentTags =
+      $UserLedgerRecentTagsTable(this);
+  late final $UserCardsTable userCards = $UserCardsTable(this);
+  late final Index userCardsPlace = Index('UserCards.Place',
+      'CREATE INDEX "UserCards.Place" ON user_cards (place)');
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [users];
+  List<DatabaseSchemaEntity> get allSchemaEntities =>
+      [userInfos, userLedgerRecentTags, userCards, userCardsPlace];
 }
 
-typedef $$UsersTableInsertCompanionBuilder = UsersCompanion Function({
+typedef $$UserInfosTableInsertCompanionBuilder = UserInfosCompanion Function({
   Value<int> Id,
   required int LedgerId,
+  Value<int?> LedgerRecentCount,
   required String Name,
   required String Icon,
   Value<String?> Token,
   Value<DateTime?> VipExpiryDate,
   Value<DateTime> RegisterDate,
 });
-typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
+typedef $$UserInfosTableUpdateCompanionBuilder = UserInfosCompanion Function({
   Value<int> Id,
   Value<int> LedgerId,
+  Value<int?> LedgerRecentCount,
   Value<String> Name,
   Value<String> Icon,
   Value<String?> Token,
@@ -396,36 +842,39 @@ typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
   Value<DateTime> RegisterDate,
 });
 
-class $$UsersTableTableManager extends RootTableManager<
+class $$UserInfosTableTableManager extends RootTableManager<
     _$UserDBHelper,
-    $UsersTable,
-    User,
-    $$UsersTableFilterComposer,
-    $$UsersTableOrderingComposer,
-    $$UsersTableProcessedTableManager,
-    $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
-  $$UsersTableTableManager(_$UserDBHelper db, $UsersTable table)
+    $UserInfosTable,
+    UserInfo,
+    $$UserInfosTableFilterComposer,
+    $$UserInfosTableOrderingComposer,
+    $$UserInfosTableProcessedTableManager,
+    $$UserInfosTableInsertCompanionBuilder,
+    $$UserInfosTableUpdateCompanionBuilder> {
+  $$UserInfosTableTableManager(_$UserDBHelper db, $UserInfosTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           filteringComposer:
-              $$UsersTableFilterComposer(ComposerState(db, table)),
+              $$UserInfosTableFilterComposer(ComposerState(db, table)),
           orderingComposer:
-              $$UsersTableOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $$UsersTableProcessedTableManager(p),
+              $$UserInfosTableOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$UserInfosTableProcessedTableManager(p),
           getUpdateCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
             Value<int> LedgerId = const Value.absent(),
+            Value<int?> LedgerRecentCount = const Value.absent(),
             Value<String> Name = const Value.absent(),
             Value<String> Icon = const Value.absent(),
             Value<String?> Token = const Value.absent(),
             Value<DateTime?> VipExpiryDate = const Value.absent(),
             Value<DateTime> RegisterDate = const Value.absent(),
           }) =>
-              UsersCompanion(
+              UserInfosCompanion(
             Id: Id,
             LedgerId: LedgerId,
+            LedgerRecentCount: LedgerRecentCount,
             Name: Name,
             Icon: Icon,
             Token: Token,
@@ -435,15 +884,17 @@ class $$UsersTableTableManager extends RootTableManager<
           getInsertCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
             required int LedgerId,
+            Value<int?> LedgerRecentCount = const Value.absent(),
             required String Name,
             required String Icon,
             Value<String?> Token = const Value.absent(),
             Value<DateTime?> VipExpiryDate = const Value.absent(),
             Value<DateTime> RegisterDate = const Value.absent(),
           }) =>
-              UsersCompanion.insert(
+              UserInfosCompanion.insert(
             Id: Id,
             LedgerId: LedgerId,
+            LedgerRecentCount: LedgerRecentCount,
             Name: Name,
             Icon: Icon,
             Token: Token,
@@ -453,21 +904,21 @@ class $$UsersTableTableManager extends RootTableManager<
         ));
 }
 
-class $$UsersTableProcessedTableManager extends ProcessedTableManager<
+class $$UserInfosTableProcessedTableManager extends ProcessedTableManager<
     _$UserDBHelper,
-    $UsersTable,
-    User,
-    $$UsersTableFilterComposer,
-    $$UsersTableOrderingComposer,
-    $$UsersTableProcessedTableManager,
-    $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
-  $$UsersTableProcessedTableManager(super.$state);
+    $UserInfosTable,
+    UserInfo,
+    $$UserInfosTableFilterComposer,
+    $$UserInfosTableOrderingComposer,
+    $$UserInfosTableProcessedTableManager,
+    $$UserInfosTableInsertCompanionBuilder,
+    $$UserInfosTableUpdateCompanionBuilder> {
+  $$UserInfosTableProcessedTableManager(super.$state);
 }
 
-class $$UsersTableFilterComposer
-    extends FilterComposer<_$UserDBHelper, $UsersTable> {
-  $$UsersTableFilterComposer(super.$state);
+class $$UserInfosTableFilterComposer
+    extends FilterComposer<_$UserDBHelper, $UserInfosTable> {
+  $$UserInfosTableFilterComposer(super.$state);
   ColumnFilters<int> get Id => $state.composableBuilder(
       column: $state.table.Id,
       builder: (column, joinBuilders) =>
@@ -475,6 +926,11 @@ class $$UsersTableFilterComposer
 
   ColumnFilters<int> get LedgerId => $state.composableBuilder(
       column: $state.table.LedgerId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get LedgerRecentCount => $state.composableBuilder(
+      column: $state.table.LedgerRecentCount,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -504,9 +960,9 @@ class $$UsersTableFilterComposer
           ColumnFilters(column, joinBuilders: joinBuilders));
 }
 
-class $$UsersTableOrderingComposer
-    extends OrderingComposer<_$UserDBHelper, $UsersTable> {
-  $$UsersTableOrderingComposer(super.$state);
+class $$UserInfosTableOrderingComposer
+    extends OrderingComposer<_$UserDBHelper, $UserInfosTable> {
+  $$UserInfosTableOrderingComposer(super.$state);
   ColumnOrderings<int> get Id => $state.composableBuilder(
       column: $state.table.Id,
       builder: (column, joinBuilders) =>
@@ -514,6 +970,11 @@ class $$UsersTableOrderingComposer
 
   ColumnOrderings<int> get LedgerId => $state.composableBuilder(
       column: $state.table.LedgerId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get LedgerRecentCount => $state.composableBuilder(
+      column: $state.table.LedgerRecentCount,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
@@ -543,9 +1004,207 @@ class $$UsersTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+typedef $$UserLedgerRecentTagsTableInsertCompanionBuilder
+    = UserLedgerRecentTagsCompanion Function({
+  Value<int> Id,
+  required int TagId,
+});
+typedef $$UserLedgerRecentTagsTableUpdateCompanionBuilder
+    = UserLedgerRecentTagsCompanion Function({
+  Value<int> Id,
+  Value<int> TagId,
+});
+
+class $$UserLedgerRecentTagsTableTableManager extends RootTableManager<
+    _$UserDBHelper,
+    $UserLedgerRecentTagsTable,
+    UserLedgerRecentTag,
+    $$UserLedgerRecentTagsTableFilterComposer,
+    $$UserLedgerRecentTagsTableOrderingComposer,
+    $$UserLedgerRecentTagsTableProcessedTableManager,
+    $$UserLedgerRecentTagsTableInsertCompanionBuilder,
+    $$UserLedgerRecentTagsTableUpdateCompanionBuilder> {
+  $$UserLedgerRecentTagsTableTableManager(
+      _$UserDBHelper db, $UserLedgerRecentTagsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $$UserLedgerRecentTagsTableFilterComposer(
+              ComposerState(db, table)),
+          orderingComposer: $$UserLedgerRecentTagsTableOrderingComposer(
+              ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$UserLedgerRecentTagsTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<int> Id = const Value.absent(),
+            Value<int> TagId = const Value.absent(),
+          }) =>
+              UserLedgerRecentTagsCompanion(
+            Id: Id,
+            TagId: TagId,
+          ),
+          getInsertCompanionBuilder: ({
+            Value<int> Id = const Value.absent(),
+            required int TagId,
+          }) =>
+              UserLedgerRecentTagsCompanion.insert(
+            Id: Id,
+            TagId: TagId,
+          ),
+        ));
+}
+
+class $$UserLedgerRecentTagsTableProcessedTableManager
+    extends ProcessedTableManager<
+        _$UserDBHelper,
+        $UserLedgerRecentTagsTable,
+        UserLedgerRecentTag,
+        $$UserLedgerRecentTagsTableFilterComposer,
+        $$UserLedgerRecentTagsTableOrderingComposer,
+        $$UserLedgerRecentTagsTableProcessedTableManager,
+        $$UserLedgerRecentTagsTableInsertCompanionBuilder,
+        $$UserLedgerRecentTagsTableUpdateCompanionBuilder> {
+  $$UserLedgerRecentTagsTableProcessedTableManager(super.$state);
+}
+
+class $$UserLedgerRecentTagsTableFilterComposer
+    extends FilterComposer<_$UserDBHelper, $UserLedgerRecentTagsTable> {
+  $$UserLedgerRecentTagsTableFilterComposer(super.$state);
+  ColumnFilters<int> get Id => $state.composableBuilder(
+      column: $state.table.Id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get TagId => $state.composableBuilder(
+      column: $state.table.TagId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$UserLedgerRecentTagsTableOrderingComposer
+    extends OrderingComposer<_$UserDBHelper, $UserLedgerRecentTagsTable> {
+  $$UserLedgerRecentTagsTableOrderingComposer(super.$state);
+  ColumnOrderings<int> get Id => $state.composableBuilder(
+      column: $state.table.Id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get TagId => $state.composableBuilder(
+      column: $state.table.TagId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $$UserCardsTableInsertCompanionBuilder = UserCardsCompanion Function({
+  Value<int> Id,
+  required int Place,
+  Value<String?> Params,
+});
+typedef $$UserCardsTableUpdateCompanionBuilder = UserCardsCompanion Function({
+  Value<int> Id,
+  Value<int> Place,
+  Value<String?> Params,
+});
+
+class $$UserCardsTableTableManager extends RootTableManager<
+    _$UserDBHelper,
+    $UserCardsTable,
+    UserCard,
+    $$UserCardsTableFilterComposer,
+    $$UserCardsTableOrderingComposer,
+    $$UserCardsTableProcessedTableManager,
+    $$UserCardsTableInsertCompanionBuilder,
+    $$UserCardsTableUpdateCompanionBuilder> {
+  $$UserCardsTableTableManager(_$UserDBHelper db, $UserCardsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$UserCardsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$UserCardsTableOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$UserCardsTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<int> Id = const Value.absent(),
+            Value<int> Place = const Value.absent(),
+            Value<String?> Params = const Value.absent(),
+          }) =>
+              UserCardsCompanion(
+            Id: Id,
+            Place: Place,
+            Params: Params,
+          ),
+          getInsertCompanionBuilder: ({
+            Value<int> Id = const Value.absent(),
+            required int Place,
+            Value<String?> Params = const Value.absent(),
+          }) =>
+              UserCardsCompanion.insert(
+            Id: Id,
+            Place: Place,
+            Params: Params,
+          ),
+        ));
+}
+
+class $$UserCardsTableProcessedTableManager extends ProcessedTableManager<
+    _$UserDBHelper,
+    $UserCardsTable,
+    UserCard,
+    $$UserCardsTableFilterComposer,
+    $$UserCardsTableOrderingComposer,
+    $$UserCardsTableProcessedTableManager,
+    $$UserCardsTableInsertCompanionBuilder,
+    $$UserCardsTableUpdateCompanionBuilder> {
+  $$UserCardsTableProcessedTableManager(super.$state);
+}
+
+class $$UserCardsTableFilterComposer
+    extends FilterComposer<_$UserDBHelper, $UserCardsTable> {
+  $$UserCardsTableFilterComposer(super.$state);
+  ColumnFilters<int> get Id => $state.composableBuilder(
+      column: $state.table.Id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get Place => $state.composableBuilder(
+      column: $state.table.Place,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get Params => $state.composableBuilder(
+      column: $state.table.Params,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$UserCardsTableOrderingComposer
+    extends OrderingComposer<_$UserDBHelper, $UserCardsTable> {
+  $$UserCardsTableOrderingComposer(super.$state);
+  ColumnOrderings<int> get Id => $state.composableBuilder(
+      column: $state.table.Id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get Place => $state.composableBuilder(
+      column: $state.table.Place,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get Params => $state.composableBuilder(
+      column: $state.table.Params,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
 class _$UserDBHelperManager {
   final _$UserDBHelper _db;
   _$UserDBHelperManager(this._db);
-  $$UsersTableTableManager get users =>
-      $$UsersTableTableManager(_db, _db.users);
+  $$UserInfosTableTableManager get userInfos =>
+      $$UserInfosTableTableManager(_db, _db.userInfos);
+  $$UserLedgerRecentTagsTableTableManager get userLedgerRecentTags =>
+      $$UserLedgerRecentTagsTableTableManager(_db, _db.userLedgerRecentTags);
+  $$UserCardsTableTableManager get userCards =>
+      $$UserCardsTableTableManager(_db, _db.userCards);
 }

@@ -17,7 +17,7 @@ class UserLedgerDao {
   UserLedgerDao({required this.Info, required this.Tag});
   static Future<UserLedgerDao> Create() async {
     return UserLedgerDao(
-      Info: AsyncValue(() async => await LedgerDB.managers.ledgerInfos.filter((f) => f.Id(UserData.LedgerId)).getSingle()),
+      Info: AsyncValue(() async => await LedgerDB.managers.ledgerInfos.filter((f) => f.Id(User.Info.LedgerId)).getSingle()),
       Tag: AsyncValue(() async => await LedgerTagDao.Create()),
     );
   }
@@ -27,14 +27,12 @@ class UserLedgerDao {
 class LedgerTagDao {
   final Map<int, LedgerTag> AllTags;
   final Map<String, List<LedgerTag>> TagGroups;
-  final List<LedgerTag> RecentTags;
-  LedgerTagDao({required this.AllTags, required this.TagGroups, required this.RecentTags});
+  LedgerTagDao({required this.AllTags, required this.TagGroups});
   static Future<LedgerTagDao> Create() async {
     final allTags = await LedgerDB.managers.ledgerTags.get();
     return LedgerTagDao(
       AllTags: Map.fromEntries(allTags.map((e) => MapEntry(e.Id, e))),
       TagGroups: allTags.groupListsBy((e) => e.Group),
-      RecentTags: await LedgerDB.select(LedgerDB.ledgerRecentTags).map((t) => allTags[t.Id]).get(),
     );
   }
 }
@@ -53,7 +51,6 @@ enum EOwnerRole {
 ///
 class LedgerInfos extends Table {
   IntColumn get Id => integer().autoIncrement()();
-  IntColumn get RecentCount => integer().withDefault(const Constant(8))();
   TextColumn get Name => text()();
   TextColumn get Icon => text()();
   TextColumn get Options => textEnum<ELedgerOption>().nullable()();
@@ -78,12 +75,6 @@ class LedgerTags extends Table {
 }
 
 ///
-class LedgerRecentTags extends Table {
-  IntColumn get Id => integer().autoIncrement()();
-  IntColumn get TagId => integer().unique()();
-}
-
-///
 @TableIndex(name: "LedgerOwners.UserId", columns: {#UserId})
 class LedgerOwners extends Table {
   IntColumn get Id => integer().autoIncrement()();
@@ -95,7 +86,7 @@ class LedgerOwners extends Table {
 class LedgerFlags {}
 
 ///
-@DriftDatabase(tables: [LedgerInfos, LedgerEntries, LedgerTags, LedgerRecentTags, LedgerOwners])
+@DriftDatabase(tables: [LedgerInfos, LedgerEntries, LedgerTags, LedgerOwners])
 class LedgerDBHelper extends _$LedgerDBHelper {
   static bool _LedgerDBIsConnected = false;
   LedgerDBHelper(String name, int userId) : super(DatabaseHelper.OpenConnection("lg.$userId.sl"));
@@ -109,18 +100,7 @@ class LedgerDBHelper extends _$LedgerDBHelper {
   @override
   MigrationStrategy get migration {
     return MigrationStrategy(
-      onCreate: (m) async {
-        var db = m.database as LedgerDBHelper;
-        await m.createAll();
-        await customStatement("""
-CREATE TRIGGER RecentTagsLimit
-AFTER INSERT ON ${$LedgerRecentTagsTable.$name}
-WHEN (SELECT COUNT(*) FROM ${$LedgerRecentTagsTable.$name}) > (SELECT ${db.ledgerInfos.RecentCount.name} FROM ${$LedgerInfosTable.$name} LIMIT 1)
-BEGIN
-  DELETE FROM ${$LedgerRecentTagsTable.$name} WHERE Id = (SELECT Id FROM ${$LedgerRecentTagsTable.$name} ORDER BY Id LIMIT 1);
-END;
-""");
-      },
+      onCreate: (m) => m.createAll(),
       onUpgrade: (m, from, to) async {
         await customStatement('PRAGMA foreign_keys = OFF');
       },
@@ -148,16 +128,9 @@ END;
   ///
   static Future<int> CreateLedger(int userId, LedgerDBHelper db, LedgerInfosCompanion info, Iterable<LedgerTagsCompanion> tags) async {
     await Future.wait([for (var t in db.allTables) t.deleteAll()]);
-    final recentCount = info.RecentCount.present ? info.RecentCount.value : (db.ledgerInfos.RecentCount.defaultValue as Constant<int>).value!;
     final id = await db.managers.ledgerInfos.create((o) => info);
     await db.managers.ledgerTags.bulkCreate((o) => tags);
     await db.managers.ledgerOwners.create((o) => o(Role: EOwnerRole.Anim, UserId: userId));
-    final tagIds = await (db.selectOnly(db.ledgerTags)
-          ..addColumns([db.ledgerTags.Id])
-          ..limit(recentCount))
-        .map((e) => LedgerRecentTagsCompanion.insert(TagId: e.read(db.ledgerTags.Id)!))
-        .get();
-    await db.managers.ledgerRecentTags.bulkCreate((o) => tagIds);
     return id;
   }
 }

@@ -18,14 +18,6 @@ class $LedgerInfosTable extends LedgerInfos
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _RecentCountMeta =
-      const VerificationMeta('RecentCount');
-  @override
-  late final GeneratedColumn<int> RecentCount = GeneratedColumn<int>(
-      'recent_count', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(8));
   static const VerificationMeta _NameMeta = const VerificationMeta('Name');
   @override
   late final GeneratedColumn<String> Name = GeneratedColumn<String>(
@@ -44,7 +36,7 @@ class $LedgerInfosTable extends LedgerInfos
               type: DriftSqlType.string, requiredDuringInsert: false)
           .withConverter<ELedgerOption?>($LedgerInfosTable.$converterOptionsn);
   @override
-  List<GeneratedColumn> get $columns => [Id, RecentCount, Name, Icon, Options];
+  List<GeneratedColumn> get $columns => [Id, Name, Icon, Options];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -57,12 +49,6 @@ class $LedgerInfosTable extends LedgerInfos
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_IdMeta, Id.isAcceptableOrUnknown(data['id']!, _IdMeta));
-    }
-    if (data.containsKey('recent_count')) {
-      context.handle(
-          _RecentCountMeta,
-          RecentCount.isAcceptableOrUnknown(
-              data['recent_count']!, _RecentCountMeta));
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -88,8 +74,6 @@ class $LedgerInfosTable extends LedgerInfos
     return LedgerInfo(
       Id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      RecentCount: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}recent_count'])!,
       Name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       Icon: attachedDatabase.typeMapping
@@ -113,21 +97,15 @@ class $LedgerInfosTable extends LedgerInfos
 
 class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
   final int Id;
-  final int RecentCount;
   final String Name;
   final String Icon;
   final ELedgerOption? Options;
   const LedgerInfo(
-      {required this.Id,
-      required this.RecentCount,
-      required this.Name,
-      required this.Icon,
-      this.Options});
+      {required this.Id, required this.Name, required this.Icon, this.Options});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(Id);
-    map['recent_count'] = Variable<int>(RecentCount);
     map['name'] = Variable<String>(Name);
     map['icon'] = Variable<String>(Icon);
     if (!nullToAbsent || Options != null) {
@@ -140,7 +118,6 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
   LedgerInfosCompanion toCompanion(bool nullToAbsent) {
     return LedgerInfosCompanion(
       Id: Value(Id),
-      RecentCount: Value(RecentCount),
       Name: Value(Name),
       Icon: Value(Icon),
       Options: Options == null && nullToAbsent
@@ -154,7 +131,6 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LedgerInfo(
       Id: serializer.fromJson<int>(json['Id']),
-      RecentCount: serializer.fromJson<int>(json['RecentCount']),
       Name: serializer.fromJson<String>(json['Name']),
       Icon: serializer.fromJson<String>(json['Icon']),
       Options: $LedgerInfosTable.$converterOptionsn
@@ -166,7 +142,6 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'Id': serializer.toJson<int>(Id),
-      'RecentCount': serializer.toJson<int>(RecentCount),
       'Name': serializer.toJson<String>(Name),
       'Icon': serializer.toJson<String>(Icon),
       'Options': serializer.toJson<String?>(
@@ -176,13 +151,11 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
 
   LedgerInfo copyWith(
           {int? Id,
-          int? RecentCount,
           String? Name,
           String? Icon,
           Value<ELedgerOption?> Options = const Value.absent()}) =>
       LedgerInfo(
         Id: Id ?? this.Id,
-        RecentCount: RecentCount ?? this.RecentCount,
         Name: Name ?? this.Name,
         Icon: Icon ?? this.Icon,
         Options: Options.present ? Options.value : this.Options,
@@ -191,7 +164,6 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
   String toString() {
     return (StringBuffer('LedgerInfo(')
           ..write('Id: $Id, ')
-          ..write('RecentCount: $RecentCount, ')
           ..write('Name: $Name, ')
           ..write('Icon: $Icon, ')
           ..write('Options: $Options')
@@ -200,13 +172,12 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
   }
 
   @override
-  int get hashCode => Object.hash(Id, RecentCount, Name, Icon, Options);
+  int get hashCode => Object.hash(Id, Name, Icon, Options);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is LedgerInfo &&
           other.Id == this.Id &&
-          other.RecentCount == this.RecentCount &&
           other.Name == this.Name &&
           other.Icon == this.Icon &&
           other.Options == this.Options);
@@ -214,20 +185,17 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
 
 class LedgerInfosCompanion extends UpdateCompanion<LedgerInfo> {
   final Value<int> Id;
-  final Value<int> RecentCount;
   final Value<String> Name;
   final Value<String> Icon;
   final Value<ELedgerOption?> Options;
   const LedgerInfosCompanion({
     this.Id = const Value.absent(),
-    this.RecentCount = const Value.absent(),
     this.Name = const Value.absent(),
     this.Icon = const Value.absent(),
     this.Options = const Value.absent(),
   });
   LedgerInfosCompanion.insert({
     this.Id = const Value.absent(),
-    this.RecentCount = const Value.absent(),
     required String Name,
     required String Icon,
     this.Options = const Value.absent(),
@@ -235,14 +203,12 @@ class LedgerInfosCompanion extends UpdateCompanion<LedgerInfo> {
         Icon = Value(Icon);
   static Insertable<LedgerInfo> custom({
     Expression<int>? Id,
-    Expression<int>? RecentCount,
     Expression<String>? Name,
     Expression<String>? Icon,
     Expression<String>? Options,
   }) {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
-      if (RecentCount != null) 'recent_count': RecentCount,
       if (Name != null) 'name': Name,
       if (Icon != null) 'icon': Icon,
       if (Options != null) 'options': Options,
@@ -251,13 +217,11 @@ class LedgerInfosCompanion extends UpdateCompanion<LedgerInfo> {
 
   LedgerInfosCompanion copyWith(
       {Value<int>? Id,
-      Value<int>? RecentCount,
       Value<String>? Name,
       Value<String>? Icon,
       Value<ELedgerOption?>? Options}) {
     return LedgerInfosCompanion(
       Id: Id ?? this.Id,
-      RecentCount: RecentCount ?? this.RecentCount,
       Name: Name ?? this.Name,
       Icon: Icon ?? this.Icon,
       Options: Options ?? this.Options,
@@ -269,9 +233,6 @@ class LedgerInfosCompanion extends UpdateCompanion<LedgerInfo> {
     final map = <String, Expression>{};
     if (Id.present) {
       map['id'] = Variable<int>(Id.value);
-    }
-    if (RecentCount.present) {
-      map['recent_count'] = Variable<int>(RecentCount.value);
     }
     if (Name.present) {
       map['name'] = Variable<String>(Name.value);
@@ -290,7 +251,6 @@ class LedgerInfosCompanion extends UpdateCompanion<LedgerInfo> {
   String toString() {
     return (StringBuffer('LedgerInfosCompanion(')
           ..write('Id: $Id, ')
-          ..write('RecentCount: $RecentCount, ')
           ..write('Name: $Name, ')
           ..write('Icon: $Icon, ')
           ..write('Options: $Options')
@@ -830,178 +790,6 @@ class LedgerTagsCompanion extends UpdateCompanion<LedgerTag> {
   }
 }
 
-class $LedgerRecentTagsTable extends LedgerRecentTags
-    with TableInfo<$LedgerRecentTagsTable, LedgerRecentTag> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $LedgerRecentTagsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _IdMeta = const VerificationMeta('Id');
-  @override
-  late final GeneratedColumn<int> Id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _TagIdMeta = const VerificationMeta('TagId');
-  @override
-  late final GeneratedColumn<int> TagId = GeneratedColumn<int>(
-      'tag_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  @override
-  List<GeneratedColumn> get $columns => [Id, TagId];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'ledger_recent_tags';
-  @override
-  VerificationContext validateIntegrity(Insertable<LedgerRecentTag> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_IdMeta, Id.isAcceptableOrUnknown(data['id']!, _IdMeta));
-    }
-    if (data.containsKey('tag_id')) {
-      context.handle(
-          _TagIdMeta, TagId.isAcceptableOrUnknown(data['tag_id']!, _TagIdMeta));
-    } else if (isInserting) {
-      context.missing(_TagIdMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {Id};
-  @override
-  LedgerRecentTag map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LedgerRecentTag(
-      Id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      TagId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}tag_id'])!,
-    );
-  }
-
-  @override
-  $LedgerRecentTagsTable createAlias(String alias) {
-    return $LedgerRecentTagsTable(attachedDatabase, alias);
-  }
-}
-
-class LedgerRecentTag extends DataClass implements Insertable<LedgerRecentTag> {
-  final int Id;
-  final int TagId;
-  const LedgerRecentTag({required this.Id, required this.TagId});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(Id);
-    map['tag_id'] = Variable<int>(TagId);
-    return map;
-  }
-
-  LedgerRecentTagsCompanion toCompanion(bool nullToAbsent) {
-    return LedgerRecentTagsCompanion(
-      Id: Value(Id),
-      TagId: Value(TagId),
-    );
-  }
-
-  factory LedgerRecentTag.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LedgerRecentTag(
-      Id: serializer.fromJson<int>(json['Id']),
-      TagId: serializer.fromJson<int>(json['TagId']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'Id': serializer.toJson<int>(Id),
-      'TagId': serializer.toJson<int>(TagId),
-    };
-  }
-
-  LedgerRecentTag copyWith({int? Id, int? TagId}) => LedgerRecentTag(
-        Id: Id ?? this.Id,
-        TagId: TagId ?? this.TagId,
-      );
-  @override
-  String toString() {
-    return (StringBuffer('LedgerRecentTag(')
-          ..write('Id: $Id, ')
-          ..write('TagId: $TagId')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(Id, TagId);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is LedgerRecentTag &&
-          other.Id == this.Id &&
-          other.TagId == this.TagId);
-}
-
-class LedgerRecentTagsCompanion extends UpdateCompanion<LedgerRecentTag> {
-  final Value<int> Id;
-  final Value<int> TagId;
-  const LedgerRecentTagsCompanion({
-    this.Id = const Value.absent(),
-    this.TagId = const Value.absent(),
-  });
-  LedgerRecentTagsCompanion.insert({
-    this.Id = const Value.absent(),
-    required int TagId,
-  }) : TagId = Value(TagId);
-  static Insertable<LedgerRecentTag> custom({
-    Expression<int>? Id,
-    Expression<int>? TagId,
-  }) {
-    return RawValuesInsertable({
-      if (Id != null) 'id': Id,
-      if (TagId != null) 'tag_id': TagId,
-    });
-  }
-
-  LedgerRecentTagsCompanion copyWith({Value<int>? Id, Value<int>? TagId}) {
-    return LedgerRecentTagsCompanion(
-      Id: Id ?? this.Id,
-      TagId: TagId ?? this.TagId,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (Id.present) {
-      map['id'] = Variable<int>(Id.value);
-    }
-    if (TagId.present) {
-      map['tag_id'] = Variable<int>(TagId.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('LedgerRecentTagsCompanion(')
-          ..write('Id: $Id, ')
-          ..write('TagId: $TagId')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $LedgerOwnersTable extends LedgerOwners
     with TableInfo<$LedgerOwnersTable, LedgerOwner> {
   @override
@@ -1021,7 +809,9 @@ class $LedgerOwnersTable extends LedgerOwners
   @override
   late final GeneratedColumn<int> UserId = GeneratedColumn<int>(
       'user_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
   static const VerificationMeta _RoleMeta = const VerificationMeta('Role');
   @override
   late final GeneratedColumnWithTypeConverter<EOwnerRole, String> Role =
@@ -1220,8 +1010,6 @@ abstract class _$LedgerDBHelper extends GeneratedDatabase {
   late final $LedgerInfosTable ledgerInfos = $LedgerInfosTable(this);
   late final $LedgerEntriesTable ledgerEntries = $LedgerEntriesTable(this);
   late final $LedgerTagsTable ledgerTags = $LedgerTagsTable(this);
-  late final $LedgerRecentTagsTable ledgerRecentTags =
-      $LedgerRecentTagsTable(this);
   late final $LedgerOwnersTable ledgerOwners = $LedgerOwnersTable(this);
   late final Index ledgerEntriesTagId = Index('LedgerEntries.TagId',
       'CREATE INDEX "LedgerEntries.TagId" ON ledger_entries (tag_id)');
@@ -1237,7 +1025,6 @@ abstract class _$LedgerDBHelper extends GeneratedDatabase {
         ledgerInfos,
         ledgerEntries,
         ledgerTags,
-        ledgerRecentTags,
         ledgerOwners,
         ledgerEntriesTagId,
         ledgerEntriesDate,
@@ -1248,7 +1035,6 @@ abstract class _$LedgerDBHelper extends GeneratedDatabase {
 typedef $$LedgerInfosTableInsertCompanionBuilder = LedgerInfosCompanion
     Function({
   Value<int> Id,
-  Value<int> RecentCount,
   required String Name,
   required String Icon,
   Value<ELedgerOption?> Options,
@@ -1256,7 +1042,6 @@ typedef $$LedgerInfosTableInsertCompanionBuilder = LedgerInfosCompanion
 typedef $$LedgerInfosTableUpdateCompanionBuilder = LedgerInfosCompanion
     Function({
   Value<int> Id,
-  Value<int> RecentCount,
   Value<String> Name,
   Value<String> Icon,
   Value<ELedgerOption?> Options,
@@ -1283,28 +1068,24 @@ class $$LedgerInfosTableTableManager extends RootTableManager<
               $$LedgerInfosTableProcessedTableManager(p),
           getUpdateCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
-            Value<int> RecentCount = const Value.absent(),
             Value<String> Name = const Value.absent(),
             Value<String> Icon = const Value.absent(),
             Value<ELedgerOption?> Options = const Value.absent(),
           }) =>
               LedgerInfosCompanion(
             Id: Id,
-            RecentCount: RecentCount,
             Name: Name,
             Icon: Icon,
             Options: Options,
           ),
           getInsertCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
-            Value<int> RecentCount = const Value.absent(),
             required String Name,
             required String Icon,
             Value<ELedgerOption?> Options = const Value.absent(),
           }) =>
               LedgerInfosCompanion.insert(
             Id: Id,
-            RecentCount: RecentCount,
             Name: Name,
             Icon: Icon,
             Options: Options,
@@ -1332,11 +1113,6 @@ class $$LedgerInfosTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
-  ColumnFilters<int> get RecentCount => $state.composableBuilder(
-      column: $state.table.RecentCount,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
   ColumnFilters<String> get Name => $state.composableBuilder(
       column: $state.table.Name,
       builder: (column, joinBuilders) =>
@@ -1360,11 +1136,6 @@ class $$LedgerInfosTableOrderingComposer
   $$LedgerInfosTableOrderingComposer(super.$state);
   ColumnOrderings<int> get Id => $state.composableBuilder(
       column: $state.table.Id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<int> get RecentCount => $state.composableBuilder(
-      column: $state.table.RecentCount,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
@@ -1641,97 +1412,6 @@ class $$LedgerTagsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $$LedgerRecentTagsTableInsertCompanionBuilder
-    = LedgerRecentTagsCompanion Function({
-  Value<int> Id,
-  required int TagId,
-});
-typedef $$LedgerRecentTagsTableUpdateCompanionBuilder
-    = LedgerRecentTagsCompanion Function({
-  Value<int> Id,
-  Value<int> TagId,
-});
-
-class $$LedgerRecentTagsTableTableManager extends RootTableManager<
-    _$LedgerDBHelper,
-    $LedgerRecentTagsTable,
-    LedgerRecentTag,
-    $$LedgerRecentTagsTableFilterComposer,
-    $$LedgerRecentTagsTableOrderingComposer,
-    $$LedgerRecentTagsTableProcessedTableManager,
-    $$LedgerRecentTagsTableInsertCompanionBuilder,
-    $$LedgerRecentTagsTableUpdateCompanionBuilder> {
-  $$LedgerRecentTagsTableTableManager(
-      _$LedgerDBHelper db, $LedgerRecentTagsTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $$LedgerRecentTagsTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$LedgerRecentTagsTableOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$LedgerRecentTagsTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
-            Value<int> Id = const Value.absent(),
-            Value<int> TagId = const Value.absent(),
-          }) =>
-              LedgerRecentTagsCompanion(
-            Id: Id,
-            TagId: TagId,
-          ),
-          getInsertCompanionBuilder: ({
-            Value<int> Id = const Value.absent(),
-            required int TagId,
-          }) =>
-              LedgerRecentTagsCompanion.insert(
-            Id: Id,
-            TagId: TagId,
-          ),
-        ));
-}
-
-class $$LedgerRecentTagsTableProcessedTableManager
-    extends ProcessedTableManager<
-        _$LedgerDBHelper,
-        $LedgerRecentTagsTable,
-        LedgerRecentTag,
-        $$LedgerRecentTagsTableFilterComposer,
-        $$LedgerRecentTagsTableOrderingComposer,
-        $$LedgerRecentTagsTableProcessedTableManager,
-        $$LedgerRecentTagsTableInsertCompanionBuilder,
-        $$LedgerRecentTagsTableUpdateCompanionBuilder> {
-  $$LedgerRecentTagsTableProcessedTableManager(super.$state);
-}
-
-class $$LedgerRecentTagsTableFilterComposer
-    extends FilterComposer<_$LedgerDBHelper, $LedgerRecentTagsTable> {
-  $$LedgerRecentTagsTableFilterComposer(super.$state);
-  ColumnFilters<int> get Id => $state.composableBuilder(
-      column: $state.table.Id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<int> get TagId => $state.composableBuilder(
-      column: $state.table.TagId,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-}
-
-class $$LedgerRecentTagsTableOrderingComposer
-    extends OrderingComposer<_$LedgerDBHelper, $LedgerRecentTagsTable> {
-  $$LedgerRecentTagsTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get Id => $state.composableBuilder(
-      column: $state.table.Id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<int> get TagId => $state.composableBuilder(
-      column: $state.table.TagId,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-}
-
 typedef $$LedgerOwnersTableInsertCompanionBuilder = LedgerOwnersCompanion
     Function({
   Value<int> Id,
@@ -1848,8 +1528,6 @@ class _$LedgerDBHelperManager {
       $$LedgerEntriesTableTableManager(_db, _db.ledgerEntries);
   $$LedgerTagsTableTableManager get ledgerTags =>
       $$LedgerTagsTableTableManager(_db, _db.ledgerTags);
-  $$LedgerRecentTagsTableTableManager get ledgerRecentTags =>
-      $$LedgerRecentTagsTableTableManager(_db, _db.ledgerRecentTags);
   $$LedgerOwnersTableTableManager get ledgerOwners =>
       $$LedgerOwnersTableTableManager(_db, _db.ledgerOwners);
 }

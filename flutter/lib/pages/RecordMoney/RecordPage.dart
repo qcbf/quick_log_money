@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
@@ -53,7 +49,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
             child: IconButton(
                 onPressed: () async {
                   if (!await Navigator.maybePop(context)) {
-                    if (!mounted) return;
+                    if (!context.mounted) return;
                     Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
                   }
                 },
