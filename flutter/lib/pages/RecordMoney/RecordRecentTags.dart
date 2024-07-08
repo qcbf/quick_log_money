@@ -23,13 +23,13 @@ class _RecordRecentTagsState extends State<RecordRecentTags> {
   Widget BuildTags() {
     var entry = context.read<EntryEditingProvider>();
     if (entry.Tag.Id == 0) {
-      entry.Tag = Ledger.Tag.value.RecentTags.first;
+      entry.Tag = Ledger.Tag.value.AllTags[User.RecentTags.first]!;
       Future.delayed(Durations.short1, () => entry.Notify());
     }
 
     return TagListUI(
       entry.Tag.Id,
-      Ledger.Tag.value.RecentTags.reversed,
+      User.RecentTags.map((e) => Ledger.Tag.value.AllTags[e]!).toList().reversed,
       (tag) => setState(() => entry
         ..Tag = tag
         ..Notify()),

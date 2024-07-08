@@ -433,15 +433,18 @@ class $UserLedgerRecentTagsTable extends UserLedgerRecentTags
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _UidMeta = const VerificationMeta('Uid');
+  @override
+  late final GeneratedColumn<int> Uid = GeneratedColumn<int>(
+      'uid', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _TagIdMeta = const VerificationMeta('TagId');
   @override
   late final GeneratedColumn<int> TagId = GeneratedColumn<int>(
       'tag_id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+      type: DriftSqlType.int, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [Id, TagId];
+  List<GeneratedColumn> get $columns => [Id, Uid, TagId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -455,6 +458,12 @@ class $UserLedgerRecentTagsTable extends UserLedgerRecentTags
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_IdMeta, Id.isAcceptableOrUnknown(data['id']!, _IdMeta));
+    }
+    if (data.containsKey('uid')) {
+      context.handle(
+          _UidMeta, Uid.isAcceptableOrUnknown(data['uid']!, _UidMeta));
+    } else if (isInserting) {
+      context.missing(_UidMeta);
     }
     if (data.containsKey('tag_id')) {
       context.handle(
@@ -473,6 +482,8 @@ class $UserLedgerRecentTagsTable extends UserLedgerRecentTags
     return UserLedgerRecentTag(
       Id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      Uid: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}uid'])!,
       TagId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}tag_id'])!,
     );
@@ -487,12 +498,15 @@ class $UserLedgerRecentTagsTable extends UserLedgerRecentTags
 class UserLedgerRecentTag extends DataClass
     implements Insertable<UserLedgerRecentTag> {
   final int Id;
+  final int Uid;
   final int TagId;
-  const UserLedgerRecentTag({required this.Id, required this.TagId});
+  const UserLedgerRecentTag(
+      {required this.Id, required this.Uid, required this.TagId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(Id);
+    map['uid'] = Variable<int>(Uid);
     map['tag_id'] = Variable<int>(TagId);
     return map;
   }
@@ -500,6 +514,7 @@ class UserLedgerRecentTag extends DataClass
   UserLedgerRecentTagsCompanion toCompanion(bool nullToAbsent) {
     return UserLedgerRecentTagsCompanion(
       Id: Value(Id),
+      Uid: Value(Uid),
       TagId: Value(TagId),
     );
   }
@@ -509,6 +524,7 @@ class UserLedgerRecentTag extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return UserLedgerRecentTag(
       Id: serializer.fromJson<int>(json['Id']),
+      Uid: serializer.fromJson<int>(json['Uid']),
       TagId: serializer.fromJson<int>(json['TagId']),
     );
   }
@@ -517,58 +533,71 @@ class UserLedgerRecentTag extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'Id': serializer.toJson<int>(Id),
+      'Uid': serializer.toJson<int>(Uid),
       'TagId': serializer.toJson<int>(TagId),
     };
   }
 
-  UserLedgerRecentTag copyWith({int? Id, int? TagId}) => UserLedgerRecentTag(
+  UserLedgerRecentTag copyWith({int? Id, int? Uid, int? TagId}) =>
+      UserLedgerRecentTag(
         Id: Id ?? this.Id,
+        Uid: Uid ?? this.Uid,
         TagId: TagId ?? this.TagId,
       );
   @override
   String toString() {
     return (StringBuffer('UserLedgerRecentTag(')
           ..write('Id: $Id, ')
+          ..write('Uid: $Uid, ')
           ..write('TagId: $TagId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(Id, TagId);
+  int get hashCode => Object.hash(Id, Uid, TagId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is UserLedgerRecentTag &&
           other.Id == this.Id &&
+          other.Uid == this.Uid &&
           other.TagId == this.TagId);
 }
 
 class UserLedgerRecentTagsCompanion
     extends UpdateCompanion<UserLedgerRecentTag> {
   final Value<int> Id;
+  final Value<int> Uid;
   final Value<int> TagId;
   const UserLedgerRecentTagsCompanion({
     this.Id = const Value.absent(),
+    this.Uid = const Value.absent(),
     this.TagId = const Value.absent(),
   });
   UserLedgerRecentTagsCompanion.insert({
     this.Id = const Value.absent(),
+    required int Uid,
     required int TagId,
-  }) : TagId = Value(TagId);
+  })  : Uid = Value(Uid),
+        TagId = Value(TagId);
   static Insertable<UserLedgerRecentTag> custom({
     Expression<int>? Id,
+    Expression<int>? Uid,
     Expression<int>? TagId,
   }) {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
+      if (Uid != null) 'uid': Uid,
       if (TagId != null) 'tag_id': TagId,
     });
   }
 
-  UserLedgerRecentTagsCompanion copyWith({Value<int>? Id, Value<int>? TagId}) {
+  UserLedgerRecentTagsCompanion copyWith(
+      {Value<int>? Id, Value<int>? Uid, Value<int>? TagId}) {
     return UserLedgerRecentTagsCompanion(
       Id: Id ?? this.Id,
+      Uid: Uid ?? this.Uid,
       TagId: TagId ?? this.TagId,
     );
   }
@@ -578,6 +607,9 @@ class UserLedgerRecentTagsCompanion
     final map = <String, Expression>{};
     if (Id.present) {
       map['id'] = Variable<int>(Id.value);
+    }
+    if (Uid.present) {
+      map['uid'] = Variable<int>(Uid.value);
     }
     if (TagId.present) {
       map['tag_id'] = Variable<int>(TagId.value);
@@ -589,6 +621,7 @@ class UserLedgerRecentTagsCompanion
   String toString() {
     return (StringBuffer('UserLedgerRecentTagsCompanion(')
           ..write('Id: $Id, ')
+          ..write('Uid: $Uid, ')
           ..write('TagId: $TagId')
           ..write(')'))
         .toString();
@@ -610,6 +643,11 @@ class $UserCardsTable extends UserCards
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _UidMeta = const VerificationMeta('Uid');
+  @override
+  late final GeneratedColumn<int> Uid = GeneratedColumn<int>(
+      'uid', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _PlaceMeta = const VerificationMeta('Place');
   @override
   late final GeneratedColumn<int> Place = GeneratedColumn<int>(
@@ -621,7 +659,7 @@ class $UserCardsTable extends UserCards
       'params', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   @override
-  List<GeneratedColumn> get $columns => [Id, Place, Params];
+  List<GeneratedColumn> get $columns => [Id, Uid, Place, Params];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -634,6 +672,12 @@ class $UserCardsTable extends UserCards
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_IdMeta, Id.isAcceptableOrUnknown(data['id']!, _IdMeta));
+    }
+    if (data.containsKey('uid')) {
+      context.handle(
+          _UidMeta, Uid.isAcceptableOrUnknown(data['uid']!, _UidMeta));
+    } else if (isInserting) {
+      context.missing(_UidMeta);
     }
     if (data.containsKey('place')) {
       context.handle(
@@ -656,6 +700,8 @@ class $UserCardsTable extends UserCards
     return UserCard(
       Id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      Uid: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}uid'])!,
       Place: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}place'])!,
       Params: attachedDatabase.typeMapping
@@ -671,13 +717,16 @@ class $UserCardsTable extends UserCards
 
 class UserCard extends DataClass implements Insertable<UserCard> {
   final int Id;
+  final int Uid;
   final int Place;
   final String? Params;
-  const UserCard({required this.Id, required this.Place, this.Params});
+  const UserCard(
+      {required this.Id, required this.Uid, required this.Place, this.Params});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(Id);
+    map['uid'] = Variable<int>(Uid);
     map['place'] = Variable<int>(Place);
     if (!nullToAbsent || Params != null) {
       map['params'] = Variable<String>(Params);
@@ -688,6 +737,7 @@ class UserCard extends DataClass implements Insertable<UserCard> {
   UserCardsCompanion toCompanion(bool nullToAbsent) {
     return UserCardsCompanion(
       Id: Value(Id),
+      Uid: Value(Uid),
       Place: Value(Place),
       Params:
           Params == null && nullToAbsent ? const Value.absent() : Value(Params),
@@ -699,6 +749,7 @@ class UserCard extends DataClass implements Insertable<UserCard> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return UserCard(
       Id: serializer.fromJson<int>(json['Id']),
+      Uid: serializer.fromJson<int>(json['Uid']),
       Place: serializer.fromJson<int>(json['Place']),
       Params: serializer.fromJson<String?>(json['Params']),
     );
@@ -708,6 +759,7 @@ class UserCard extends DataClass implements Insertable<UserCard> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'Id': serializer.toJson<int>(Id),
+      'Uid': serializer.toJson<int>(Uid),
       'Place': serializer.toJson<int>(Place),
       'Params': serializer.toJson<String?>(Params),
     };
@@ -715,10 +767,12 @@ class UserCard extends DataClass implements Insertable<UserCard> {
 
   UserCard copyWith(
           {int? Id,
+          int? Uid,
           int? Place,
           Value<String?> Params = const Value.absent()}) =>
       UserCard(
         Id: Id ?? this.Id,
+        Uid: Uid ?? this.Uid,
         Place: Place ?? this.Place,
         Params: Params.present ? Params.value : this.Params,
       );
@@ -726,6 +780,7 @@ class UserCard extends DataClass implements Insertable<UserCard> {
   String toString() {
     return (StringBuffer('UserCard(')
           ..write('Id: $Id, ')
+          ..write('Uid: $Uid, ')
           ..write('Place: $Place, ')
           ..write('Params: $Params')
           ..write(')'))
@@ -733,46 +788,57 @@ class UserCard extends DataClass implements Insertable<UserCard> {
   }
 
   @override
-  int get hashCode => Object.hash(Id, Place, Params);
+  int get hashCode => Object.hash(Id, Uid, Place, Params);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is UserCard &&
           other.Id == this.Id &&
+          other.Uid == this.Uid &&
           other.Place == this.Place &&
           other.Params == this.Params);
 }
 
 class UserCardsCompanion extends UpdateCompanion<UserCard> {
   final Value<int> Id;
+  final Value<int> Uid;
   final Value<int> Place;
   final Value<String?> Params;
   const UserCardsCompanion({
     this.Id = const Value.absent(),
+    this.Uid = const Value.absent(),
     this.Place = const Value.absent(),
     this.Params = const Value.absent(),
   });
   UserCardsCompanion.insert({
     this.Id = const Value.absent(),
+    required int Uid,
     required int Place,
     this.Params = const Value.absent(),
-  }) : Place = Value(Place);
+  })  : Uid = Value(Uid),
+        Place = Value(Place);
   static Insertable<UserCard> custom({
     Expression<int>? Id,
+    Expression<int>? Uid,
     Expression<int>? Place,
     Expression<String>? Params,
   }) {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
+      if (Uid != null) 'uid': Uid,
       if (Place != null) 'place': Place,
       if (Params != null) 'params': Params,
     });
   }
 
   UserCardsCompanion copyWith(
-      {Value<int>? Id, Value<int>? Place, Value<String?>? Params}) {
+      {Value<int>? Id,
+      Value<int>? Uid,
+      Value<int>? Place,
+      Value<String?>? Params}) {
     return UserCardsCompanion(
       Id: Id ?? this.Id,
+      Uid: Uid ?? this.Uid,
       Place: Place ?? this.Place,
       Params: Params ?? this.Params,
     );
@@ -783,6 +849,9 @@ class UserCardsCompanion extends UpdateCompanion<UserCard> {
     final map = <String, Expression>{};
     if (Id.present) {
       map['id'] = Variable<int>(Id.value);
+    }
+    if (Uid.present) {
+      map['uid'] = Variable<int>(Uid.value);
     }
     if (Place.present) {
       map['place'] = Variable<int>(Place.value);
@@ -797,6 +866,7 @@ class UserCardsCompanion extends UpdateCompanion<UserCard> {
   String toString() {
     return (StringBuffer('UserCardsCompanion(')
           ..write('Id: $Id, ')
+          ..write('Uid: $Uid, ')
           ..write('Place: $Place, ')
           ..write('Params: $Params')
           ..write(')'))
@@ -811,14 +881,24 @@ abstract class _$UserDBHelper extends GeneratedDatabase {
   late final $UserLedgerRecentTagsTable userLedgerRecentTags =
       $UserLedgerRecentTagsTable(this);
   late final $UserCardsTable userCards = $UserCardsTable(this);
+  late final Index userLedgerRecentTagsUid = Index('UserLedgerRecentTags.Uid',
+      'CREATE INDEX "UserLedgerRecentTags.Uid" ON user_ledger_recent_tags (uid)');
   late final Index userCardsPlace = Index('UserCards.Place',
       'CREATE INDEX "UserCards.Place" ON user_cards (place)');
+  late final Index userCardsUid = Index(
+      'UserCards.Uid', 'CREATE INDEX "UserCards.Uid" ON user_cards (uid)');
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [userInfos, userLedgerRecentTags, userCards, userCardsPlace];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        userInfos,
+        userLedgerRecentTags,
+        userCards,
+        userLedgerRecentTagsUid,
+        userCardsPlace,
+        userCardsUid
+      ];
 }
 
 typedef $$UserInfosTableInsertCompanionBuilder = UserInfosCompanion Function({
@@ -1007,11 +1087,13 @@ class $$UserInfosTableOrderingComposer
 typedef $$UserLedgerRecentTagsTableInsertCompanionBuilder
     = UserLedgerRecentTagsCompanion Function({
   Value<int> Id,
+  required int Uid,
   required int TagId,
 });
 typedef $$UserLedgerRecentTagsTableUpdateCompanionBuilder
     = UserLedgerRecentTagsCompanion Function({
   Value<int> Id,
+  Value<int> Uid,
   Value<int> TagId,
 });
 
@@ -1037,18 +1119,22 @@ class $$UserLedgerRecentTagsTableTableManager extends RootTableManager<
               $$UserLedgerRecentTagsTableProcessedTableManager(p),
           getUpdateCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
+            Value<int> Uid = const Value.absent(),
             Value<int> TagId = const Value.absent(),
           }) =>
               UserLedgerRecentTagsCompanion(
             Id: Id,
+            Uid: Uid,
             TagId: TagId,
           ),
           getInsertCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
+            required int Uid,
             required int TagId,
           }) =>
               UserLedgerRecentTagsCompanion.insert(
             Id: Id,
+            Uid: Uid,
             TagId: TagId,
           ),
         ));
@@ -1075,6 +1161,11 @@ class $$UserLedgerRecentTagsTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
+  ColumnFilters<int> get Uid => $state.composableBuilder(
+      column: $state.table.Uid,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
   ColumnFilters<int> get TagId => $state.composableBuilder(
       column: $state.table.TagId,
       builder: (column, joinBuilders) =>
@@ -1089,6 +1180,11 @@ class $$UserLedgerRecentTagsTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
+  ColumnOrderings<int> get Uid => $state.composableBuilder(
+      column: $state.table.Uid,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
   ColumnOrderings<int> get TagId => $state.composableBuilder(
       column: $state.table.TagId,
       builder: (column, joinBuilders) =>
@@ -1097,11 +1193,13 @@ class $$UserLedgerRecentTagsTableOrderingComposer
 
 typedef $$UserCardsTableInsertCompanionBuilder = UserCardsCompanion Function({
   Value<int> Id,
+  required int Uid,
   required int Place,
   Value<String?> Params,
 });
 typedef $$UserCardsTableUpdateCompanionBuilder = UserCardsCompanion Function({
   Value<int> Id,
+  Value<int> Uid,
   Value<int> Place,
   Value<String?> Params,
 });
@@ -1127,21 +1225,25 @@ class $$UserCardsTableTableManager extends RootTableManager<
               $$UserCardsTableProcessedTableManager(p),
           getUpdateCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
+            Value<int> Uid = const Value.absent(),
             Value<int> Place = const Value.absent(),
             Value<String?> Params = const Value.absent(),
           }) =>
               UserCardsCompanion(
             Id: Id,
+            Uid: Uid,
             Place: Place,
             Params: Params,
           ),
           getInsertCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
+            required int Uid,
             required int Place,
             Value<String?> Params = const Value.absent(),
           }) =>
               UserCardsCompanion.insert(
             Id: Id,
+            Uid: Uid,
             Place: Place,
             Params: Params,
           ),
@@ -1168,6 +1270,11 @@ class $$UserCardsTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
+  ColumnFilters<int> get Uid => $state.composableBuilder(
+      column: $state.table.Uid,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
   ColumnFilters<int> get Place => $state.composableBuilder(
       column: $state.table.Place,
       builder: (column, joinBuilders) =>
@@ -1184,6 +1291,11 @@ class $$UserCardsTableOrderingComposer
   $$UserCardsTableOrderingComposer(super.$state);
   ColumnOrderings<int> get Id => $state.composableBuilder(
       column: $state.table.Id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get Uid => $state.composableBuilder(
+      column: $state.table.Uid,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

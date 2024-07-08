@@ -15,7 +15,13 @@ class RecordSaveBtn extends StatelessWidget {
   Widget build(BuildContext context) => Consumer<EntryEditingProvider>(
       builder: (BuildContext context, EntryEditingProvider value, Widget? child) => TextButton(
             style: Style,
-            onPressed: () => context.read<EntryEditingProvider>().Save().whenComplete(() async {
+            onPressed: () async {
+              final err = await context.read<EntryEditingProvider>().Save();
+              if (err != null) {
+                BotToast.showSimpleNotification(title: err, duration: Durations.extralong4);
+                return;
+              }
+              if (!context.mounted) return;
               if (!await Navigator.maybePop(context)) {
                 if (!context.mounted) return;
                 if (kDebugMode) {
@@ -25,7 +31,8 @@ class RecordSaveBtn extends StatelessWidget {
                   SystemNavigator.pop(animated: true);
                 }
               }
-            }),
+              BotToast.showSimpleNotification(title: "保存成功", duration: Durations.extralong4);
+            },
             child: Text("保存", style: TextStyle(color: value.IsIncome ? Colors.green : Colors.red)),
           ));
 }

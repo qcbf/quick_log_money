@@ -14,7 +14,7 @@ late final UserDao User;
 
 class UserDao {
   final UserInfo Info;
-  final List<int> RecentTags;
+  final Iterable<int> RecentTags;
   UserDao({required this.Info, required this.RecentTags});
 }
 
@@ -31,15 +31,19 @@ class UserInfos extends Table {
 }
 
 ///
+@TableIndex(name: "UserLedgerRecentTags.Uid", columns: {#Uid})
 class UserLedgerRecentTags extends Table {
   IntColumn get Id => integer().autoIncrement()();
-  IntColumn get TagId => integer().unique()();
+  IntColumn get Uid => integer()();
+  IntColumn get TagId => integer()();
 }
 
 ///
 @TableIndex(name: "UserCards.Place", columns: {#Place})
+@TableIndex(name: "UserCards.Uid", columns: {#Uid})
 class UserCards extends Table {
   IntColumn get Id => integer().autoIncrement()();
+  IntColumn get Uid => integer()();
   IntColumn get Place => integer()();
   TextColumn get Params => text().nullable()();
 }
@@ -55,18 +59,7 @@ class UserDBHelper extends _$UserDBHelper {
   @override
   MigrationStrategy get migration {
     return MigrationStrategy(
-      onCreate: (m) async {
-        await m.createAll();
-        var db = m.database as UserDBHelper;
-        await customStatement("""
-CREATE TRIGGER RecentTagsLimit
-AFTER INSERT ON ${$UserLedgerRecentTagsTable.$name}
-WHEN (SELECT COUNT(*) FROM ${$UserLedgerRecentTagsTable.$name}) > (SELECT ${db.userInfos.LedgerRecentCount.name} FROM ${$LedgerInfosTable.$name} LIMIT 1)
-BEGIN
-  DELETE FROM ${$UserLedgerRecentTagsTable.$name} WHERE Id = (SELECT Id FROM ${$UserLedgerRecentTagsTable.$name} ORDER BY Id LIMIT 1);
-END;
-""");
-      },
+      onCreate: (m) => m.createAll(),
       onUpgrade: (m, from, to) async {
         await customStatement('PRAGMA foreign_keys = OFF');
       },
@@ -82,7 +75,17 @@ END;
     await DatabaseHelper.DebugTryResetDatabase(UserDB);
     if (Prefs.IsNotUserId) return;
     try {
-      await _OnLoginFinish(await UserDB.managers.userInfos.filter((f) => f.Id(Prefs.UserId)).getSingle());
+      final result = await Future.wait<dynamic>([
+        UserDB.managers.userInfos.filter((f) => f.Id(Prefs.UserId)).getSingle(),
+        (UserDB.selectOnly(UserDB.userLedgerRecentTags)
+              ..addColumns([UserDB.userLedgerRecentTags.TagId])
+              ..where(UserDB.userLedgerRecentTags.Uid.equals(Prefs.UserId)))
+            .get(),
+      ]);
+      await _OnLoginFinish(UserDao(
+        Info: result[0],
+        RecentTags: (result[1] as List<TypedResult>).map((e) => e.read(UserDB.userLedgerRecentTags.TagId)!),
+      ));
     } catch (e) {
       Prefs.SetNotUserId();
       rethrow;
@@ -109,29 +112,29 @@ END;
         .entries
         .expand((e) => (e.value as List).map((tag) => LedgerTagsCompanion.insert(Group: e.key, Name: tag[0], Icon: tag[1])));
 
-    await _OnLoginFinish(await UserDB.transaction<UserInfo>(() async {
+    await _OnLoginFinish(await UserDB.transaction<UserDao>(() async {
       final user = await UserDB.managers.userInfos.createReturning((o) => o(Name: "游客", Icon: "", LedgerId: 0));
-      UserDB.select(UserDB.userInfos);
 
       final ledgerDB = LedgerDBHelper.FromUser(user.Id);
       final ledgerId = await LedgerDBHelper.CreateLedger(user.Id, ledgerDB, ledgerInfo, tags);
-      await ledgerDB.close();
       await UserDB.managers.userInfos.filter((f) => f.Id(user.Id)).update((o) => o(LedgerId: Value(ledgerId)));
 
       final recentCount = user.LedgerRecentCount!;
       final tagIds = await (ledgerDB.selectOnly(ledgerDB.ledgerTags)
             ..addColumns([ledgerDB.ledgerTags.Id])
             ..limit(recentCount))
-          .map((e) => UserLedgerRecentTagsCompanion.insert(TagId: e.read(ledgerDB.ledgerTags.Id)!))
+          .map((e) => UserLedgerRecentTagsCompanion.insert(Uid: user.Id, TagId: e.read(ledgerDB.ledgerTags.Id)!))
           .get();
+
       await UserDB.managers.userLedgerRecentTags.bulkCreate((o) => tagIds);
-      return user.copyWith(LedgerId: ledgerId);
+      await ledgerDB.close();
+      return UserDao(Info: user.copyWith(LedgerId: ledgerId), RecentTags: tagIds.map((e) => e.Id.value));
     }));
   }
 
   ///
-  static Future _OnLoginFinish(UserInfo info) async {
-    User = UserDao(Info: info);
+  static Future _OnLoginFinish(UserDao u) async {
+    User = u;
     Prefs.UserId = User.Info.Id;
     await LedgerDBHelper.Init();
   }

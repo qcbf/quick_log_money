@@ -31,19 +31,19 @@ class DrawerMenu extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(UserData.Name, style: Theme.of(context).textTheme.headlineMedium),
-            Text("ID:${UserData.Id}", style: Theme.of(context).textTheme.labelMedium),
+            Text(User.Info.Name, style: Theme.of(context).textTheme.headlineMedium),
+            Text("ID:${User.Info.Id}", style: Theme.of(context).textTheme.labelMedium),
             Conditional.SwitchIndex(() {
-              if (UserData.Token == null) {
+              if (User.Info.Token == null) {
                 return 0;
-              } else if (UserData.VipExpiryDate == null) {
+              } else if (User.Info.VipExpiryDate == null) {
                 return 1;
               }
               return 2;
             }, [
               () => TextButton(onPressed: () {}, child: const Text("注册正式用户")),
               () => TextButton(onPressed: () {}, child: const Text("开通vip")),
-              () => TextButton(onPressed: () {}, child: Text("Vip${Utility.DateToString(UserData.VipExpiryDate!)}到期")),
+              () => TextButton(onPressed: () {}, child: Text("Vip${Utility.DateToString(User.Info.VipExpiryDate!)}到期")),
             ]),
           ],
         ),

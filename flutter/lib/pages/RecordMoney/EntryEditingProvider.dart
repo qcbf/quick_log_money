@@ -26,15 +26,18 @@ class EntryEditingProvider with ChangeNotifier {
     return "$integer.$MoneyDecimalStr";
   }
 
-  Future Save() async {
+  Future<String?> Save() async {
     var money = (int.tryParse(MoneyIntegerStr) ?? 0) * 100;
     if (MoneyDecimalStr?.isNotEmpty == true) {
       money += int.parse(MoneyDecimalStr!);
     }
+    if (money == 0) {
+      return "请填写金额";
+    }
     final loadingCancel = BotToast.showLoading();
     await LedgerDB.managers.ledgerEntries.create((o) => LedgerEntriesCompanion.insert(TagId: Tag.Id, IntMoney: money, Date: Date, Comment: Comment));
-    BotToast.showSimpleNotification(title: "保存成功", duration: Durations.long2);
     loadingCancel();
+    return null;
   }
 
   void Notify() {

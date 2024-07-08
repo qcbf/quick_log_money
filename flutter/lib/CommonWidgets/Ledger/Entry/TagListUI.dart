@@ -18,7 +18,7 @@ class TagListUI extends StatelessWidget {
       maxCrossAxisExtent: 80,
       crossAxisSpacing: 3,
       mainAxisSpacing: 6,
-      childAspectRatio: 1.3,
+      childAspectRatio: 1.35,
       shrinkWrap: true,
       physics: Physics,
       children: [for (var tag in Tags) BuildTag(context, tag)],
