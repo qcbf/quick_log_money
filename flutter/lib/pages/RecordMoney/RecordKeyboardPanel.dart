@@ -17,32 +17,12 @@ class RecordKeyboardPanel extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        const Flexible(flex: 117, child: RecordRecentTags()),
+        const SizedBox(height: 106, child: RecordRecentTags()),
         const Divider(height: 6),
-        Expanded(flex: 250, child: Row(children: children)),
+        Expanded(child: Row(children: children)),
       ],
     );
   }
-
-  // Padding _BuildComment(BuildContext context) {
-  //   return Padding(
-  //     padding: const EdgeInsets.only(top: 6, bottom: 6),
-  //     child: TextField(
-  //       textInputAction: TextInputAction.done,
-  //       maxLength: 500,
-  //       style: const TextStyle(fontSize: 14),
-  //       decoration: const InputDecoration(
-  //         hintText: "备注...",
-  //         hintStyle: TextStyle(letterSpacing: 3),
-  //         counterText: "",
-  //         border: InputBorder.none,
-  //         contentPadding: EdgeInsets.zero,
-  //         isDense: true,
-  //       ),
-  //       onChanged: (text) => context.read<EntryEditingProvider>().Comment = text,
-  //     ),
-  //   );
-  // }
 
   Widget _BuildKeyboardRow(BuildContext context, _KeyboardKey k1, _KeyboardKey k2, _KeyboardKey k3) {
     return Expanded(

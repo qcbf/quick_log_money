@@ -128,7 +128,7 @@ class UserDBHelper extends _$UserDBHelper {
 
       await UserDB.managers.userLedgerRecentTags.bulkCreate((o) => tagIds);
       await ledgerDB.close();
-      return UserDao(Info: user.copyWith(LedgerId: ledgerId), RecentTags: tagIds.map((e) => e.Id.value));
+      return UserDao(Info: user.copyWith(LedgerId: ledgerId), RecentTags: tagIds.map((e) => e.TagId.value));
     }));
   }
 

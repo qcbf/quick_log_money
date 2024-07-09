@@ -25,21 +25,6 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
   late TabController _TabCtrl;
 
   @override
-  void initState() {
-    super.initState();
-    _TabCtrl = TabController(length: 2, vsync: this);
-    _TabCtrl.addListener(() {
-      if (_TabCtrl.indexIsChanging) SetIsCost(context);
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _TabCtrl.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -62,10 +47,25 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const RecordDescription())),
-            const SizedBox(height: 350, child: RecordBottomPanel()),
+            const SizedBox(height: 320, child: RecordBottomPanel()),
           ],
         ),
       );
+
+  @override
+  void dispose() {
+    super.dispose();
+    _TabCtrl.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _TabCtrl = TabController(length: 2, vsync: this);
+    _TabCtrl.addListener(() {
+      if (_TabCtrl.indexIsChanging) SetIsCost(context);
+    });
+  }
 
   /// 设置是否消费记账
   void SetIsCost(BuildContext context) {

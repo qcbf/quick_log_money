@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordKeyboardPanel.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordLedgerPanel.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordTagPanel.dart';
+import 'package:quick_log_money/pages/RecordMoney/RecordOptionPanel.dart';
 
 /// 底部输入区域
 class RecordBottomPanel extends StatefulWidget {
@@ -16,12 +17,18 @@ class _RecordBottomPanelState extends State<RecordBottomPanel> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    var children = [
+    var contents = [
       Flexible(flex: 10, child: BuildLeftMenu()),
       Expanded(flex: 30, child: BuildRightContent()),
     ];
-    if (_IsReverseLayout) children = children.reversed.toList();
-    return Card(child: Row(children: children));
+    if (_IsReverseLayout) contents = contents.reversed.toList();
+    return Card(
+        child: Column(
+      children: [
+        const RecordOptionPanel(),
+        Row(children: contents),
+      ],
+    ));
   }
 
   /// 左边菜单，记账，类别什么的
