@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagGroupUI.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
-import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordSaveBtn.dart';
 
 /// 记账标签页
@@ -22,7 +22,7 @@ class RecordTagPanel extends StatelessWidget {
 
   ///
   TagGroupUI BuildTagGroup(BuildContext context) {
-    final entry = context.read<EntryEditingProvider>();
+    final entry = context.read<RecordEntryEditingProvider>();
     return TagGroupUI(
       entry.Tag.Id,
       Ledger.Tag.value.TagGroups,

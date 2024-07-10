@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordRecentTags.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordSaveBtn.dart';
 
@@ -64,7 +64,7 @@ class RecordKeyboardPanel extends StatelessWidget {
           flex: 258,
           child: Padding(
             padding: paddingValue,
-            child: Consumer<EntryEditingProvider>(builder: (BuildContext context, EntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
+            child: Consumer<RecordEntryEditingProvider>(builder: (BuildContext context, RecordEntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
           ),
         ),
         Expanded(
@@ -124,7 +124,7 @@ class RecordKeyboardPanel extends StatelessWidget {
   }
 
   void _OnInputKey(BuildContext context, _KeyboardKey key) {
-    var data = context.read<EntryEditingProvider>();
+    var data = context.read<RecordEntryEditingProvider>();
 
     var newInteger = data.MoneyIntegerStr;
     var newDecimal = data.MoneyDecimalStr;

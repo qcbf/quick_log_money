@@ -4,7 +4,7 @@ import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagListUI.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Database/UserDB.dart';
-import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 
 class RecordRecentTags extends StatefulWidget {
   const RecordRecentTags({super.key});
@@ -21,7 +21,7 @@ class _RecordRecentTagsState extends State<RecordRecentTags> {
 
   ///
   Widget BuildTags() {
-    var entry = context.read<EntryEditingProvider>();
+    var entry = context.read<RecordEntryEditingProvider>();
     if (entry.Tag.Id == 0) {
       entry.Tag = Ledger.Tag.value.AllTags[User.RecentTags.first]!;
       Future.delayed(Durations.short1, () => entry.Notify());

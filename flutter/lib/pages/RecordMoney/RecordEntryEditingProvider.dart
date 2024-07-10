@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 
 /// 编辑时的条目数据
-class RecordEntryEditingProvider with ChangeNotifier {
+class RecordRecordEntryEditingProvider with ChangeNotifier {
   ///
   DateTime Date = DateTime.now();
 

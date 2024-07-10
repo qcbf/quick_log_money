@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordBottomPanel.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordDescription.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
@@ -10,7 +10,7 @@ class RecordPage extends StatelessWidget {
   const RecordPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(create: (context) => EntryEditingProvider(), child: _RecordPageContent(key: key));
+    return ChangeNotifierProvider(create: (context) => RecordEntryEditingProvider(), child: _RecordPageContent(key: key));
   }
 }
 
@@ -69,7 +69,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
 
   /// 设置是否消费记账
   void SetIsCost(BuildContext context) {
-    var data = context.read<EntryEditingProvider>();
+    var data = context.read<RecordEntryEditingProvider>();
     data.IsIncome = _TabCtrl.index == 1;
     data.Notify();
   }

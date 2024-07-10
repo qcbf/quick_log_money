@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
-import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Utilities/Utility.dart';
 
 class RecordDescription extends StatelessWidget {
@@ -12,9 +12,9 @@ class RecordDescription extends StatelessWidget {
   Widget build(BuildContext context) => ConditionalValueListener.AsyncValue(
       Ledger.Tag,
       (context, value, child) =>
-          Card(child: Consumer<EntryEditingProvider>(builder: (context, value, child) => _BuildDescriptionLabel(value.IsIncome, context, value))));
+          Card(child: Consumer<RecordEntryEditingProvider>(builder: (context, value, child) => _BuildDescriptionLabel(value.IsIncome, context, value))));
 
-  static Widget _BuildDescriptionLabel(bool IsIncome, BuildContext context, EntryEditingProvider value) {
+  static Widget _BuildDescriptionLabel(bool IsIncome, BuildContext context, RecordEntryEditingProvider value) {
     var baseTextStyle = Theme.of(context).textTheme.titleMedium!;
     var actionTextStyle =
         baseTextStyle.apply(color: Colors.blueGrey, fontSizeDelta: 2).copyWith(fontWeight: FontWeight.bold, decoration: TextDecoration.underline);

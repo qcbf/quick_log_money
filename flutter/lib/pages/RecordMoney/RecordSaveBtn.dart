@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 
 class RecordSaveBtn extends StatelessWidget {
@@ -12,11 +12,11 @@ class RecordSaveBtn extends StatelessWidget {
   const RecordSaveBtn({super.key, this.Style});
 
   @override
-  Widget build(BuildContext context) => Consumer<EntryEditingProvider>(
-      builder: (BuildContext context, EntryEditingProvider value, Widget? child) => TextButton(
+  Widget build(BuildContext context) => Consumer<RecordEntryEditingProvider>(
+      builder: (BuildContext context, RecordEntryEditingProvider value, Widget? child) => TextButton(
             style: Style,
             onPressed: () async {
-              final err = await context.read<EntryEditingProvider>().Save();
+              final err = await context.read<RecordEntryEditingProvider>().Save();
               if (err != null) {
                 BotToast.showSimpleNotification(title: err, duration: Durations.extralong4);
                 return;

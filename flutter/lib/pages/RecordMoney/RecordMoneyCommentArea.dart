@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_log_money/Pages/RecordMoney/EntryEditingProvider.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 
 class RecordMoneyCommentArea extends StatelessWidget {
   const RecordMoneyCommentArea({super.key});
@@ -11,7 +11,7 @@ class RecordMoneyCommentArea extends StatelessWidget {
         _BuildComment(context),
       ]);
 
-  Widget _BuildMoney() => Consumer<EntryEditingProvider>(builder: (context, value, child) {
+  Widget _BuildMoney() => Consumer<RecordEntryEditingProvider>(builder: (context, value, child) {
         return Text("${value.GetMoneyString()}￥",
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
                   color: value.IsIncome ? Colors.green : Colors.red,
@@ -35,7 +35,7 @@ class RecordMoneyCommentArea extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             isDense: true,
           ),
-          onChanged: (text) => context.read<EntryEditingProvider>().Comment = text,
+          onChanged: (text) => context.read<RecordEntryEditingProvider>().Comment = text,
         ),
       );
 }
