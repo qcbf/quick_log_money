@@ -18,7 +18,7 @@ class _RecordBottomPanelState extends State<RecordBottomPanel> with SingleTicker
   @override
   Widget build(BuildContext context) {
     var contents = [
-      Flexible(flex: 10, child: BuildLeftMenu()),
+      Flexible(flex: 8, child: BuildLeftMenu()),
       Expanded(flex: 30, child: BuildRightContent()),
     ];
     if (_IsReverseLayout) contents = contents.reversed.toList();
@@ -26,7 +26,8 @@ class _RecordBottomPanelState extends State<RecordBottomPanel> with SingleTicker
         child: Column(
       children: [
         const RecordOptionPanel(),
-        Row(children: contents),
+        const Divider(height: 6, endIndent: 2, indent: 2),
+        Expanded(child: Row(children: contents)),
       ],
     ));
   }

@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -41,7 +42,6 @@ class RecordKeyboardPanel extends StatelessWidget {
         _BuildKeyboardRow(context, _KeyboardKey.N4, _KeyboardKey.N5, _KeyboardKey.N6),
         _BuildKeyboardRow(context, _KeyboardKey.N1, _KeyboardKey.N2, _KeyboardKey.N3),
         _BuildKeyboardRow(context, _KeyboardKey.Dot, _KeyboardKey.N0, _KeyboardKey.Back),
-        // _BuildComment(context),
       ],
     );
   }
@@ -64,7 +64,8 @@ class RecordKeyboardPanel extends StatelessWidget {
           flex: 258,
           child: Padding(
             padding: paddingValue,
-            child: Consumer<RecordEntryEditingProvider>(builder: (BuildContext context, RecordEntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
+            child: Consumer<RecordEntryEditingProvider>(
+                builder: (BuildContext context, RecordEntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
           ),
         ),
         Expanded(
@@ -154,6 +155,10 @@ class RecordKeyboardPanel extends StatelessWidget {
     }
 
     if (newInteger != data.MoneyIntegerStr || newDecimal != data.MoneyDecimalStr) {
+      if (newInteger.length > 9) {
+        BotToast.showText(text: "输入的钱太多了");
+        return;
+      }
       data
         ..MoneyIntegerStr = newInteger
         ..MoneyDecimalStr = newDecimal
