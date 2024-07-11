@@ -44,14 +44,22 @@ android {
         versionName = flutterVersionName
         ndk {abiFilters "arm64-v8a"}
     }
-
-    buildTypes {
+    
+    signingConfigs {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            keyAlias "f"
+            keyPassword System.getenv("F_KEY_PASS")
+            storeFile file("f.keystore")
+            storePassword System.getenv("F_KEY_PASS")
         }
     }
+    
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+
 }
 
 flutter {
