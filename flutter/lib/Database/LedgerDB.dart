@@ -65,6 +65,9 @@ class LedgerEntries extends Table {
   IntColumn get IntMoney => integer()();
   DateTimeColumn get Date => dateTime()();
   TextColumn get Comment => text()();
+  TextColumn get LocationCountry => text()();
+  TextColumn get LocationCity => text()();
+  TextColumn get LocationStreet => text()();
 }
 
 class LedgerTags extends Table {

@@ -63,7 +63,7 @@ class RecordOptionPanel extends StatelessWidget {
   }
 
   static Widget _BuildBtn(String text, VoidCallback onPressed) {
-    return SizedBox(height: 26, child: TextButton(onPressed: onPressed, child: Text(text)));
+    return SizedBox(height: 26, child: TextButton(onPressed: onPressed, style: const ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.all(0))), child: Text(text)));
   }
 
   ///

@@ -18,7 +18,7 @@ class RecordKeyboardPanel extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        const SizedBox(height: 106, child: RecordRecentTags()),
+        const RecordRecentTags(),
         const Divider(height: 6),
         Expanded(child: Row(children: children)),
       ],
@@ -64,8 +64,7 @@ class RecordKeyboardPanel extends StatelessWidget {
           flex: 258,
           child: Padding(
             padding: paddingValue,
-            child: Consumer<RecordEntryEditingProvider>(
-                builder: (BuildContext context, RecordEntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
+            child: Consumer<RecordEntryEditingProvider>(builder: (BuildContext context, RecordEntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
           ),
         ),
         Expanded(

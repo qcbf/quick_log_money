@@ -15,7 +15,7 @@ class TagListUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) => GridView.extent(
         maxCrossAxisExtent: 70,
-        childAspectRatio: 1.3,
+        childAspectRatio: 1.6,
         crossAxisSpacing: 3,
         mainAxisSpacing: 3,
         shrinkWrap: true,
@@ -25,7 +25,8 @@ class TagListUI extends StatelessWidget {
 
   ///
   Widget BuildTag(BuildContext context, LedgerTag tag) => TagUI(
-        Style: tag.Id == SelectTagId ? ButtonStyle(side: WidgetStatePropertyAll(BorderSide(color: Theme.of(context).colorScheme.primary, width: 1))) : null,
+        BtnStyle: tag.Id == SelectTagId ? ButtonStyle(side: WidgetStatePropertyAll(BorderSide(color: Theme.of(context).colorScheme.primary, width: 1))) : null,
+        ContentColor: tag.Id == SelectTagId ? Colors.blue : null,
         tag,
         () => OnSelectTagHandler(tag),
       );
