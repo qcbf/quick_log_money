@@ -21,9 +21,9 @@ class TagGroupUI extends StatelessWidget {
   ///
   Widget BuildTagGroup(BuildContext context, String groupName, Iterable<LedgerTag> tags) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Text(groupName, style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.outline, height: 2)),
+        Text(groupName, style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.outline)),
         TagListUI(SelectTagId, tags, OnSelectTagHandler, Physics: const NeverScrollableScrollPhysics()),
       ]),
     );

@@ -296,8 +296,35 @@ class $LedgerEntriesTable extends LedgerEntries
   late final GeneratedColumn<String> Comment = GeneratedColumn<String>(
       'comment', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _LocationCountryMeta =
+      const VerificationMeta('LocationCountry');
   @override
-  List<GeneratedColumn> get $columns => [Id, TagId, IntMoney, Date, Comment];
+  late final GeneratedColumn<String> LocationCountry = GeneratedColumn<String>(
+      'location_country', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _LocationCityMeta =
+      const VerificationMeta('LocationCity');
+  @override
+  late final GeneratedColumn<String> LocationCity = GeneratedColumn<String>(
+      'location_city', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _LocationStreetMeta =
+      const VerificationMeta('LocationStreet');
+  @override
+  late final GeneratedColumn<String> LocationStreet = GeneratedColumn<String>(
+      'location_street', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        Id,
+        TagId,
+        IntMoney,
+        Date,
+        Comment,
+        LocationCountry,
+        LocationCity,
+        LocationStreet
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -335,6 +362,24 @@ class $LedgerEntriesTable extends LedgerEntries
     } else if (isInserting) {
       context.missing(_CommentMeta);
     }
+    if (data.containsKey('location_country')) {
+      context.handle(
+          _LocationCountryMeta,
+          LocationCountry.isAcceptableOrUnknown(
+              data['location_country']!, _LocationCountryMeta));
+    }
+    if (data.containsKey('location_city')) {
+      context.handle(
+          _LocationCityMeta,
+          LocationCity.isAcceptableOrUnknown(
+              data['location_city']!, _LocationCityMeta));
+    }
+    if (data.containsKey('location_street')) {
+      context.handle(
+          _LocationStreetMeta,
+          LocationStreet.isAcceptableOrUnknown(
+              data['location_street']!, _LocationStreetMeta));
+    }
     return context;
   }
 
@@ -354,6 +399,12 @@ class $LedgerEntriesTable extends LedgerEntries
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
       Comment: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}comment'])!,
+      LocationCountry: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}location_country']),
+      LocationCity: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}location_city']),
+      LocationStreet: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}location_street']),
     );
   }
 
@@ -369,12 +420,18 @@ class LedgerEntry extends DataClass implements Insertable<LedgerEntry> {
   final int IntMoney;
   final DateTime Date;
   final String Comment;
+  final String? LocationCountry;
+  final String? LocationCity;
+  final String? LocationStreet;
   const LedgerEntry(
       {required this.Id,
       required this.TagId,
       required this.IntMoney,
       required this.Date,
-      required this.Comment});
+      required this.Comment,
+      this.LocationCountry,
+      this.LocationCity,
+      this.LocationStreet});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -383,6 +440,15 @@ class LedgerEntry extends DataClass implements Insertable<LedgerEntry> {
     map['int_money'] = Variable<int>(IntMoney);
     map['date'] = Variable<DateTime>(Date);
     map['comment'] = Variable<String>(Comment);
+    if (!nullToAbsent || LocationCountry != null) {
+      map['location_country'] = Variable<String>(LocationCountry);
+    }
+    if (!nullToAbsent || LocationCity != null) {
+      map['location_city'] = Variable<String>(LocationCity);
+    }
+    if (!nullToAbsent || LocationStreet != null) {
+      map['location_street'] = Variable<String>(LocationStreet);
+    }
     return map;
   }
 
@@ -393,6 +459,15 @@ class LedgerEntry extends DataClass implements Insertable<LedgerEntry> {
       IntMoney: Value(IntMoney),
       Date: Value(Date),
       Comment: Value(Comment),
+      LocationCountry: LocationCountry == null && nullToAbsent
+          ? const Value.absent()
+          : Value(LocationCountry),
+      LocationCity: LocationCity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(LocationCity),
+      LocationStreet: LocationStreet == null && nullToAbsent
+          ? const Value.absent()
+          : Value(LocationStreet),
     );
   }
 
@@ -405,6 +480,9 @@ class LedgerEntry extends DataClass implements Insertable<LedgerEntry> {
       IntMoney: serializer.fromJson<int>(json['IntMoney']),
       Date: serializer.fromJson<DateTime>(json['Date']),
       Comment: serializer.fromJson<String>(json['Comment']),
+      LocationCountry: serializer.fromJson<String?>(json['LocationCountry']),
+      LocationCity: serializer.fromJson<String?>(json['LocationCity']),
+      LocationStreet: serializer.fromJson<String?>(json['LocationStreet']),
     );
   }
   @override
@@ -416,6 +494,9 @@ class LedgerEntry extends DataClass implements Insertable<LedgerEntry> {
       'IntMoney': serializer.toJson<int>(IntMoney),
       'Date': serializer.toJson<DateTime>(Date),
       'Comment': serializer.toJson<String>(Comment),
+      'LocationCountry': serializer.toJson<String?>(LocationCountry),
+      'LocationCity': serializer.toJson<String?>(LocationCity),
+      'LocationStreet': serializer.toJson<String?>(LocationStreet),
     };
   }
 
@@ -424,13 +505,23 @@ class LedgerEntry extends DataClass implements Insertable<LedgerEntry> {
           int? TagId,
           int? IntMoney,
           DateTime? Date,
-          String? Comment}) =>
+          String? Comment,
+          Value<String?> LocationCountry = const Value.absent(),
+          Value<String?> LocationCity = const Value.absent(),
+          Value<String?> LocationStreet = const Value.absent()}) =>
       LedgerEntry(
         Id: Id ?? this.Id,
         TagId: TagId ?? this.TagId,
         IntMoney: IntMoney ?? this.IntMoney,
         Date: Date ?? this.Date,
         Comment: Comment ?? this.Comment,
+        LocationCountry: LocationCountry.present
+            ? LocationCountry.value
+            : this.LocationCountry,
+        LocationCity:
+            LocationCity.present ? LocationCity.value : this.LocationCity,
+        LocationStreet:
+            LocationStreet.present ? LocationStreet.value : this.LocationStreet,
       );
   @override
   String toString() {
@@ -439,13 +530,17 @@ class LedgerEntry extends DataClass implements Insertable<LedgerEntry> {
           ..write('TagId: $TagId, ')
           ..write('IntMoney: $IntMoney, ')
           ..write('Date: $Date, ')
-          ..write('Comment: $Comment')
+          ..write('Comment: $Comment, ')
+          ..write('LocationCountry: $LocationCountry, ')
+          ..write('LocationCity: $LocationCity, ')
+          ..write('LocationStreet: $LocationStreet')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(Id, TagId, IntMoney, Date, Comment);
+  int get hashCode => Object.hash(Id, TagId, IntMoney, Date, Comment,
+      LocationCountry, LocationCity, LocationStreet);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -454,7 +549,10 @@ class LedgerEntry extends DataClass implements Insertable<LedgerEntry> {
           other.TagId == this.TagId &&
           other.IntMoney == this.IntMoney &&
           other.Date == this.Date &&
-          other.Comment == this.Comment);
+          other.Comment == this.Comment &&
+          other.LocationCountry == this.LocationCountry &&
+          other.LocationCity == this.LocationCity &&
+          other.LocationStreet == this.LocationStreet);
 }
 
 class LedgerEntriesCompanion extends UpdateCompanion<LedgerEntry> {
@@ -463,12 +561,18 @@ class LedgerEntriesCompanion extends UpdateCompanion<LedgerEntry> {
   final Value<int> IntMoney;
   final Value<DateTime> Date;
   final Value<String> Comment;
+  final Value<String?> LocationCountry;
+  final Value<String?> LocationCity;
+  final Value<String?> LocationStreet;
   const LedgerEntriesCompanion({
     this.Id = const Value.absent(),
     this.TagId = const Value.absent(),
     this.IntMoney = const Value.absent(),
     this.Date = const Value.absent(),
     this.Comment = const Value.absent(),
+    this.LocationCountry = const Value.absent(),
+    this.LocationCity = const Value.absent(),
+    this.LocationStreet = const Value.absent(),
   });
   LedgerEntriesCompanion.insert({
     this.Id = const Value.absent(),
@@ -476,6 +580,9 @@ class LedgerEntriesCompanion extends UpdateCompanion<LedgerEntry> {
     required int IntMoney,
     required DateTime Date,
     required String Comment,
+    this.LocationCountry = const Value.absent(),
+    this.LocationCity = const Value.absent(),
+    this.LocationStreet = const Value.absent(),
   })  : TagId = Value(TagId),
         IntMoney = Value(IntMoney),
         Date = Value(Date),
@@ -486,6 +593,9 @@ class LedgerEntriesCompanion extends UpdateCompanion<LedgerEntry> {
     Expression<int>? IntMoney,
     Expression<DateTime>? Date,
     Expression<String>? Comment,
+    Expression<String>? LocationCountry,
+    Expression<String>? LocationCity,
+    Expression<String>? LocationStreet,
   }) {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
@@ -493,6 +603,9 @@ class LedgerEntriesCompanion extends UpdateCompanion<LedgerEntry> {
       if (IntMoney != null) 'int_money': IntMoney,
       if (Date != null) 'date': Date,
       if (Comment != null) 'comment': Comment,
+      if (LocationCountry != null) 'location_country': LocationCountry,
+      if (LocationCity != null) 'location_city': LocationCity,
+      if (LocationStreet != null) 'location_street': LocationStreet,
     });
   }
 
@@ -501,13 +614,19 @@ class LedgerEntriesCompanion extends UpdateCompanion<LedgerEntry> {
       Value<int>? TagId,
       Value<int>? IntMoney,
       Value<DateTime>? Date,
-      Value<String>? Comment}) {
+      Value<String>? Comment,
+      Value<String?>? LocationCountry,
+      Value<String?>? LocationCity,
+      Value<String?>? LocationStreet}) {
     return LedgerEntriesCompanion(
       Id: Id ?? this.Id,
       TagId: TagId ?? this.TagId,
       IntMoney: IntMoney ?? this.IntMoney,
       Date: Date ?? this.Date,
       Comment: Comment ?? this.Comment,
+      LocationCountry: LocationCountry ?? this.LocationCountry,
+      LocationCity: LocationCity ?? this.LocationCity,
+      LocationStreet: LocationStreet ?? this.LocationStreet,
     );
   }
 
@@ -529,6 +648,15 @@ class LedgerEntriesCompanion extends UpdateCompanion<LedgerEntry> {
     if (Comment.present) {
       map['comment'] = Variable<String>(Comment.value);
     }
+    if (LocationCountry.present) {
+      map['location_country'] = Variable<String>(LocationCountry.value);
+    }
+    if (LocationCity.present) {
+      map['location_city'] = Variable<String>(LocationCity.value);
+    }
+    if (LocationStreet.present) {
+      map['location_street'] = Variable<String>(LocationStreet.value);
+    }
     return map;
   }
 
@@ -539,7 +667,10 @@ class LedgerEntriesCompanion extends UpdateCompanion<LedgerEntry> {
           ..write('TagId: $TagId, ')
           ..write('IntMoney: $IntMoney, ')
           ..write('Date: $Date, ')
-          ..write('Comment: $Comment')
+          ..write('Comment: $Comment, ')
+          ..write('LocationCountry: $LocationCountry, ')
+          ..write('LocationCity: $LocationCity, ')
+          ..write('LocationStreet: $LocationStreet')
           ..write(')'))
         .toString();
   }
@@ -575,8 +706,18 @@ class $LedgerTagsTable extends LedgerTags
   late final GeneratedColumn<String> Icon = GeneratedColumn<String>(
       'icon', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _IsIncomeMeta =
+      const VerificationMeta('IsIncome');
   @override
-  List<GeneratedColumn> get $columns => [Id, Group, Name, Icon];
+  late final GeneratedColumn<bool> IsIncome = GeneratedColumn<bool>(
+      'is_income', aliasedName, true,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_income" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns => [Id, Group, Name, Icon, IsIncome];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -608,6 +749,10 @@ class $LedgerTagsTable extends LedgerTags
     } else if (isInserting) {
       context.missing(_IconMeta);
     }
+    if (data.containsKey('is_income')) {
+      context.handle(_IsIncomeMeta,
+          IsIncome.isAcceptableOrUnknown(data['is_income']!, _IsIncomeMeta));
+    }
     return context;
   }
 
@@ -625,6 +770,8 @@ class $LedgerTagsTable extends LedgerTags
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       Icon: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}icon'])!,
+      IsIncome: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_income']),
     );
   }
 
@@ -639,11 +786,13 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
   final String Group;
   final String Name;
   final String Icon;
+  final bool? IsIncome;
   const LedgerTag(
       {required this.Id,
       required this.Group,
       required this.Name,
-      required this.Icon});
+      required this.Icon,
+      this.IsIncome});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -651,6 +800,9 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
     map['group'] = Variable<String>(Group);
     map['name'] = Variable<String>(Name);
     map['icon'] = Variable<String>(Icon);
+    if (!nullToAbsent || IsIncome != null) {
+      map['is_income'] = Variable<bool>(IsIncome);
+    }
     return map;
   }
 
@@ -660,6 +812,9 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
       Group: Value(Group),
       Name: Value(Name),
       Icon: Value(Icon),
+      IsIncome: IsIncome == null && nullToAbsent
+          ? const Value.absent()
+          : Value(IsIncome),
     );
   }
 
@@ -671,6 +826,7 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
       Group: serializer.fromJson<String>(json['Group']),
       Name: serializer.fromJson<String>(json['Name']),
       Icon: serializer.fromJson<String>(json['Icon']),
+      IsIncome: serializer.fromJson<bool?>(json['IsIncome']),
     );
   }
   @override
@@ -681,15 +837,22 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
       'Group': serializer.toJson<String>(Group),
       'Name': serializer.toJson<String>(Name),
       'Icon': serializer.toJson<String>(Icon),
+      'IsIncome': serializer.toJson<bool?>(IsIncome),
     };
   }
 
-  LedgerTag copyWith({int? Id, String? Group, String? Name, String? Icon}) =>
+  LedgerTag copyWith(
+          {int? Id,
+          String? Group,
+          String? Name,
+          String? Icon,
+          Value<bool?> IsIncome = const Value.absent()}) =>
       LedgerTag(
         Id: Id ?? this.Id,
         Group: Group ?? this.Group,
         Name: Name ?? this.Name,
         Icon: Icon ?? this.Icon,
+        IsIncome: IsIncome.present ? IsIncome.value : this.IsIncome,
       );
   @override
   String toString() {
@@ -697,13 +860,14 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
           ..write('Id: $Id, ')
           ..write('Group: $Group, ')
           ..write('Name: $Name, ')
-          ..write('Icon: $Icon')
+          ..write('Icon: $Icon, ')
+          ..write('IsIncome: $IsIncome')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(Id, Group, Name, Icon);
+  int get hashCode => Object.hash(Id, Group, Name, Icon, IsIncome);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -711,7 +875,8 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
           other.Id == this.Id &&
           other.Group == this.Group &&
           other.Name == this.Name &&
-          other.Icon == this.Icon);
+          other.Icon == this.Icon &&
+          other.IsIncome == this.IsIncome);
 }
 
 class LedgerTagsCompanion extends UpdateCompanion<LedgerTag> {
@@ -719,17 +884,20 @@ class LedgerTagsCompanion extends UpdateCompanion<LedgerTag> {
   final Value<String> Group;
   final Value<String> Name;
   final Value<String> Icon;
+  final Value<bool?> IsIncome;
   const LedgerTagsCompanion({
     this.Id = const Value.absent(),
     this.Group = const Value.absent(),
     this.Name = const Value.absent(),
     this.Icon = const Value.absent(),
+    this.IsIncome = const Value.absent(),
   });
   LedgerTagsCompanion.insert({
     this.Id = const Value.absent(),
     required String Group,
     required String Name,
     required String Icon,
+    this.IsIncome = const Value.absent(),
   })  : Group = Value(Group),
         Name = Value(Name),
         Icon = Value(Icon);
@@ -738,12 +906,14 @@ class LedgerTagsCompanion extends UpdateCompanion<LedgerTag> {
     Expression<String>? Group,
     Expression<String>? Name,
     Expression<String>? Icon,
+    Expression<bool>? IsIncome,
   }) {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
       if (Group != null) 'group': Group,
       if (Name != null) 'name': Name,
       if (Icon != null) 'icon': Icon,
+      if (IsIncome != null) 'is_income': IsIncome,
     });
   }
 
@@ -751,12 +921,14 @@ class LedgerTagsCompanion extends UpdateCompanion<LedgerTag> {
       {Value<int>? Id,
       Value<String>? Group,
       Value<String>? Name,
-      Value<String>? Icon}) {
+      Value<String>? Icon,
+      Value<bool?>? IsIncome}) {
     return LedgerTagsCompanion(
       Id: Id ?? this.Id,
       Group: Group ?? this.Group,
       Name: Name ?? this.Name,
       Icon: Icon ?? this.Icon,
+      IsIncome: IsIncome ?? this.IsIncome,
     );
   }
 
@@ -775,6 +947,9 @@ class LedgerTagsCompanion extends UpdateCompanion<LedgerTag> {
     if (Icon.present) {
       map['icon'] = Variable<String>(Icon.value);
     }
+    if (IsIncome.present) {
+      map['is_income'] = Variable<bool>(IsIncome.value);
+    }
     return map;
   }
 
@@ -784,7 +959,8 @@ class LedgerTagsCompanion extends UpdateCompanion<LedgerTag> {
           ..write('Id: $Id, ')
           ..write('Group: $Group, ')
           ..write('Name: $Name, ')
-          ..write('Icon: $Icon')
+          ..write('Icon: $Icon, ')
+          ..write('IsIncome: $IsIncome')
           ..write(')'))
         .toString();
   }
@@ -1162,6 +1338,9 @@ typedef $$LedgerEntriesTableInsertCompanionBuilder = LedgerEntriesCompanion
   required int IntMoney,
   required DateTime Date,
   required String Comment,
+  Value<String?> LocationCountry,
+  Value<String?> LocationCity,
+  Value<String?> LocationStreet,
 });
 typedef $$LedgerEntriesTableUpdateCompanionBuilder = LedgerEntriesCompanion
     Function({
@@ -1170,6 +1349,9 @@ typedef $$LedgerEntriesTableUpdateCompanionBuilder = LedgerEntriesCompanion
   Value<int> IntMoney,
   Value<DateTime> Date,
   Value<String> Comment,
+  Value<String?> LocationCountry,
+  Value<String?> LocationCity,
+  Value<String?> LocationStreet,
 });
 
 class $$LedgerEntriesTableTableManager extends RootTableManager<
@@ -1198,6 +1380,9 @@ class $$LedgerEntriesTableTableManager extends RootTableManager<
             Value<int> IntMoney = const Value.absent(),
             Value<DateTime> Date = const Value.absent(),
             Value<String> Comment = const Value.absent(),
+            Value<String?> LocationCountry = const Value.absent(),
+            Value<String?> LocationCity = const Value.absent(),
+            Value<String?> LocationStreet = const Value.absent(),
           }) =>
               LedgerEntriesCompanion(
             Id: Id,
@@ -1205,6 +1390,9 @@ class $$LedgerEntriesTableTableManager extends RootTableManager<
             IntMoney: IntMoney,
             Date: Date,
             Comment: Comment,
+            LocationCountry: LocationCountry,
+            LocationCity: LocationCity,
+            LocationStreet: LocationStreet,
           ),
           getInsertCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
@@ -1212,6 +1400,9 @@ class $$LedgerEntriesTableTableManager extends RootTableManager<
             required int IntMoney,
             required DateTime Date,
             required String Comment,
+            Value<String?> LocationCountry = const Value.absent(),
+            Value<String?> LocationCity = const Value.absent(),
+            Value<String?> LocationStreet = const Value.absent(),
           }) =>
               LedgerEntriesCompanion.insert(
             Id: Id,
@@ -1219,6 +1410,9 @@ class $$LedgerEntriesTableTableManager extends RootTableManager<
             IntMoney: IntMoney,
             Date: Date,
             Comment: Comment,
+            LocationCountry: LocationCountry,
+            LocationCity: LocationCity,
+            LocationStreet: LocationStreet,
           ),
         ));
 }
@@ -1262,6 +1456,21 @@ class $$LedgerEntriesTableFilterComposer
       column: $state.table.Comment,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get LocationCountry => $state.composableBuilder(
+      column: $state.table.LocationCountry,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get LocationCity => $state.composableBuilder(
+      column: $state.table.LocationCity,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get LocationStreet => $state.composableBuilder(
+      column: $state.table.LocationStreet,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
 }
 
 class $$LedgerEntriesTableOrderingComposer
@@ -1291,6 +1500,21 @@ class $$LedgerEntriesTableOrderingComposer
       column: $state.table.Comment,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get LocationCountry => $state.composableBuilder(
+      column: $state.table.LocationCountry,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get LocationCity => $state.composableBuilder(
+      column: $state.table.LocationCity,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get LocationStreet => $state.composableBuilder(
+      column: $state.table.LocationStreet,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
 typedef $$LedgerTagsTableInsertCompanionBuilder = LedgerTagsCompanion Function({
@@ -1298,12 +1522,14 @@ typedef $$LedgerTagsTableInsertCompanionBuilder = LedgerTagsCompanion Function({
   required String Group,
   required String Name,
   required String Icon,
+  Value<bool?> IsIncome,
 });
 typedef $$LedgerTagsTableUpdateCompanionBuilder = LedgerTagsCompanion Function({
   Value<int> Id,
   Value<String> Group,
   Value<String> Name,
   Value<String> Icon,
+  Value<bool?> IsIncome,
 });
 
 class $$LedgerTagsTableTableManager extends RootTableManager<
@@ -1330,24 +1556,28 @@ class $$LedgerTagsTableTableManager extends RootTableManager<
             Value<String> Group = const Value.absent(),
             Value<String> Name = const Value.absent(),
             Value<String> Icon = const Value.absent(),
+            Value<bool?> IsIncome = const Value.absent(),
           }) =>
               LedgerTagsCompanion(
             Id: Id,
             Group: Group,
             Name: Name,
             Icon: Icon,
+            IsIncome: IsIncome,
           ),
           getInsertCompanionBuilder: ({
             Value<int> Id = const Value.absent(),
             required String Group,
             required String Name,
             required String Icon,
+            Value<bool?> IsIncome = const Value.absent(),
           }) =>
               LedgerTagsCompanion.insert(
             Id: Id,
             Group: Group,
             Name: Name,
             Icon: Icon,
+            IsIncome: IsIncome,
           ),
         ));
 }
@@ -1386,6 +1616,11 @@ class $$LedgerTagsTableFilterComposer
       column: $state.table.Icon,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get IsIncome => $state.composableBuilder(
+      column: $state.table.IsIncome,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
 }
 
 class $$LedgerTagsTableOrderingComposer
@@ -1408,6 +1643,11 @@ class $$LedgerTagsTableOrderingComposer
 
   ColumnOrderings<String> get Icon => $state.composableBuilder(
       column: $state.table.Icon,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get IsIncome => $state.composableBuilder(
+      column: $state.table.IsIncome,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }

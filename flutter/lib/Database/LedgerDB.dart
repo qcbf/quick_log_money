@@ -13,12 +13,12 @@ late final UserLedgerDao Ledger;
 ///
 class UserLedgerDao {
   final AsyncValue<LedgerInfo> Info;
-  final AsyncValue<LedgerTagDao> Tag;
-  UserLedgerDao({required this.Info, required this.Tag});
+  final AsyncValue<LedgerTagDao> ExpenseTag;
+  UserLedgerDao({required this.Info, required this.ExpenseTag});
   static Future<UserLedgerDao> Create() async {
     return UserLedgerDao(
       Info: AsyncValue(() async => await LedgerDB.managers.ledgerInfos.filter((f) => f.Id(User.Info.LedgerId)).getSingle()),
-      Tag: AsyncValue(() async => await LedgerTagDao.Create()),
+      ExpenseTag: AsyncValue(() async => await LedgerTagDao.Create()),
     );
   }
 }
@@ -65,9 +65,9 @@ class LedgerEntries extends Table {
   IntColumn get IntMoney => integer()();
   DateTimeColumn get Date => dateTime()();
   TextColumn get Comment => text()();
-  TextColumn get LocationCountry => text()();
-  TextColumn get LocationCity => text()();
-  TextColumn get LocationStreet => text()();
+  TextColumn get LocationCountry => text().nullable()();
+  TextColumn get LocationCity => text().nullable()();
+  TextColumn get LocationStreet => text().nullable()();
 }
 
 class LedgerTags extends Table {
@@ -75,6 +75,7 @@ class LedgerTags extends Table {
   TextColumn get Group => text()();
   TextColumn get Name => text()();
   TextColumn get Icon => text()();
+  BoolColumn get IsIncome => boolean().nullable().withDefault(const Constant(false))();
 }
 
 ///
@@ -106,6 +107,9 @@ class LedgerDBHelper extends _$LedgerDBHelper {
       onCreate: (m) => m.createAll(),
       onUpgrade: (m, from, to) async {
         await customStatement('PRAGMA foreign_keys = OFF');
+        // if (from < 2) {
+        //   await m.addColumn(ledgerTags, ledgerTags.IsIncome);
+        // }
       },
       beforeOpen: (details) async {
         await customStatement('PRAGMA foreign_keys = ON');

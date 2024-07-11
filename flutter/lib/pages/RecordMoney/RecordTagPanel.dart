@@ -25,7 +25,7 @@ class RecordTagPanel extends StatelessWidget {
     final entry = context.read<RecordEntryEditingProvider>();
     return TagGroupUI(
       entry.Tag.Id,
-      Ledger.Tag.value.TagGroups,
+      Ledger.ExpenseTag.value.TagGroups,
       (tag) {
         entry
           ..Tag = tag

@@ -29,7 +29,9 @@ class RecordEntryEditingProvider with ChangeNotifier {
   Future<String?> Save() async {
     var money = (int.tryParse(MoneyIntegerStr) ?? 0) * 100;
     if (MoneyDecimalStr?.isNotEmpty == true) {
-      money += int.parse(MoneyDecimalStr!);
+      var decimal = int.parse(MoneyDecimalStr!);
+      if (decimal < 10) decimal *= 10;
+      money += decimal;
     }
     if (money == 0) {
       return "请填写金额";
