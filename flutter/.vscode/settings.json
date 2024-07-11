@@ -2,6 +2,7 @@
 	"files.exclude": {
 		"**/*.g.dart": true,
 		"*.lock": true,
+		".dart_tool": true,
 		"*.metadata": true,
 		"*.flutter-plugins*": true,
 		"build": true,
