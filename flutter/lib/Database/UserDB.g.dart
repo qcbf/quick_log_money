@@ -266,6 +266,25 @@ class UserInfo extends DataClass implements Insertable<UserInfo> {
             VipExpiryDate.present ? VipExpiryDate.value : this.VipExpiryDate,
         RegisterDate: RegisterDate ?? this.RegisterDate,
       );
+  UserInfo copyWithCompanion(UserInfosCompanion data) {
+    return UserInfo(
+      Id: data.Id.present ? data.Id.value : this.Id,
+      LedgerId: data.LedgerId.present ? data.LedgerId.value : this.LedgerId,
+      LedgerRecentCount: data.LedgerRecentCount.present
+          ? data.LedgerRecentCount.value
+          : this.LedgerRecentCount,
+      Name: data.Name.present ? data.Name.value : this.Name,
+      Icon: data.Icon.present ? data.Icon.value : this.Icon,
+      Token: data.Token.present ? data.Token.value : this.Token,
+      VipExpiryDate: data.VipExpiryDate.present
+          ? data.VipExpiryDate.value
+          : this.VipExpiryDate,
+      RegisterDate: data.RegisterDate.present
+          ? data.RegisterDate.value
+          : this.RegisterDate,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('UserInfo(')
@@ -544,6 +563,14 @@ class UserLedgerRecentTag extends DataClass
         Uid: Uid ?? this.Uid,
         TagId: TagId ?? this.TagId,
       );
+  UserLedgerRecentTag copyWithCompanion(UserLedgerRecentTagsCompanion data) {
+    return UserLedgerRecentTag(
+      Id: data.Id.present ? data.Id.value : this.Id,
+      Uid: data.Uid.present ? data.Uid.value : this.Uid,
+      TagId: data.TagId.present ? data.TagId.value : this.TagId,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('UserLedgerRecentTag(')
@@ -776,6 +803,15 @@ class UserCard extends DataClass implements Insertable<UserCard> {
         Place: Place ?? this.Place,
         Params: Params.present ? Params.value : this.Params,
       );
+  UserCard copyWithCompanion(UserCardsCompanion data) {
+    return UserCard(
+      Id: data.Id.present ? data.Id.value : this.Id,
+      Uid: data.Uid.present ? data.Uid.value : this.Uid,
+      Place: data.Place.present ? data.Place.value : this.Place,
+      Params: data.Params.present ? data.Params.value : this.Params,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('UserCard(')
@@ -876,7 +912,7 @@ class UserCardsCompanion extends UpdateCompanion<UserCard> {
 
 abstract class _$UserDBHelper extends GeneratedDatabase {
   _$UserDBHelper(QueryExecutor e) : super(e);
-  _$UserDBHelperManager get managers => _$UserDBHelperManager(this);
+  $UserDBHelperManager get managers => $UserDBHelperManager(this);
   late final $UserInfosTable userInfos = $UserInfosTable(this);
   late final $UserLedgerRecentTagsTable userLedgerRecentTags =
       $UserLedgerRecentTagsTable(this);
@@ -901,7 +937,7 @@ abstract class _$UserDBHelper extends GeneratedDatabase {
       ];
 }
 
-typedef $$UserInfosTableInsertCompanionBuilder = UserInfosCompanion Function({
+typedef $$UserInfosTableCreateCompanionBuilder = UserInfosCompanion Function({
   Value<int> Id,
   required int LedgerId,
   Value<int?> LedgerRecentCount,
@@ -928,8 +964,7 @@ class $$UserInfosTableTableManager extends RootTableManager<
     UserInfo,
     $$UserInfosTableFilterComposer,
     $$UserInfosTableOrderingComposer,
-    $$UserInfosTableProcessedTableManager,
-    $$UserInfosTableInsertCompanionBuilder,
+    $$UserInfosTableCreateCompanionBuilder,
     $$UserInfosTableUpdateCompanionBuilder> {
   $$UserInfosTableTableManager(_$UserDBHelper db, $UserInfosTable table)
       : super(TableManagerState(
@@ -939,9 +974,7 @@ class $$UserInfosTableTableManager extends RootTableManager<
               $$UserInfosTableFilterComposer(ComposerState(db, table)),
           orderingComposer:
               $$UserInfosTableOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$UserInfosTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             Value<int> LedgerId = const Value.absent(),
             Value<int?> LedgerRecentCount = const Value.absent(),
@@ -961,7 +994,7 @@ class $$UserInfosTableTableManager extends RootTableManager<
             VipExpiryDate: VipExpiryDate,
             RegisterDate: RegisterDate,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             required int LedgerId,
             Value<int?> LedgerRecentCount = const Value.absent(),
@@ -982,18 +1015,6 @@ class $$UserInfosTableTableManager extends RootTableManager<
             RegisterDate: RegisterDate,
           ),
         ));
-}
-
-class $$UserInfosTableProcessedTableManager extends ProcessedTableManager<
-    _$UserDBHelper,
-    $UserInfosTable,
-    UserInfo,
-    $$UserInfosTableFilterComposer,
-    $$UserInfosTableOrderingComposer,
-    $$UserInfosTableProcessedTableManager,
-    $$UserInfosTableInsertCompanionBuilder,
-    $$UserInfosTableUpdateCompanionBuilder> {
-  $$UserInfosTableProcessedTableManager(super.$state);
 }
 
 class $$UserInfosTableFilterComposer
@@ -1084,7 +1105,7 @@ class $$UserInfosTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $$UserLedgerRecentTagsTableInsertCompanionBuilder
+typedef $$UserLedgerRecentTagsTableCreateCompanionBuilder
     = UserLedgerRecentTagsCompanion Function({
   Value<int> Id,
   required int Uid,
@@ -1103,8 +1124,7 @@ class $$UserLedgerRecentTagsTableTableManager extends RootTableManager<
     UserLedgerRecentTag,
     $$UserLedgerRecentTagsTableFilterComposer,
     $$UserLedgerRecentTagsTableOrderingComposer,
-    $$UserLedgerRecentTagsTableProcessedTableManager,
-    $$UserLedgerRecentTagsTableInsertCompanionBuilder,
+    $$UserLedgerRecentTagsTableCreateCompanionBuilder,
     $$UserLedgerRecentTagsTableUpdateCompanionBuilder> {
   $$UserLedgerRecentTagsTableTableManager(
       _$UserDBHelper db, $UserLedgerRecentTagsTable table)
@@ -1115,9 +1135,7 @@ class $$UserLedgerRecentTagsTableTableManager extends RootTableManager<
               ComposerState(db, table)),
           orderingComposer: $$UserLedgerRecentTagsTableOrderingComposer(
               ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$UserLedgerRecentTagsTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             Value<int> Uid = const Value.absent(),
             Value<int> TagId = const Value.absent(),
@@ -1127,7 +1145,7 @@ class $$UserLedgerRecentTagsTableTableManager extends RootTableManager<
             Uid: Uid,
             TagId: TagId,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             required int Uid,
             required int TagId,
@@ -1138,19 +1156,6 @@ class $$UserLedgerRecentTagsTableTableManager extends RootTableManager<
             TagId: TagId,
           ),
         ));
-}
-
-class $$UserLedgerRecentTagsTableProcessedTableManager
-    extends ProcessedTableManager<
-        _$UserDBHelper,
-        $UserLedgerRecentTagsTable,
-        UserLedgerRecentTag,
-        $$UserLedgerRecentTagsTableFilterComposer,
-        $$UserLedgerRecentTagsTableOrderingComposer,
-        $$UserLedgerRecentTagsTableProcessedTableManager,
-        $$UserLedgerRecentTagsTableInsertCompanionBuilder,
-        $$UserLedgerRecentTagsTableUpdateCompanionBuilder> {
-  $$UserLedgerRecentTagsTableProcessedTableManager(super.$state);
 }
 
 class $$UserLedgerRecentTagsTableFilterComposer
@@ -1191,7 +1196,7 @@ class $$UserLedgerRecentTagsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $$UserCardsTableInsertCompanionBuilder = UserCardsCompanion Function({
+typedef $$UserCardsTableCreateCompanionBuilder = UserCardsCompanion Function({
   Value<int> Id,
   required int Uid,
   required int Place,
@@ -1210,8 +1215,7 @@ class $$UserCardsTableTableManager extends RootTableManager<
     UserCard,
     $$UserCardsTableFilterComposer,
     $$UserCardsTableOrderingComposer,
-    $$UserCardsTableProcessedTableManager,
-    $$UserCardsTableInsertCompanionBuilder,
+    $$UserCardsTableCreateCompanionBuilder,
     $$UserCardsTableUpdateCompanionBuilder> {
   $$UserCardsTableTableManager(_$UserDBHelper db, $UserCardsTable table)
       : super(TableManagerState(
@@ -1221,9 +1225,7 @@ class $$UserCardsTableTableManager extends RootTableManager<
               $$UserCardsTableFilterComposer(ComposerState(db, table)),
           orderingComposer:
               $$UserCardsTableOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$UserCardsTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             Value<int> Uid = const Value.absent(),
             Value<int> Place = const Value.absent(),
@@ -1235,7 +1237,7 @@ class $$UserCardsTableTableManager extends RootTableManager<
             Place: Place,
             Params: Params,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             required int Uid,
             required int Place,
@@ -1248,18 +1250,6 @@ class $$UserCardsTableTableManager extends RootTableManager<
             Params: Params,
           ),
         ));
-}
-
-class $$UserCardsTableProcessedTableManager extends ProcessedTableManager<
-    _$UserDBHelper,
-    $UserCardsTable,
-    UserCard,
-    $$UserCardsTableFilterComposer,
-    $$UserCardsTableOrderingComposer,
-    $$UserCardsTableProcessedTableManager,
-    $$UserCardsTableInsertCompanionBuilder,
-    $$UserCardsTableUpdateCompanionBuilder> {
-  $$UserCardsTableProcessedTableManager(super.$state);
 }
 
 class $$UserCardsTableFilterComposer
@@ -1310,9 +1300,9 @@ class $$UserCardsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-class _$UserDBHelperManager {
+class $UserDBHelperManager {
   final _$UserDBHelper _db;
-  _$UserDBHelperManager(this._db);
+  $UserDBHelperManager(this._db);
   $$UserInfosTableTableManager get userInfos =>
       $$UserInfosTableTableManager(_db, _db.userInfos);
   $$UserLedgerRecentTagsTableTableManager get userLedgerRecentTags =>

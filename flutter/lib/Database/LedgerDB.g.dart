@@ -160,6 +160,15 @@ class LedgerInfo extends DataClass implements Insertable<LedgerInfo> {
         Icon: Icon ?? this.Icon,
         Options: Options.present ? Options.value : this.Options,
       );
+  LedgerInfo copyWithCompanion(LedgerInfosCompanion data) {
+    return LedgerInfo(
+      Id: data.Id.present ? data.Id.value : this.Id,
+      Name: data.Name.present ? data.Name.value : this.Name,
+      Icon: data.Icon.present ? data.Icon.value : this.Icon,
+      Options: data.Options.present ? data.Options.value : this.Options,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('LedgerInfo(')
@@ -523,6 +532,25 @@ class LedgerEntry extends DataClass implements Insertable<LedgerEntry> {
         LocationStreet:
             LocationStreet.present ? LocationStreet.value : this.LocationStreet,
       );
+  LedgerEntry copyWithCompanion(LedgerEntriesCompanion data) {
+    return LedgerEntry(
+      Id: data.Id.present ? data.Id.value : this.Id,
+      TagId: data.TagId.present ? data.TagId.value : this.TagId,
+      IntMoney: data.IntMoney.present ? data.IntMoney.value : this.IntMoney,
+      Date: data.Date.present ? data.Date.value : this.Date,
+      Comment: data.Comment.present ? data.Comment.value : this.Comment,
+      LocationCountry: data.LocationCountry.present
+          ? data.LocationCountry.value
+          : this.LocationCountry,
+      LocationCity: data.LocationCity.present
+          ? data.LocationCity.value
+          : this.LocationCity,
+      LocationStreet: data.LocationStreet.present
+          ? data.LocationStreet.value
+          : this.LocationStreet,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('LedgerEntry(')
@@ -854,6 +882,16 @@ class LedgerTag extends DataClass implements Insertable<LedgerTag> {
         Icon: Icon ?? this.Icon,
         IsIncome: IsIncome.present ? IsIncome.value : this.IsIncome,
       );
+  LedgerTag copyWithCompanion(LedgerTagsCompanion data) {
+    return LedgerTag(
+      Id: data.Id.present ? data.Id.value : this.Id,
+      Group: data.Group.present ? data.Group.value : this.Group,
+      Name: data.Name.present ? data.Name.value : this.Name,
+      Icon: data.Icon.present ? data.Icon.value : this.Icon,
+      IsIncome: data.IsIncome.present ? data.IsIncome.value : this.IsIncome,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('LedgerTag(')
@@ -1096,6 +1134,14 @@ class LedgerOwner extends DataClass implements Insertable<LedgerOwner> {
         UserId: UserId ?? this.UserId,
         Role: Role ?? this.Role,
       );
+  LedgerOwner copyWithCompanion(LedgerOwnersCompanion data) {
+    return LedgerOwner(
+      Id: data.Id.present ? data.Id.value : this.Id,
+      UserId: data.UserId.present ? data.UserId.value : this.UserId,
+      Role: data.Role.present ? data.Role.value : this.Role,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('LedgerOwner(')
@@ -1182,7 +1228,7 @@ class LedgerOwnersCompanion extends UpdateCompanion<LedgerOwner> {
 
 abstract class _$LedgerDBHelper extends GeneratedDatabase {
   _$LedgerDBHelper(QueryExecutor e) : super(e);
-  _$LedgerDBHelperManager get managers => _$LedgerDBHelperManager(this);
+  $LedgerDBHelperManager get managers => $LedgerDBHelperManager(this);
   late final $LedgerInfosTable ledgerInfos = $LedgerInfosTable(this);
   late final $LedgerEntriesTable ledgerEntries = $LedgerEntriesTable(this);
   late final $LedgerTagsTable ledgerTags = $LedgerTagsTable(this);
@@ -1208,7 +1254,7 @@ abstract class _$LedgerDBHelper extends GeneratedDatabase {
       ];
 }
 
-typedef $$LedgerInfosTableInsertCompanionBuilder = LedgerInfosCompanion
+typedef $$LedgerInfosTableCreateCompanionBuilder = LedgerInfosCompanion
     Function({
   Value<int> Id,
   required String Name,
@@ -1229,8 +1275,7 @@ class $$LedgerInfosTableTableManager extends RootTableManager<
     LedgerInfo,
     $$LedgerInfosTableFilterComposer,
     $$LedgerInfosTableOrderingComposer,
-    $$LedgerInfosTableProcessedTableManager,
-    $$LedgerInfosTableInsertCompanionBuilder,
+    $$LedgerInfosTableCreateCompanionBuilder,
     $$LedgerInfosTableUpdateCompanionBuilder> {
   $$LedgerInfosTableTableManager(_$LedgerDBHelper db, $LedgerInfosTable table)
       : super(TableManagerState(
@@ -1240,9 +1285,7 @@ class $$LedgerInfosTableTableManager extends RootTableManager<
               $$LedgerInfosTableFilterComposer(ComposerState(db, table)),
           orderingComposer:
               $$LedgerInfosTableOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$LedgerInfosTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             Value<String> Name = const Value.absent(),
             Value<String> Icon = const Value.absent(),
@@ -1254,7 +1297,7 @@ class $$LedgerInfosTableTableManager extends RootTableManager<
             Icon: Icon,
             Options: Options,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             required String Name,
             required String Icon,
@@ -1267,18 +1310,6 @@ class $$LedgerInfosTableTableManager extends RootTableManager<
             Options: Options,
           ),
         ));
-}
-
-class $$LedgerInfosTableProcessedTableManager extends ProcessedTableManager<
-    _$LedgerDBHelper,
-    $LedgerInfosTable,
-    LedgerInfo,
-    $$LedgerInfosTableFilterComposer,
-    $$LedgerInfosTableOrderingComposer,
-    $$LedgerInfosTableProcessedTableManager,
-    $$LedgerInfosTableInsertCompanionBuilder,
-    $$LedgerInfosTableUpdateCompanionBuilder> {
-  $$LedgerInfosTableProcessedTableManager(super.$state);
 }
 
 class $$LedgerInfosTableFilterComposer
@@ -1331,7 +1362,7 @@ class $$LedgerInfosTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $$LedgerEntriesTableInsertCompanionBuilder = LedgerEntriesCompanion
+typedef $$LedgerEntriesTableCreateCompanionBuilder = LedgerEntriesCompanion
     Function({
   Value<int> Id,
   required int TagId,
@@ -1360,8 +1391,7 @@ class $$LedgerEntriesTableTableManager extends RootTableManager<
     LedgerEntry,
     $$LedgerEntriesTableFilterComposer,
     $$LedgerEntriesTableOrderingComposer,
-    $$LedgerEntriesTableProcessedTableManager,
-    $$LedgerEntriesTableInsertCompanionBuilder,
+    $$LedgerEntriesTableCreateCompanionBuilder,
     $$LedgerEntriesTableUpdateCompanionBuilder> {
   $$LedgerEntriesTableTableManager(
       _$LedgerDBHelper db, $LedgerEntriesTable table)
@@ -1372,9 +1402,7 @@ class $$LedgerEntriesTableTableManager extends RootTableManager<
               $$LedgerEntriesTableFilterComposer(ComposerState(db, table)),
           orderingComposer:
               $$LedgerEntriesTableOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$LedgerEntriesTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             Value<int> TagId = const Value.absent(),
             Value<int> IntMoney = const Value.absent(),
@@ -1394,7 +1422,7 @@ class $$LedgerEntriesTableTableManager extends RootTableManager<
             LocationCity: LocationCity,
             LocationStreet: LocationStreet,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             required int TagId,
             required int IntMoney,
@@ -1415,18 +1443,6 @@ class $$LedgerEntriesTableTableManager extends RootTableManager<
             LocationStreet: LocationStreet,
           ),
         ));
-}
-
-class $$LedgerEntriesTableProcessedTableManager extends ProcessedTableManager<
-    _$LedgerDBHelper,
-    $LedgerEntriesTable,
-    LedgerEntry,
-    $$LedgerEntriesTableFilterComposer,
-    $$LedgerEntriesTableOrderingComposer,
-    $$LedgerEntriesTableProcessedTableManager,
-    $$LedgerEntriesTableInsertCompanionBuilder,
-    $$LedgerEntriesTableUpdateCompanionBuilder> {
-  $$LedgerEntriesTableProcessedTableManager(super.$state);
 }
 
 class $$LedgerEntriesTableFilterComposer
@@ -1517,7 +1533,7 @@ class $$LedgerEntriesTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $$LedgerTagsTableInsertCompanionBuilder = LedgerTagsCompanion Function({
+typedef $$LedgerTagsTableCreateCompanionBuilder = LedgerTagsCompanion Function({
   Value<int> Id,
   required String Group,
   required String Name,
@@ -1538,8 +1554,7 @@ class $$LedgerTagsTableTableManager extends RootTableManager<
     LedgerTag,
     $$LedgerTagsTableFilterComposer,
     $$LedgerTagsTableOrderingComposer,
-    $$LedgerTagsTableProcessedTableManager,
-    $$LedgerTagsTableInsertCompanionBuilder,
+    $$LedgerTagsTableCreateCompanionBuilder,
     $$LedgerTagsTableUpdateCompanionBuilder> {
   $$LedgerTagsTableTableManager(_$LedgerDBHelper db, $LedgerTagsTable table)
       : super(TableManagerState(
@@ -1549,9 +1564,7 @@ class $$LedgerTagsTableTableManager extends RootTableManager<
               $$LedgerTagsTableFilterComposer(ComposerState(db, table)),
           orderingComposer:
               $$LedgerTagsTableOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$LedgerTagsTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             Value<String> Group = const Value.absent(),
             Value<String> Name = const Value.absent(),
@@ -1565,7 +1578,7 @@ class $$LedgerTagsTableTableManager extends RootTableManager<
             Icon: Icon,
             IsIncome: IsIncome,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             required String Group,
             required String Name,
@@ -1580,18 +1593,6 @@ class $$LedgerTagsTableTableManager extends RootTableManager<
             IsIncome: IsIncome,
           ),
         ));
-}
-
-class $$LedgerTagsTableProcessedTableManager extends ProcessedTableManager<
-    _$LedgerDBHelper,
-    $LedgerTagsTable,
-    LedgerTag,
-    $$LedgerTagsTableFilterComposer,
-    $$LedgerTagsTableOrderingComposer,
-    $$LedgerTagsTableProcessedTableManager,
-    $$LedgerTagsTableInsertCompanionBuilder,
-    $$LedgerTagsTableUpdateCompanionBuilder> {
-  $$LedgerTagsTableProcessedTableManager(super.$state);
 }
 
 class $$LedgerTagsTableFilterComposer
@@ -1652,7 +1653,7 @@ class $$LedgerTagsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $$LedgerOwnersTableInsertCompanionBuilder = LedgerOwnersCompanion
+typedef $$LedgerOwnersTableCreateCompanionBuilder = LedgerOwnersCompanion
     Function({
   Value<int> Id,
   required int UserId,
@@ -1671,8 +1672,7 @@ class $$LedgerOwnersTableTableManager extends RootTableManager<
     LedgerOwner,
     $$LedgerOwnersTableFilterComposer,
     $$LedgerOwnersTableOrderingComposer,
-    $$LedgerOwnersTableProcessedTableManager,
-    $$LedgerOwnersTableInsertCompanionBuilder,
+    $$LedgerOwnersTableCreateCompanionBuilder,
     $$LedgerOwnersTableUpdateCompanionBuilder> {
   $$LedgerOwnersTableTableManager(_$LedgerDBHelper db, $LedgerOwnersTable table)
       : super(TableManagerState(
@@ -1682,9 +1682,7 @@ class $$LedgerOwnersTableTableManager extends RootTableManager<
               $$LedgerOwnersTableFilterComposer(ComposerState(db, table)),
           orderingComposer:
               $$LedgerOwnersTableOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$LedgerOwnersTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             Value<int> UserId = const Value.absent(),
             Value<EOwnerRole> Role = const Value.absent(),
@@ -1694,7 +1692,7 @@ class $$LedgerOwnersTableTableManager extends RootTableManager<
             UserId: UserId,
             Role: Role,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             required int UserId,
             required EOwnerRole Role,
@@ -1705,18 +1703,6 @@ class $$LedgerOwnersTableTableManager extends RootTableManager<
             Role: Role,
           ),
         ));
-}
-
-class $$LedgerOwnersTableProcessedTableManager extends ProcessedTableManager<
-    _$LedgerDBHelper,
-    $LedgerOwnersTable,
-    LedgerOwner,
-    $$LedgerOwnersTableFilterComposer,
-    $$LedgerOwnersTableOrderingComposer,
-    $$LedgerOwnersTableProcessedTableManager,
-    $$LedgerOwnersTableInsertCompanionBuilder,
-    $$LedgerOwnersTableUpdateCompanionBuilder> {
-  $$LedgerOwnersTableProcessedTableManager(super.$state);
 }
 
 class $$LedgerOwnersTableFilterComposer
@@ -1759,9 +1745,9 @@ class $$LedgerOwnersTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-class _$LedgerDBHelperManager {
+class $LedgerDBHelperManager {
   final _$LedgerDBHelper _db;
-  _$LedgerDBHelperManager(this._db);
+  $LedgerDBHelperManager(this._db);
   $$LedgerInfosTableTableManager get ledgerInfos =>
       $$LedgerInfosTableTableManager(_db, _db.ledgerInfos);
   $$LedgerEntriesTableTableManager get ledgerEntries =>

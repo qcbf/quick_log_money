@@ -20,6 +20,7 @@ dependencies:
   sqlcipher_flutter_libs: ^0.6.3
   shared_preferences: ^2.2.3
   collection: ^1.18.0
+  decimal: ^3.0.2
 
 dev_dependencies:
   flutter_test:

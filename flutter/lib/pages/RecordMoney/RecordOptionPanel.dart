@@ -23,11 +23,17 @@ class RecordOptionPanel extends StatelessWidget {
 
   ///
   Widget _BuildMoney(BuildContext context, RecordEntryEditingProvider value) {
-    return Text("￥${value.GetMoneyString()}",
-        style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              color: value.IsIncome ? Colors.green : Colors.red,
-              fontSize: 24,
-            ));
+    final text = "￥${value.MoneyCalc.GetResultStr()}";
+
+    if (value.MoneyCalc.IsHasOperator) {
+      final moneyCalcStr = value.MoneyCalc.toString();
+      return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Flexible(child: FittedBox(child: Text(moneyCalcStr))),
+        Text(text, style: Theme.of(context).textTheme.titleMedium!.copyWith(color: value.IsIncome ? Colors.green : Colors.red, fontSize: moneyCalcStr.length > 10 ? 18 : 24)),
+      ]);
+    } else {
+      return Text(text, style: Theme.of(context).textTheme.titleMedium!.copyWith(color: value.IsIncome ? Colors.green : Colors.red, fontSize: 24));
+    }
   }
 
   ///

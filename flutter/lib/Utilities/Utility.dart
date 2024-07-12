@@ -52,3 +52,6 @@ class Utility {
 
   //
 }
+
+///
+T? TryCastType<T>(dynamic ipt) => ipt is T ? ipt : null;

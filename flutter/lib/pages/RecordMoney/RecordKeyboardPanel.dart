@@ -1,6 +1,4 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordRecentTags.dart';
@@ -14,7 +12,7 @@ class RecordKeyboardPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var children = [Expanded(flex: 35, child: _BuildLeftMenu(context)), Expanded(flex: 10, child: _BuildRightMenu())];
+    var children = [Expanded(flex: 35, child: _BuildLeftMenu(context)), Expanded(flex: 10, child: _BuildRightMenu(context))];
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -54,7 +52,7 @@ class RecordKeyboardPanel extends StatelessWidget {
     return Expanded(child: result);
   }
 
-  Widget _BuildRightMenu() {
+  Widget _BuildRightMenu(BuildContext context) {
     const paddingValue = EdgeInsets.fromLTRB(0, 2, 0, 0);
     var style = _BtnStyle.copyWith(padding: const WidgetStatePropertyAll(EdgeInsets.zero));
     return Column(
@@ -84,7 +82,7 @@ class RecordKeyboardPanel extends StatelessWidget {
             padding: paddingValue,
             child: TextButton(
               style: style,
-              onPressed: () {},
+              onPressed: () => _OnInputKey(context, _KeyboardKey.CalcAdd),
               child: const Icon(Icons.add),
             ),
           ),
@@ -95,7 +93,7 @@ class RecordKeyboardPanel extends StatelessWidget {
             padding: paddingValue,
             child: TextButton(
               style: style,
-              onPressed: () {},
+              onPressed: () => _OnInputKey(context, _KeyboardKey.CalcSub),
               child: const Icon(Icons.remove),
             ),
           ),
@@ -124,45 +122,68 @@ class RecordKeyboardPanel extends StatelessWidget {
   }
 
   void _OnInputKey(BuildContext context, _KeyboardKey key) {
-    var data = context.read<RecordEntryEditingProvider>();
-
-    var newInteger = data.MoneyIntegerStr;
-    var newDecimal = data.MoneyDecimalStr;
-
-    if (key == _KeyboardKey.Back) {
-      if (newDecimal != null) {
-        newDecimal = newDecimal.isEmpty ? null : newDecimal.substring(0, newDecimal.length - 1);
-      } else if (newInteger.isNotEmpty) {
-        newInteger = newInteger.substring(0, newInteger.length - 1);
-      }
-    } else if (key == _KeyboardKey.LongBack) {
-      newInteger = "";
-      newDecimal = null;
-    } else if (key == _KeyboardKey.Dot) {
-      newDecimal ??= "";
-    } else {
-      var keyStr = key.index.toString();
-      if (newDecimal != null) {
-        if (newDecimal.length < 2) {
-          newDecimal += keyStr;
-        } else {
-          newDecimal = newDecimal[0] + keyStr;
-        }
-      } else {
-        if (key != _KeyboardKey.N0 || newInteger.isNotEmpty) newInteger += keyStr;
-      }
+    var entry = context.read<RecordEntryEditingProvider>();
+    if (key == _KeyboardKey.LongBack) {
+      entry.MoneyCalc.Clear();
+      entry.Notify();
+      return;
     }
 
-    if (newInteger != data.MoneyIntegerStr || newDecimal != data.MoneyDecimalStr) {
-      if (newInteger.length > 9) {
-        BotToast.showText(text: "输入的钱太多了");
-        return;
+    var endIndex = entry.MoneyCalc.Values.length - 1;
+    final calc = entry.MoneyCalc.Values[endIndex];
+    if (calc is ECalcOperator) {
+      if (key == _KeyboardKey.CalcAdd) {
+        entry.MoneyCalc.Values[endIndex] = ECalcOperator.Add;
+        entry.Notify();
+      } else if (key == _KeyboardKey.CalcSub) {
+        entry.MoneyCalc.Values[endIndex] = ECalcOperator.Sub;
+        entry.Notify();
+      } else if (key == _KeyboardKey.Back) {
+        entry.MoneyCalc.Values.removeAt(endIndex);
+        entry.Notify();
+      } else {
+        entry.MoneyCalc.Values.add(CalcNumeric(IntegerStr: key.index.toString()));
+        entry.Notify();
       }
-      data
-        ..MoneyIntegerStr = newInteger
-        ..MoneyDecimalStr = newDecimal
-        ..Notify();
-      HapticFeedback.lightImpact();
+    } else {
+      final numeric = calc as CalcNumeric;
+      if (key == _KeyboardKey.Back) {
+        if (numeric.DecimalStr != null) {
+          numeric.DecimalStr = numeric.DecimalStr!.isEmpty ? null : numeric.DecimalStr!.substring(0, numeric.DecimalStr!.length - 1);
+          entry.Notify();
+        } else if (numeric.IntegerStr.isNotEmpty) {
+          numeric.IntegerStr = numeric.IntegerStr.substring(0, numeric.IntegerStr.length - 1);
+          entry.Notify();
+        } else if (entry.MoneyCalc.Values.length > 1) {
+          entry.MoneyCalc.Values.removeAt(endIndex);
+          entry.Notify();
+        }
+      } else if (key == _KeyboardKey.Dot) {
+        numeric.DecimalStr ??= "";
+        entry.Notify();
+      } else if (key == _KeyboardKey.CalcAdd) {
+        entry.MoneyCalc.Values.add(ECalcOperator.Add);
+        entry.Notify();
+      } else if (key == _KeyboardKey.CalcSub) {
+        entry.MoneyCalc.Values.add(ECalcOperator.Sub);
+        entry.Notify();
+      } else {
+        var keyStr = key.index.toString();
+        if (numeric.DecimalStr != null) {
+          if (numeric.DecimalStr!.length < 2) {
+            numeric.DecimalStr = numeric.DecimalStr! + keyStr;
+            entry.Notify();
+          } else {
+            numeric.DecimalStr = numeric.DecimalStr![0] + keyStr;
+            entry.Notify();
+          }
+        } else {
+          if (key != _KeyboardKey.N0 || numeric.IntegerStr.isNotEmpty) {
+            numeric.IntegerStr += keyStr;
+            entry.Notify();
+          }
+        }
+      }
     }
   }
 }
@@ -181,4 +202,6 @@ enum _KeyboardKey {
   Dot,
   Back,
   LongBack,
+  CalcAdd,
+  CalcSub,
 }
