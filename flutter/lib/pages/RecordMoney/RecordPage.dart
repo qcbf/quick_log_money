@@ -25,32 +25,34 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
   late TabController _TabCtrl;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          leading: SizedBox(
-            width: kToolbarHeight,
-            child: IconButton(
-                onPressed: () async {
-                  if (!await Navigator.maybePop(context)) {
-                    if (!context.mounted) return;
-                    Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
-                  }
-                },
-                icon: const Icon(Icons.arrow_back)),
-          ),
-          title: TabBar(controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
-          actions: [SizedBox(height: kToolbarHeight, width: kToolbarHeight, child: IconButton(onPressed: () {}, icon: const Icon(Icons.settings)))],
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        leading: SizedBox(
+          width: kToolbarHeight,
+          child: IconButton(
+              onPressed: () async {
+                if (!await Navigator.maybePop(context)) {
+                  if (!context.mounted) return;
+                  Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
+                }
+              },
+              icon: const Icon(Icons.arrow_back)),
         ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const RecordDescription())),
-            const SizedBox(height: 370, child: RecordBottomPanel()),
-          ],
-        ),
-      );
+        title: TabBar(controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
+        actions: [SizedBox(height: kToolbarHeight, width: kToolbarHeight, child: IconButton(onPressed: () {}, icon: const Icon(Icons.settings)))],
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const RecordDescription())),
+          const SizedBox(height: 390, child: RecordBottomPanel()),
+        ],
+      ),
+    );
+  }
 
   @override
   void dispose() {

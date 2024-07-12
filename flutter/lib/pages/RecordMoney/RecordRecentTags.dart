@@ -16,7 +16,11 @@ class RecordRecentTags extends StatefulWidget {
 class _RecordRecentTagsState extends State<RecordRecentTags> {
   @override
   Widget build(BuildContext context) {
-    return ConditionalValueListener.AsyncValue(Ledger.ExpenseTag, (context, value, child) => BuildTags());
+    return ConditionalValueListener.AsyncValue(
+      Ledger.ExpenseTag,
+      (context, value, child) => BuildTags(),
+      Fallback: () => TagListUI(0, List<LedgerTag>.filled(8, const LedgerTag(Id: 1, Group: "", Name: "...", Icon: "")), (_) {}),
+    );
   }
 
   ///
@@ -26,7 +30,7 @@ class _RecordRecentTagsState extends State<RecordRecentTags> {
       entry.Tag = Ledger.ExpenseTag.value.AllTags[User.RecentTags.first]!;
       Future.delayed(Durations.short1, () => entry.Notify());
     }
-
+    
     return TagListUI(
       entry.Tag.Id,
       User.RecentTags.map((e) => Ledger.ExpenseTag.value.AllTags[e]!).toList().reversed,
