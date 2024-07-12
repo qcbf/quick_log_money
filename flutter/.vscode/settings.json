@@ -5,6 +5,7 @@
 		".dart_tool": true,
 		"*.metadata": true,
 		"*.flutter-plugins*": true,
+		"*.iml": true,
 		"build": true,
 		// "android": true,
 		"ios": true,
