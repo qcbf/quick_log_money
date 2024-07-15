@@ -31,9 +31,14 @@ class RecordEntryEditingProvider with ChangeNotifier {
     return null;
   }
 
+  void SetState(VoidCallback handler, {bool isHapticFeedback = true}) {
+    handler.call();
+    notifyListeners();
+    if (isHapticFeedback) HapticFeedback.lightImpact();
+  }
+
   void Notify() {
     notifyListeners();
-    HapticFeedback.lightImpact();
   }
 }
 

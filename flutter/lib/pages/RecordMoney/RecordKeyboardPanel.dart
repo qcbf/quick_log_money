@@ -124,8 +124,7 @@ class RecordKeyboardPanel extends StatelessWidget {
   void _OnInputKey(BuildContext context, _KeyboardKey key) {
     var entry = context.read<RecordEntryEditingProvider>();
     if (key == _KeyboardKey.LongBack) {
-      entry.MoneyCalc.Clear();
-      entry.Notify();
+      entry.SetState(() => entry.MoneyCalc.Clear());
       return;
     }
 
@@ -133,54 +132,41 @@ class RecordKeyboardPanel extends StatelessWidget {
     final calc = entry.MoneyCalc.Values[endIndex];
     if (calc is ECalcOperator) {
       if (key == _KeyboardKey.CalcAdd) {
-        entry.MoneyCalc.Values[endIndex] = ECalcOperator.Add;
-        entry.Notify();
+        entry.SetState(() => entry.MoneyCalc.Values[endIndex] = ECalcOperator.Add);
       } else if (key == _KeyboardKey.CalcSub) {
-        entry.MoneyCalc.Values[endIndex] = ECalcOperator.Sub;
-        entry.Notify();
+        entry.SetState(() => entry.MoneyCalc.Values[endIndex] = ECalcOperator.Sub);
       } else if (key == _KeyboardKey.Back) {
-        entry.MoneyCalc.Values.removeAt(endIndex);
-        entry.Notify();
+        entry.SetState(() => entry.MoneyCalc.Values.removeAt(endIndex));
       } else {
-        entry.MoneyCalc.Values.add(CalcNumeric(IntegerStr: key.index.toString()));
-        entry.Notify();
+        entry.SetState(() => entry.MoneyCalc.Values.add(CalcNumeric(IntegerStr: key.index.toString())));
       }
     } else {
       final numeric = calc as CalcNumeric;
       if (key == _KeyboardKey.Back) {
         if (numeric.DecimalStr != null) {
-          numeric.DecimalStr = numeric.DecimalStr!.isEmpty ? null : numeric.DecimalStr!.substring(0, numeric.DecimalStr!.length - 1);
-          entry.Notify();
+          entry.SetState(() => numeric.DecimalStr = numeric.DecimalStr!.isEmpty ? null : numeric.DecimalStr!.substring(0, numeric.DecimalStr!.length - 1));
         } else if (numeric.IntegerStr.isNotEmpty) {
-          numeric.IntegerStr = numeric.IntegerStr.substring(0, numeric.IntegerStr.length - 1);
-          entry.Notify();
+          entry.SetState(() => numeric.IntegerStr = numeric.IntegerStr.substring(0, numeric.IntegerStr.length - 1));
         } else if (entry.MoneyCalc.Values.length > 1) {
-          entry.MoneyCalc.Values.removeAt(endIndex);
-          entry.Notify();
+          entry.SetState(() => entry.MoneyCalc.Values.removeAt(endIndex));
         }
       } else if (key == _KeyboardKey.Dot) {
-        numeric.DecimalStr ??= "";
-        entry.Notify();
+        entry.SetState(() => numeric.DecimalStr ??= "");
       } else if (key == _KeyboardKey.CalcAdd) {
-        entry.MoneyCalc.Values.add(ECalcOperator.Add);
-        entry.Notify();
+        entry.SetState(() => entry.MoneyCalc.Values.add(ECalcOperator.Add));
       } else if (key == _KeyboardKey.CalcSub) {
-        entry.MoneyCalc.Values.add(ECalcOperator.Sub);
-        entry.Notify();
+        entry.SetState(() => entry.MoneyCalc.Values.add(ECalcOperator.Sub));
       } else {
         var keyStr = key.index.toString();
         if (numeric.DecimalStr != null) {
           if (numeric.DecimalStr!.length < 2) {
-            numeric.DecimalStr = numeric.DecimalStr! + keyStr;
-            entry.Notify();
+            entry.SetState(() => numeric.DecimalStr = numeric.DecimalStr! + keyStr);
           } else {
-            numeric.DecimalStr = numeric.DecimalStr![0] + keyStr;
-            entry.Notify();
+            entry.SetState(() => numeric.DecimalStr = numeric.DecimalStr![0] + keyStr);
           }
         } else {
           if (key != _KeyboardKey.N0 || numeric.IntegerStr.isNotEmpty) {
-            numeric.IntegerStr += keyStr;
-            entry.Notify();
+            entry.SetState(() => numeric.IntegerStr += keyStr);
           }
         }
       }
