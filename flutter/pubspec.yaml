@@ -48,9 +48,5 @@ flutter_launcher_icons:
 flutter:
   uses-material-design: true
   assets:
-    - Assets/Configs/
+    - Assets/Ledger/
     - Assets/Icon.png
-  fonts:
-    - family: Ledger
-      fonts:
-        - asset: Assets/Ledger/Icon.ttf

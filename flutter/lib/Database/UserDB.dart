@@ -106,7 +106,7 @@ class UserDBHelper extends _$UserDBHelper {
   ///
   static Future LoginAnonym() async {
     // 创造账本数据
-    final ledgerJson = jsonDecode(await rootBundle.loadString(Def.LedgerTemplatePath, cache: false)) as Map<String, dynamic>;
+    final ledgerJson = jsonDecode(await rootBundle.loadString(Def.LedgerConfigPath, cache: false))["Template"] as Map<String, dynamic>;
     final ledgerInfo = LedgerInfosCompanion.insert(Name: ledgerJson["Name"], Icon: ledgerJson["Icon"]);
     final tags = (ledgerJson["Tags"] as Map<String, dynamic>)
         .entries

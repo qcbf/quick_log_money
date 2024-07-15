@@ -1,4 +1,6 @@
 {
+	"git.enabled": true,
+	"git.autofetch": true,
 	"files.exclude": {
 		"**/*.g.dart": true,
 		"*.lock": true,
