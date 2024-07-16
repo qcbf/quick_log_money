@@ -2,9 +2,10 @@ import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
+import 'package:quick_log_money/pages/LedgerCards/CardBase.dart';
 
-class WeekStatis extends StatelessWidget {
-  const WeekStatis({super.key});
+class WeekStatisCard extends StatelessWidget with CardBase {
+  const WeekStatisCard({super.key});
 
   @override
   Widget build(BuildContext context) {

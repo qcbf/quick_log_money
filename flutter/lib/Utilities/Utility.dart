@@ -51,6 +51,9 @@ class Utility {
   // }
 
   //
+
+  ///
+  static String LedgerIconNameToAssetPath(String name) => "Assets/Ledger/TagIcons/$name";
 }
 
 ///

@@ -22,14 +22,13 @@ class _RecordBottomPanelState extends State<RecordBottomPanel> with SingleTicker
       Expanded(flex: 30, child: BuildRightContent()),
     ];
     if (_IsReverseLayout) contents = contents.reversed.toList();
-    return Card(
-        child: Column(
+    return Column(
       children: [
         const RecordOptionPanel(),
         const Divider(height: 6, endIndent: 2, indent: 2),
         Expanded(child: Row(children: contents)),
       ],
-    ));
+    );
   }
 
   /// 左边菜单，记账，类别什么的

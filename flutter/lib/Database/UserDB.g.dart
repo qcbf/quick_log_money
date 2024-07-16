@@ -677,16 +677,22 @@ class $UserCardsTable extends UserCards
       type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _PlaceMeta = const VerificationMeta('Place');
   @override
-  late final GeneratedColumn<int> Place = GeneratedColumn<int>(
-      'place', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+  late final GeneratedColumnWithTypeConverter<ELedgerCardSpace, String> Place =
+      GeneratedColumn<String>('place', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<ELedgerCardSpace>($UserCardsTable.$converterPlace);
+  static const VerificationMeta _NameMeta = const VerificationMeta('Name');
+  @override
+  late final GeneratedColumn<String> Name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _ParamsMeta = const VerificationMeta('Params');
   @override
   late final GeneratedColumn<String> Params = GeneratedColumn<String>(
       'params', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   @override
-  List<GeneratedColumn> get $columns => [Id, Uid, Place, Params];
+  List<GeneratedColumn> get $columns => [Id, Uid, Place, Name, Params];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -706,11 +712,12 @@ class $UserCardsTable extends UserCards
     } else if (isInserting) {
       context.missing(_UidMeta);
     }
-    if (data.containsKey('place')) {
+    context.handle(_PlaceMeta, const VerificationResult.success());
+    if (data.containsKey('name')) {
       context.handle(
-          _PlaceMeta, Place.isAcceptableOrUnknown(data['place']!, _PlaceMeta));
+          _NameMeta, Name.isAcceptableOrUnknown(data['name']!, _NameMeta));
     } else if (isInserting) {
-      context.missing(_PlaceMeta);
+      context.missing(_NameMeta);
     }
     if (data.containsKey('params')) {
       context.handle(_ParamsMeta,
@@ -729,8 +736,11 @@ class $UserCardsTable extends UserCards
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       Uid: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}uid'])!,
-      Place: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}place'])!,
+      Place: $UserCardsTable.$converterPlace.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}place'])!),
+      Name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       Params: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}params']),
     );
@@ -740,21 +750,33 @@ class $UserCardsTable extends UserCards
   $UserCardsTable createAlias(String alias) {
     return $UserCardsTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<ELedgerCardSpace, String, String> $converterPlace =
+      const EnumNameConverter<ELedgerCardSpace>(ELedgerCardSpace.values);
 }
 
 class UserCard extends DataClass implements Insertable<UserCard> {
   final int Id;
   final int Uid;
-  final int Place;
+  final ELedgerCardSpace Place;
+  final String Name;
   final String? Params;
   const UserCard(
-      {required this.Id, required this.Uid, required this.Place, this.Params});
+      {required this.Id,
+      required this.Uid,
+      required this.Place,
+      required this.Name,
+      this.Params});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(Id);
     map['uid'] = Variable<int>(Uid);
-    map['place'] = Variable<int>(Place);
+    {
+      map['place'] =
+          Variable<String>($UserCardsTable.$converterPlace.toSql(Place));
+    }
+    map['name'] = Variable<String>(Name);
     if (!nullToAbsent || Params != null) {
       map['params'] = Variable<String>(Params);
     }
@@ -766,6 +788,7 @@ class UserCard extends DataClass implements Insertable<UserCard> {
       Id: Value(Id),
       Uid: Value(Uid),
       Place: Value(Place),
+      Name: Value(Name),
       Params:
           Params == null && nullToAbsent ? const Value.absent() : Value(Params),
     );
@@ -777,7 +800,9 @@ class UserCard extends DataClass implements Insertable<UserCard> {
     return UserCard(
       Id: serializer.fromJson<int>(json['Id']),
       Uid: serializer.fromJson<int>(json['Uid']),
-      Place: serializer.fromJson<int>(json['Place']),
+      Place: $UserCardsTable.$converterPlace
+          .fromJson(serializer.fromJson<String>(json['Place'])),
+      Name: serializer.fromJson<String>(json['Name']),
       Params: serializer.fromJson<String?>(json['Params']),
     );
   }
@@ -787,7 +812,9 @@ class UserCard extends DataClass implements Insertable<UserCard> {
     return <String, dynamic>{
       'Id': serializer.toJson<int>(Id),
       'Uid': serializer.toJson<int>(Uid),
-      'Place': serializer.toJson<int>(Place),
+      'Place': serializer
+          .toJson<String>($UserCardsTable.$converterPlace.toJson(Place)),
+      'Name': serializer.toJson<String>(Name),
       'Params': serializer.toJson<String?>(Params),
     };
   }
@@ -795,12 +822,14 @@ class UserCard extends DataClass implements Insertable<UserCard> {
   UserCard copyWith(
           {int? Id,
           int? Uid,
-          int? Place,
+          ELedgerCardSpace? Place,
+          String? Name,
           Value<String?> Params = const Value.absent()}) =>
       UserCard(
         Id: Id ?? this.Id,
         Uid: Uid ?? this.Uid,
         Place: Place ?? this.Place,
+        Name: Name ?? this.Name,
         Params: Params.present ? Params.value : this.Params,
       );
   UserCard copyWithCompanion(UserCardsCompanion data) {
@@ -808,6 +837,7 @@ class UserCard extends DataClass implements Insertable<UserCard> {
       Id: data.Id.present ? data.Id.value : this.Id,
       Uid: data.Uid.present ? data.Uid.value : this.Uid,
       Place: data.Place.present ? data.Place.value : this.Place,
+      Name: data.Name.present ? data.Name.value : this.Name,
       Params: data.Params.present ? data.Params.value : this.Params,
     );
   }
@@ -818,13 +848,14 @@ class UserCard extends DataClass implements Insertable<UserCard> {
           ..write('Id: $Id, ')
           ..write('Uid: $Uid, ')
           ..write('Place: $Place, ')
+          ..write('Name: $Name, ')
           ..write('Params: $Params')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(Id, Uid, Place, Params);
+  int get hashCode => Object.hash(Id, Uid, Place, Name, Params);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -832,37 +863,44 @@ class UserCard extends DataClass implements Insertable<UserCard> {
           other.Id == this.Id &&
           other.Uid == this.Uid &&
           other.Place == this.Place &&
+          other.Name == this.Name &&
           other.Params == this.Params);
 }
 
 class UserCardsCompanion extends UpdateCompanion<UserCard> {
   final Value<int> Id;
   final Value<int> Uid;
-  final Value<int> Place;
+  final Value<ELedgerCardSpace> Place;
+  final Value<String> Name;
   final Value<String?> Params;
   const UserCardsCompanion({
     this.Id = const Value.absent(),
     this.Uid = const Value.absent(),
     this.Place = const Value.absent(),
+    this.Name = const Value.absent(),
     this.Params = const Value.absent(),
   });
   UserCardsCompanion.insert({
     this.Id = const Value.absent(),
     required int Uid,
-    required int Place,
+    required ELedgerCardSpace Place,
+    required String Name,
     this.Params = const Value.absent(),
   })  : Uid = Value(Uid),
-        Place = Value(Place);
+        Place = Value(Place),
+        Name = Value(Name);
   static Insertable<UserCard> custom({
     Expression<int>? Id,
     Expression<int>? Uid,
-    Expression<int>? Place,
+    Expression<String>? Place,
+    Expression<String>? Name,
     Expression<String>? Params,
   }) {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
       if (Uid != null) 'uid': Uid,
       if (Place != null) 'place': Place,
+      if (Name != null) 'name': Name,
       if (Params != null) 'params': Params,
     });
   }
@@ -870,12 +908,14 @@ class UserCardsCompanion extends UpdateCompanion<UserCard> {
   UserCardsCompanion copyWith(
       {Value<int>? Id,
       Value<int>? Uid,
-      Value<int>? Place,
+      Value<ELedgerCardSpace>? Place,
+      Value<String>? Name,
       Value<String?>? Params}) {
     return UserCardsCompanion(
       Id: Id ?? this.Id,
       Uid: Uid ?? this.Uid,
       Place: Place ?? this.Place,
+      Name: Name ?? this.Name,
       Params: Params ?? this.Params,
     );
   }
@@ -890,7 +930,11 @@ class UserCardsCompanion extends UpdateCompanion<UserCard> {
       map['uid'] = Variable<int>(Uid.value);
     }
     if (Place.present) {
-      map['place'] = Variable<int>(Place.value);
+      map['place'] =
+          Variable<String>($UserCardsTable.$converterPlace.toSql(Place.value));
+    }
+    if (Name.present) {
+      map['name'] = Variable<String>(Name.value);
     }
     if (Params.present) {
       map['params'] = Variable<String>(Params.value);
@@ -904,6 +948,7 @@ class UserCardsCompanion extends UpdateCompanion<UserCard> {
           ..write('Id: $Id, ')
           ..write('Uid: $Uid, ')
           ..write('Place: $Place, ')
+          ..write('Name: $Name, ')
           ..write('Params: $Params')
           ..write(')'))
         .toString();
@@ -1199,13 +1244,15 @@ class $$UserLedgerRecentTagsTableOrderingComposer
 typedef $$UserCardsTableCreateCompanionBuilder = UserCardsCompanion Function({
   Value<int> Id,
   required int Uid,
-  required int Place,
+  required ELedgerCardSpace Place,
+  required String Name,
   Value<String?> Params,
 });
 typedef $$UserCardsTableUpdateCompanionBuilder = UserCardsCompanion Function({
   Value<int> Id,
   Value<int> Uid,
-  Value<int> Place,
+  Value<ELedgerCardSpace> Place,
+  Value<String> Name,
   Value<String?> Params,
 });
 
@@ -1228,25 +1275,29 @@ class $$UserCardsTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             Value<int> Uid = const Value.absent(),
-            Value<int> Place = const Value.absent(),
+            Value<ELedgerCardSpace> Place = const Value.absent(),
+            Value<String> Name = const Value.absent(),
             Value<String?> Params = const Value.absent(),
           }) =>
               UserCardsCompanion(
             Id: Id,
             Uid: Uid,
             Place: Place,
+            Name: Name,
             Params: Params,
           ),
           createCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             required int Uid,
-            required int Place,
+            required ELedgerCardSpace Place,
+            required String Name,
             Value<String?> Params = const Value.absent(),
           }) =>
               UserCardsCompanion.insert(
             Id: Id,
             Uid: Uid,
             Place: Place,
+            Name: Name,
             Params: Params,
           ),
         ));
@@ -1265,8 +1316,15 @@ class $$UserCardsTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
-  ColumnFilters<int> get Place => $state.composableBuilder(
-      column: $state.table.Place,
+  ColumnWithTypeConverterFilters<ELedgerCardSpace, ELedgerCardSpace, String>
+      get Place => $state.composableBuilder(
+          column: $state.table.Place,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get Name => $state.composableBuilder(
+      column: $state.table.Name,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -1289,8 +1347,13 @@ class $$UserCardsTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
-  ColumnOrderings<int> get Place => $state.composableBuilder(
+  ColumnOrderings<String> get Place => $state.composableBuilder(
       column: $state.table.Place,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get Name => $state.composableBuilder(
+      column: $state.table.Name,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

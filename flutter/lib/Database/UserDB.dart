@@ -6,6 +6,7 @@ import 'package:quick_log_money/Database/DatabaseHelper.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
+import 'package:quick_log_money/pages/LedgerCards/LedgerCardUtility.dart';
 
 part 'UserDB.g.dart';
 
@@ -44,7 +45,8 @@ class UserLedgerRecentTags extends Table {
 class UserCards extends Table {
   IntColumn get Id => integer().autoIncrement()();
   IntColumn get Uid => integer()();
-  IntColumn get Place => integer()();
+  TextColumn get Place => textEnum<ELedgerCardSpace>()();
+  TextColumn get Name => text()();
   TextColumn get Params => text().nullable()();
 }
 
