@@ -11,8 +11,8 @@ enum ELedgerCardSpace {
 class LedgerCardUtility {
   static Widget BuildLedgerCard(UserCard card) {
     return switch (card.Name) {
-      "WeekStatis" => const WeekStatisCard(),
-      _ => const Text("not found"),
+      "WeekStatis" => WeekStatisCard(card),
+      _ => Text("not found card ${card.Name}"),
     };
   }
 }

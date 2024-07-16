@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordBottomPanel.dart';
-import 'package:quick_log_money/Pages/RecordMoney/RecordDescription.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
+import 'package:quick_log_money/pages/LedgerCards/CardList.dart';
+import 'package:quick_log_money/pages/LedgerCards/LedgerCardUtility.dart';
 
 /// 账单记录页面
 class RecordPage extends StatelessWidget {
@@ -44,11 +45,11 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
         title: TabBar(controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
         actions: [SizedBox(height: kToolbarHeight, width: kToolbarHeight, child: IconButton(onPressed: () {}, icon: const Icon(Icons.settings)))],
       ),
-      body: Column(
+      body: const Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const RecordDescription())),
-          const SizedBox(height: 390, child: RecordBottomPanel()),
+          Expanded(child: CardList(ELedgerCardSpace.Record)),
+          SizedBox(height: 390, child: RecordBottomPanel()),
         ],
       ),
     );

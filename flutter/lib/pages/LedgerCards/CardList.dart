@@ -11,11 +11,14 @@ class CardList extends StatefulWidget {
 }
 
 class _CardListState extends State<CardList> {
-  List<UserCard>? Cards;
+  Iterable<UserCard>? Cards;
 
   @override
   void initState() {
-    UserDB.managers.userCards.filter((f) => f.Uid(User.Info.Id) & f.Place(widget.Space)).get().then((value) => setState(() => Cards = value));
+    UserDB.managers.userCards
+        .filter((f) => f.Uid(User.Info.Id) & f.Place(widget.Space))
+        .get()
+        .then((value) => setState(() => Cards = [...value, UserCard(Id: 1, Uid: User.Info.Id, Place: ELedgerCardSpace.Home, Name: "WeekStatis")]));
     super.initState();
   }
 
