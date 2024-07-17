@@ -1,5 +1,5 @@
 class Utility {
-  ///
+  ///将日期转换为好看的字符串
   static String DateToString(DateTime date, {bool isDisplayTime = false}) {
     final now = DateTime.now();
     if (date.year == now.year && date.month == now.month) {
@@ -48,13 +48,27 @@ class Utility {
   //   return location.accuracy.toString();
   // }
 
-  //
+  ///将数字转换为中文字符
+  static String IntNumToWord(int index) => switch (index) {
+        0 => "零",
+        1 => "一",
+        2 => "二",
+        3 => "三",
+        4 => "四",
+        5 => "五",
+        6 => "六",
+        7 => "七",
+        8 => "八",
+        9 => "九",
+        10 => "十",
+        _ => "X",
+      };
 
-  ///
+  ///将账本图标名转换为资源路径
   static String LedgerIconNameToAssetPath(String name) => "Assets/Ledger/TagIcons/$name";
 
-  ///
-  static double IntMoneyToNumber(int money) => money * 0.01;
+  ///将整数钱转换为真实小数
+  static double GetRealMoney(int money) => money * 0.01;
 }
 
 ///
