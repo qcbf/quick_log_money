@@ -28,6 +28,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
