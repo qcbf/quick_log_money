@@ -185,6 +185,22 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.18.0"
+  community_charts_common:
+    dependency: transitive
+    description:
+      name: community_charts_common
+      sha256: d997ade57f15490346de46efbe23805d378a672aafbf5e47e19517964b671009
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.4"
+  community_charts_flutter:
+    dependency: transitive
+    description:
+      name: community_charts_flutter
+      sha256: "4614846b99782ab79b613687704865e5468ecada3f0ad1afe1cdc3ff5b727f72"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.4"
   convert:
     dependency: transitive
     description:
@@ -201,6 +217,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.3"
+  d_chart:
+    dependency: "direct main"
+    description:
+      name: d_chart
+      sha256: c19648d092a061f75a48d78a69921b2d18d3aa27b31efa2f81bb7009c0c6d2ff
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.8.0"
   dart_style:
     dependency: transitive
     description:

@@ -1,5 +1,3 @@
-// import 'package:location/location.dart';
-
 class Utility {
   ///
   static String DateToString(DateTime date, {bool isDisplayTime = false}) {
@@ -54,6 +52,9 @@ class Utility {
 
   ///
   static String LedgerIconNameToAssetPath(String name) => "Assets/Ledger/TagIcons/$name";
+
+  ///
+  static double IntMoneyToNumber(int money) => money * 0.01;
 }
 
 ///

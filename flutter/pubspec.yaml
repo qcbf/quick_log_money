@@ -21,6 +21,7 @@ dependencies:
   shared_preferences: ^2.2.3
   collection: ^1.18.0
   decimal: ^3.0.2
+  d_chart: ^2.8.0
 
 dev_dependencies:
   flutter_test:
