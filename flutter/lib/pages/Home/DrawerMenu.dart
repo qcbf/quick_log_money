@@ -43,7 +43,7 @@ class DrawerMenu extends StatelessWidget {
             }, [
               () => TextButton(onPressed: () {}, child: const Text("注册正式用户")),
               () => TextButton(onPressed: () {}, child: const Text("开通vip")),
-              () => TextButton(onPressed: () {}, child: Text("Vip${Utility.DateToString(User.Info.VipExpiryDate!)}到期")),
+              () => TextButton(onPressed: () {}, child: Text("Vip${User.Info.VipExpiryDate?.ToSmartString()}到期")),
             ]),
           ],
         ),

@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Database/UserDB.dart';
@@ -21,6 +20,7 @@ class RecentDaysCard extends StatelessWidget implements ICardable {
     DateTime endDate = DateTime(now.year, now.month, now.day + (7 - now.weekday), 23, 59, 59);
     return LedgerCard(
       "本周",
+      SettingPanel: const Text("data"),
       LedgerDB.managers.ledgerEntries.filter((f) => f.Date.isBetween(beginDate, endDate)).get(),
       (context, value) => _BuildContent(context, value),
     );
@@ -31,19 +31,20 @@ class RecentDaysCard extends StatelessWidget implements ICardable {
     for (var item in entries) {
       chartItems[item.Date.weekday] += item.IntMoney;
     }
-
     final col = Theme.of(context).dividerColor;
     return SizedBox(
-      height: 100,
+      height: 120,
       child: BarChart(BarChartData(
           alignment: BarChartAlignment.spaceAround,
           barTouchData: BarTouchData(
               enabled: false,
               touchTooltipData: BarTouchTooltipData(
                 tooltipMargin: 0,
+                fitInsideVertically: true,
+                fitInsideHorizontally: true,
                 tooltipPadding: EdgeInsets.zero,
                 getTooltipColor: (group) => Colors.transparent,
-                getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem("${chartItems[groupIndex]}￥", const TextStyle()),
+                getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem("${rod.toY.ToSmartString()}￥", const TextStyle()),
               )),
           gridData: const FlGridData(show: false),
           borderData: FlBorderData(show: false),
@@ -61,9 +62,9 @@ class RecentDaysCard extends StatelessWidget implements ICardable {
                     barRods: [
                       BarChartRodData(
                         width: 30,
-                        toY: Utility.GetRealMoney(chartItems[i]),
+                        toY: LedgerUtility.GetRealMoney(chartItems[i]),
                         color: col,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(2.5), bottom: Radius.zero),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(5), bottom: Radius.zero),
                       )
                     ],
                   )))),
@@ -79,6 +80,6 @@ class RecentDaysCard extends StatelessWidget implements ICardable {
         5 => "周五",
         6 => "周六",
         7 => "周日",
-        _ => "X",
+        _ => throw Exception(),
       };
 }

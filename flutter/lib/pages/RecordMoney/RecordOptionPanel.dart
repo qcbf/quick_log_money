@@ -56,7 +56,7 @@ class RecordOptionPanel extends StatelessWidget {
 
   ///
   Widget _BuildDateBtn(BuildContext context, RecordEntryEditingProvider value) {
-    return _BuildBtn(Utility.DateToString(value.Date), () async {
+    return _BuildBtn(value.Date.ToSmartString(), () async {
       final date = await showDatePicker(context: context, firstDate: DateTime(1970), lastDate: DateTime.now().add(const Duration(days: 366 * 2)), initialDate: value.Date);
       if (date != null) {
         value.Date = date;

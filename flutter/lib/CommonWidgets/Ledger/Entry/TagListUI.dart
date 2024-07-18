@@ -14,8 +14,8 @@ class TagListUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GridView.extent(
-        maxCrossAxisExtent: 70,
-        childAspectRatio: 1.6,
+        maxCrossAxisExtent: 80,
+        childAspectRatio: 1.45,
         crossAxisSpacing: 3,
         mainAxisSpacing: 3,
         shrinkWrap: true,

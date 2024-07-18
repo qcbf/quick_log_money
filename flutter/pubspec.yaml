@@ -22,6 +22,7 @@ dependencies:
   collection: ^1.18.0
   decimal: ^3.0.2
   fl_chart: ^0.68.0
+  flutter_animate: ^4.5.0
 
 dev_dependencies:
   flutter_test:

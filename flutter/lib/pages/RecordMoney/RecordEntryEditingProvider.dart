@@ -57,7 +57,7 @@ class Calculator {
   String toString() {
     var strbuf = StringBuffer();
     for (var i = 0; i < Values.length; i++) {
-      final op = TryCastType<ECalcOperator>(Values[i]);
+      final op = Utility.TryConvertTo<ECalcOperator>(Values[i]);
       if (op != null) {
         if (op == ECalcOperator.Add) {
           strbuf.write("+");

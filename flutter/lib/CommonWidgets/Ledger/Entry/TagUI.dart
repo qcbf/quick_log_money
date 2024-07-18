@@ -17,7 +17,7 @@ class TagUI extends StatelessWidget {
       style: const ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 1, vertical: 1)), shape: WidgetStatePropertyAll(RoundedRectangleBorder()))
           .merge(BtnStyle),
       child: Column(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-        Image.asset(Utility.LedgerIconNameToAssetPath(Data.Icon), height: 20, excludeFromSemantics: true, errorBuilder: (a, b, c) => const Icon(Icons.sync, size: 18)),
+        Image.asset(LedgerUtility.LedgerIconNameToAssetPath(Data.Icon), height: 20, excludeFromSemantics: true, errorBuilder: (a, b, c) => const Icon(Icons.sync, size: 18)),
         FittedBox(child: Text(Data.Name, style: const TextStyle(fontSize: 12).copyWith(color: ContentColor))),
       ]),
     );

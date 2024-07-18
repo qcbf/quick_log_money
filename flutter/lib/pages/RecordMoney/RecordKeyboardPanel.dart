@@ -145,7 +145,7 @@ class RecordKeyboardPanel extends StatelessWidget {
       if (key == _KeyboardKey.Back) {
         if (numeric.DecimalStr != null) {
           entry.SetState(() => numeric.DecimalStr = numeric.DecimalStr!.isEmpty ? null : numeric.DecimalStr!.substring(0, numeric.DecimalStr!.length - 1));
-        } else if (numeric.IntegerStr.isNotEmpty) {
+        } else if (numeric.IntegerStr.isNotEmpty && (entry.MoneyCalc.Values.length == 1 || numeric.IntegerStr.length > 1)) {
           entry.SetState(() => numeric.IntegerStr = numeric.IntegerStr.substring(0, numeric.IntegerStr.length - 1));
         } else if (entry.MoneyCalc.Values.length > 1) {
           entry.SetState(() => entry.MoneyCalc.Values.removeAt(endIndex));
