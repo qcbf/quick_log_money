@@ -1,3 +1,5 @@
+import "dart:developer";
+
 import "package:bot_toast/bot_toast.dart";
 import "package:flutter/material.dart";
 import "package:quick_log_money/Database/UserDB.dart";
@@ -94,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
             onPressed: () {
               if (_FormKey.currentState!.validate()) {
                 _FormKey.currentState!.save();
-                print("email: $_Username, password: $_Password");
+                log("email: $_Username, password: $_Password");
               }
             },
           ),
@@ -137,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
           child: TextButton(
             onPressed: () {
               // Navigator.pop(context);
-              print("忘记密码");
+              log("忘记密码");
             },
             child: const Text("忘记密码？", style: TextStyle(fontSize: 14, color: Colors.grey)),
           ),

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
@@ -18,13 +19,13 @@ void main() async {
   botOpt.customLoading.duration = botOpt.loading.duration = const Duration(seconds: 10);
 
   Def.LocalPath = "${(await getApplicationSupportDirectory()).path}${Platform.pathSeparator}";
-  print("Set Local Path: ${Def.LocalPath}");
+  log("Set Local Path: ${Def.LocalPath}");
 
   await Prefs.Init();
   await UserDBHelper.Init();
 
   runApp(const MainApp());
-  print("start");
+  log("start");
 }
 
 /// app root ui

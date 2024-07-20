@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/Database/UserDB.dart';
+import 'package:quick_log_money/pages/LedgerCards/CardBase.dart';
 import 'package:quick_log_money/pages/LedgerCards/RecentDaysCard.dart';
 
 enum ELedgerCardSpace {
@@ -16,13 +17,11 @@ class LedgerCardUtility {
       cardName = card.Name;
       cardParams = card.Params;
       return switch (cardName) {
-        "WeekStatis" => RecentDaysCard(card),
+        "WeekStatis" => CardBase(card, () => RecentDaysCardState()),
         _ => Text("not found card ${card.Name}"),
       };
     } catch (e) {
       return Text("$cardName($cardParams)\n${e.toString()}");
     }
   }
-  
-  
 }

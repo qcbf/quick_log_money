@@ -13,7 +13,7 @@ class Utility {
 
 extension DateEx on DateTime {
   ///将日期转换为好看的字符串
-  String ToSmartString({bool isDisplayTime = false}) {
+  String ToSmartString({bool isShort = false, bool isDisplayTime = false}) {
     final now = DateTime.now();
     if (year == now.year && month == now.month) {
       if (day == now.day) {
@@ -28,23 +28,39 @@ extension DateEx on DateTime {
     }
 
     var str = StringBuffer();
-    if (now.year != year) {
-      str.write(year);
-      str.write("年");
+    final yearTemp = now.year != year ? year : null;
+    final monthTemp = (!isDisplayTime && !isShort) || now.month != month ? month : null;
+    final dayTemp = !isDisplayTime || now.day != day ? day : null;
+
+    if (yearTemp != null) {
+      str.write(yearTemp);
+      if (!isShort) {
+        str.write("年");
+      } else if (monthTemp != null) {
+        str.write("/");
+      }
     }
-    if (!isDisplayTime || now.month != month) {
+    if (monthTemp != null) {
       str.write(month);
-      str.write("月");
+      if (!isShort) {
+        str.write("月");
+      } else if (dayTemp != null) {
+        str.write("/");
+      }
     }
     if (!isDisplayTime || now.day != day) {
       str.write(day);
-      str.write("日");
+      if (!isShort) {
+        str.write("日");
+      } else if (isDisplayTime) {
+        str.write("/");
+      }
     }
     if (isDisplayTime) {
       str.write(hour);
-      str.write("时");
+      str.write(isShort ? "/" : "时");
       str.write(minute);
-      str.write("分");
+      if (!isShort) str.write("分");
     }
     return str.toString();
   }

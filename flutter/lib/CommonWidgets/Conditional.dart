@@ -8,7 +8,7 @@ typedef ConditionBuilder = bool Function();
 
 ///
 class Conditional {
-  static ViewBuilder GlobalFallback = () => const Text("LOADING...", style: TextStyle(fontSize: 10));
+  static ViewBuilder GlobalFallback = () => const Center(child: Text("LOADING...", style: TextStyle(fontSize: 10)));
 
   ///
   static Widget Single(ConditionBuilder condition, ViewBuilder builder, {ViewBuilder? fallbackBuilder}) {
@@ -20,8 +20,7 @@ class Conditional {
   }
 
   ///
-  static Widget SingleContext(BuildContext context, bool Function(BuildContext context) condition, ViewBuilderContext builder,
-      {ViewBuilderContext? fallbackBuilder}) {
+  static Widget SingleContext(BuildContext context, bool Function(BuildContext context) condition, ViewBuilderContext builder, {ViewBuilderContext? fallbackBuilder}) {
     if (condition(context) == true) {
       return builder(context);
     } else {
@@ -30,8 +29,7 @@ class Conditional {
   }
 
   ///
-  static Widget SwitchIndexContext(BuildContext context, int Function(BuildContext context) condition, List<ViewBuilderContext> views,
-      {ViewBuilderContext? fallbackBuilder}) {
+  static Widget SwitchIndexContext(BuildContext context, int Function(BuildContext context) condition, List<ViewBuilderContext> views, {ViewBuilderContext? fallbackBuilder}) {
     final result = condition(context);
     if (result < 0 || result > views.length) {
       return fallbackBuilder?.call(context) ?? GlobalFallback();

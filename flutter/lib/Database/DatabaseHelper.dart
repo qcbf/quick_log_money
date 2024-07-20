@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:ffi';
 import 'dart:io';
 
@@ -54,17 +55,17 @@ class _SqlInterceptor extends QueryInterceptor {
     final stopwatch = Stopwatch()..start();
     try {
       final result = await operation();
-      print(" Sql: $description => succeeded  ${stopwatch.elapsedMilliseconds}ms");
+      log(" Sql: $description => succeeded  ${stopwatch.elapsedMilliseconds}ms");
       return result;
     } on Object catch (e) {
-      print(" Sql: $description => failed ${stopwatch.elapsedMilliseconds}ms ($e)");
+      log(" Sql: $description => failed ${stopwatch.elapsedMilliseconds}ms ($e)");
       rethrow;
     }
   }
 
   @override
   TransactionExecutor beginTransaction(QueryExecutor parent) {
-    print(" Transaction Begin");
+    log(" Transaction Begin");
     return super.beginTransaction(parent);
   }
 
