@@ -34,7 +34,7 @@ abstract class CardStateBase extends State<CardWidget> {
   ///
   @protected
   FutureOr RefreshState() {
-    IsHasData = true;
+    setState(() => IsHasData = true);
   }
 
   @protected
@@ -65,8 +65,13 @@ abstract class CardStateBase extends State<CardWidget> {
   Widget BuildTitle() {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(SubTitle == null ? Title : "$Title($SubTitle)", style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 14), textAlign: TextAlign.left),
-      InkWell(onTap: () => showModalBottomSheet(context: context, builder: (_) => CardSetting(this)), child: const Icon(Icons.more_horiz, color: Colors.grey))
+      InkWell(onTap: OnClickSetting, child: const Icon(Icons.more_horiz, color: Colors.grey))
     ]);
+  }
+
+  @protected
+  void OnClickSetting() {
+    showModalBottomSheet(context: context, builder: (_) => CardSetting(this));
   }
 
   ///
@@ -87,15 +92,7 @@ abstract class CardConfigStateBase<T extends ICardConfigurable> extends CardStat
   T CreateConfig();
 
   @protected
-  Widget BuildConfig(BuildContext context, void Function(VoidCallback) setState, T newConfig);
-
-  @protected
-  Future SaveConfig(T newConfig) async {
-    Config = newConfig;
-    await UserDB.managers.userCards.filter((f) => f.Id(widget.CardData.Id)).update((o) => o(Params: drift.Value(jsonEncode(newConfig.toJson()))));
-    await RefreshState();
-    (context as StatefulElement).markNeedsBuild();
-  }
+  State CreateConfigState();
 }
 
 ///账本卡片的设置面板
@@ -103,55 +100,74 @@ class CardSetting extends StatefulWidget {
   final CardStateBase Card;
   const CardSetting(this.Card, {super.key});
   @override
-  State<CardSetting> createState() => _CardSettingState();
+  State createState() {
+    // ignore: no_logic_in_create_state
+    return Card is CardConfigStateBase ? (Card as CardConfigStateBase).CreateConfigState() : CardSettingState();
+  }
 }
 
-class _CardSettingState extends State<CardSetting> {
-  late final ICardConfigurable? NewConfig;
-
-  @override
-  void initState() {
-    if (widget.Card is CardConfigStateBase) {
-      NewConfig = (widget.Card as CardConfigStateBase).CreateConfig();
-    }
-    super.initState();
-  }
-
+/// 基础设置UI
+class CardSettingState extends State<CardSetting> {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Center(child: Text("${widget.Card.Title}设置")),
-        if (widget.Card is CardConfigStateBase) (widget.Card as CardConfigStateBase).BuildConfig(context, setState, NewConfig!) else const SizedBox(height: 10),
-        _BuildBottomButtons(),
+        _BuildContent(),
+        BuildBottomButtons(),
       ]),
     );
   }
 
-  Widget _BuildBottomButtons() {
+  @protected
+  Widget _BuildContent() {
+    return const SizedBox(height: 10);
+  }
+
+  @protected
+  Widget BuildBottomButtons() {
+    return TextButton(
+      onPressed: () {},
+      onLongPress: () => widget.Card.Delete().whenComplete(() {
+        Navigator.pop(context);
+        BotToast.showText(text: "${widget.Card.Title}卡片已经删除");
+      }),
+      child: const Text("删除卡片(长按)"),
+    );
+  }
+}
+
+///存在卡片配置的设置UI
+abstract class CardConfigSettingStateBase<T extends ICardConfigurable> extends CardSettingState {
+  late final T Config;
+
+  @override
+  void initState() {
+    Config = (widget.Card as CardConfigStateBase<T>).CreateConfig();
+    super.initState();
+  }
+
+  @override
+  Widget _BuildContent() => BuildContent();
+  @protected
+  Widget BuildContent();
+
+  @override
+  Widget BuildBottomButtons() {
     return Row(children: [
-      Expanded(
-        child: TextButton(
-          onPressed: () {},
-          onLongPress: () => widget.Card.Delete().whenComplete(() {
-            Navigator.pop(context);
-            BotToast.showText(text: "${widget.Card.Title}卡片已经删除");
-          }),
-          child: const Text("删除卡片(长按)"),
-        ),
-      ),
-      if (widget.Card is CardConfigStateBase) ...[
-        const SizedBox(width: 8),
-        Expanded(
-          child: TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                (widget.Card as CardConfigStateBase).SaveConfig(NewConfig!);
-              },
-              child: const Text("保存")),
-        ),
-      ]
+      Expanded(child: super.BuildBottomButtons()),
+      const SizedBox(width: 8),
+      Expanded(child: TextButton(onPressed: SaveConfig, child: const Text("保存"))),
     ]);
+  }
+
+  @protected
+  Future SaveConfig() async {
+    Navigator.pop(context);
+    final configCard = widget.Card as CardConfigStateBase;
+    configCard.Config = Config;
+    await UserDB.managers.userCards.filter((f) => f.Id(configCard.widget.CardData.Id)).update((o) => o(Params: drift.Value(jsonEncode(Config.toJson()))));
+    await widget.Card.RefreshState();
   }
 }

@@ -10,7 +10,7 @@ EveryDayEntriesConfig _$EveryDayEntriesConfigFromJson(
         Map<String, dynamic> json) =>
     EveryDayEntriesConfig()
       ..DaysCount = (json['DaysCount'] as num).toInt()
-      ..ContentHeight = (json['ContentHeight'] as num).toDouble();
+      ..ContentHeight = (json['ContentHeight'] as num).toInt();
 
 Map<String, dynamic> _$EveryDayEntriesConfigToJson(
         EveryDayEntriesConfig instance) =>

@@ -122,19 +122,8 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
 
   ///
   @override
-  Widget BuildConfig(BuildContext context, void Function(VoidCallback) setState, RecentDaysConfig Config) {
-    return SettingsList(shrinkWrap: true, sections: [
-      SettingsSection(tiles: [
-        SettingsTile(
-          title: const Text("显示"),
-          trailing: DropdownButton(
-              alignment: AlignmentDirectional.center,
-              value: Config.Type,
-              items: ERecentDaysType.values.map((e) => DropdownMenuItem(value: e, child: Text(RecentDaysTypeNames[e.index]))).toList(),
-              onChanged: (value) => setState(() => Config.Type = value!)),
-        ),
-      ])
-    ]);
+  State CreateConfigState() {
+    return RecentDaysCardSettingState();
   }
 
   ///
@@ -158,63 +147,20 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
   }
 }
 
-
-
-
-/*
-
-
-
-
-
-*/
-
-///最近天数统计
-// class RecentDaysCardObsolete extends StatelessWidget implements IConfigCardable<RecentDaysConfig> {
-//   @override
-//   UserCard CardData;
-//   RecentDaysCardObsolete(this.CardData, {super.key});
-
-//   void UpdateCardData(UserCard cardData) {
-//     CardData = cardData;
-//   }
-
-//   @override
-//   Widget BuildConfigPanel(RecentDaysConfig newConfig, SetStateCallback setState) {
-//     return SettingsList(shrinkWrap: true, sections: [
-//       SettingsSection(tiles: [
-//         SettingsTile(
-//           title: const Text("显示"),
-//           trailing: DropdownButton(
-//               alignment: AlignmentDirectional.center,
-//               value: newConfig.Type,
-//               items: ERecentDaysType.values.map((e) => DropdownMenuItem(value: e, child: Text(RecentDaysTypeNames[e.index]))).toList(),
-//               onChanged: (value) => setState(() => newConfig.Type = value!)),
-//         ),
-//       ])
-//     ]);
-//   }
-
-//   @override
-//   RecentDaysConfig CreateConfig() {
-//     return RecentDaysConfig.fromJson(jsonDecode(CardData.Params ?? "{}"));
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final cfg = CreateConfig();
-//     log("config: ${cfg.toJson()}");
-//     DateTime now = DateTime.now();
-//     DateTime beginDate = DateTime(now.year, now.month, now.day - now.weekday + 1);
-//     DateTime endDate = DateTime(now.year, now.month, now.day + (7 - now.weekday), 23, 59, 59);
-//     return LedgerCardContainer(
-//       this,
-//       "最近账单",
-//       SubTitle: RecentDaysTypeNames[cfg.Type.index],
-//       LedgerDB.managers.ledgerEntries.filter((f) => f.Date.isBetween(beginDate, endDate)).get(),
-//       (context, value) => _BuildContent(context, value),
-//     );
-//   }
-
-
-// }
+class RecentDaysCardSettingState extends CardConfigSettingStateBase<RecentDaysConfig> {
+  @override
+  Widget BuildContent() {
+    return SettingsList(shrinkWrap: true, sections: [
+      SettingsSection(tiles: [
+        SettingsTile(
+          title: const Text("显示"),
+          trailing: DropdownButton(
+              alignment: AlignmentDirectional.center,
+              value: Config.Type,
+              items: ERecentDaysType.values.map((e) => DropdownMenuItem(value: e, child: Text(RecentDaysTypeNames[e.index]))).toList(),
+              onChanged: (value) => setState(() => Config.Type = value!)),
+        )
+      ])
+    ]);
+  }
+}
