@@ -13,6 +13,7 @@ class EntryGroups extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       children: [for (var item in Entries.entries) _BuildGroup(context, item.key, item.value)],
     );

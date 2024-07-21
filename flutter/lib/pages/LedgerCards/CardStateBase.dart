@@ -71,7 +71,7 @@ abstract class CardStateBase extends State<CardWidget> {
 
   @protected
   void OnClickSetting() {
-    showModalBottomSheet(context: context, builder: (_) => CardSetting(this));
+    showModalBottomSheet(isScrollControlled: true, context: context, builder: (_) => CardSetting(this));
   }
 
   ///
@@ -110,13 +110,15 @@ class CardSetting extends StatefulWidget {
 class CardSettingState extends State<CardSetting> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Center(child: Text("${widget.Card.Title}设置")),
-        _BuildContent(),
-        BuildBottomButtons(),
-      ]),
+    return Material(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Center(child: Text("${widget.Card.Title}设置")),
+          _BuildContent(),
+          BuildBottomButtons(),
+        ]),
+      ),
     );
   }
 

@@ -79,14 +79,14 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
   }
 
   /// 左右滑动
-  void _GestureSwipe(details) {
-    var newIndex = _TabCtrl.index;
-    var factor = 10;
-    if (details.primaryVelocity! > factor) {
-      newIndex += 1;
-    } else if (details.primaryVelocity! < -factor) {
-      newIndex -= 1;
-    }
-    _TabCtrl.animateTo(newIndex % _TabCtrl.length);
-  }
+  // void _GestureSwipe(details) {
+  //   var newIndex = _TabCtrl.index;
+  //   var factor = 10;
+  //   if (details.primaryVelocity! > factor) {
+  //     newIndex += 1;
+  //   } else if (details.primaryVelocity! < -factor) {
+  //     newIndex -= 1;
+  //   }
+  //   _TabCtrl.animateTo(newIndex % _TabCtrl.length);
+  // }
 }
