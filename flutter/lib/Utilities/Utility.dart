@@ -7,6 +7,24 @@ class LedgerUtility {
 
   ///将整数钱转换为真实小数
   static String GetRealMoneyStr(int money) => GetRealMoney(money).ToSmartString();
+
+  ///
+  static String GetHumanMoney(double money) {
+    if (money >= 1000) {
+      if (money < 10000) {
+        return "${(money * 0.001).ToSmartString()}千";
+      } else if (money < 1000000) {
+        return "${(money * 0.0001).ToSmartString()}万";
+      } else if (money < 10000000) {
+        return "${(money * 0.000001).ToSmartString()}百万";
+      } else if (money < 100000000) {
+        return "${(money * 0.0000001).ToSmartString()}千万";
+      } else if (money < 1000000000) {
+        return "${(money * 0.00000001).ToSmartString()}亿";
+      }
+    }
+    return "${money.ToSmartString()}元";
+  }
 }
 
 class Utility {

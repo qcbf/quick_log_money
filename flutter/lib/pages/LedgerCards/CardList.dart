@@ -17,9 +17,9 @@ class _CardListState extends State<CardList> {
   void initState() {
     UserDB.managers.userCards.filter((f) => f.Uid(User.Info.Id) & f.Place(widget.Space)).get().then((value) => setState(() => Cards = [
           ...value,
+          UserCard(Id: 1, Uid: User.Info.Id, Place: ELedgerCardSpace.Record, Name: "Month"),
           UserCard(Id: 1, Uid: User.Info.Id, Place: ELedgerCardSpace.Record, Name: "RecentDays"),
           UserCard(Id: 1, Uid: User.Info.Id, Place: ELedgerCardSpace.Record, Name: "EveryDayEntries"),
-          UserCard(Id: 1, Uid: User.Info.Id, Place: ELedgerCardSpace.Record, Name: "Month"),
         ]));
     super.initState();
   }
