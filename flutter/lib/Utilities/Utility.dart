@@ -4,6 +4,9 @@ class LedgerUtility {
 
   ///将整数钱转换为真实小数
   static double GetRealMoney(int money) => money * 0.01;
+
+  ///将整数钱转换为真实小数
+  static String GetRealMoneyStr(int money) => GetRealMoney(money).ToSmartString();
 }
 
 class Utility {
@@ -64,6 +67,9 @@ extension DateEx on DateTime {
     }
     return str.toString();
   }
+
+  ///转换到当天的0时0分0秒0毫秒
+  DateTime Today() => DateTime(year, month, day);
 }
 
 extension DoubleEx on double {
@@ -75,5 +81,27 @@ extension DoubleEx on double {
     } else {
       return toStringAsFixed(this * 100 % 10 == 0 ? 1 : 2);
     }
+  }
+}
+
+extension StringEx on String {
+  ///double转换到字符串最多保留两位小数
+  ///
+  /// - [ellipsisPosition] 省略号位置:-1:开头, 0:中间, 1:结尾
+  String LimitLength(int maxLength, [int ellipsisPosition = 1]) {
+    const String ellipsisChars = '...';
+    if (length > maxLength) {
+      switch (ellipsisPosition) {
+        case -1:
+          return ellipsisChars + substring(length - maxLength);
+        case 0:
+          int segmentLength = maxLength ~/ 4;
+          segmentLength = segmentLength < 1 ? 1 : segmentLength;
+          return substring(0, segmentLength) + ellipsisChars + substring(length - segmentLength);
+        case 1:
+          return substring(0, maxLength) + ellipsisChars;
+      }
+    }
+    return this;
   }
 }

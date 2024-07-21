@@ -36,11 +36,12 @@ class RecentDaysConfig implements ICardConfigurable {
 ///
 class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
   List<(DateTime, double)> LedgerEntryMoneys = List.empty();
+  double TotalMoney = 0;
 
   @override
   String get Title => "最近账单";
   @override
-  String? get SubTitle => RecentDaysTypeNames[Config.Type.index];
+  String? get SubTitle => "${RecentDaysTypeNames[Config.Type.index]} ${TotalMoney.toInt()}￥";
   @override
   double? get ContentHeight => 120;
 
@@ -50,7 +51,7 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
   }
 
   @override
-  FutureOr RefreshState() {
+  Future<FutureOr> RefreshState() async {
     setState(() => IsHasData = false);
     final DateTime now = DateTime.now();
     final DateTime beginDate;
@@ -67,17 +68,17 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
         beginDate = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 13));
         endDate = now;
     }
-    LedgerDB.managers.ledgerEntries.filter((f) => f.Date.isBetween(beginDate, endDate)).get().then((value) {
-      final Map<DateTime, double> entriesMap = Map.fromEntries(List.generate(endDate.day - beginDate.day + 1, (i) => MapEntry(beginDate.add(Duration(days: i)), 0)));
-      for (var item in value) {
-        final date = item.Date;
-        final key = DateTime(date.year, date.month, date.day);
-        final v = LedgerUtility.GetRealMoney(item.IntMoney);
-        entriesMap.update(key, (value) => value + v, ifAbsent: () => v);
-      }
-      LedgerEntryMoneys = entriesMap.entries.map((e) => (e.key, e.value)).toList();
-      setState(() => IsHasData = true);
-    });
+
+    final entries = await LedgerDB.managers.ledgerEntries.filter((f) => f.Date.isBetween(beginDate, endDate)).get();
+    final Map<DateTime, double> entriesMap = Map.fromEntries(List.generate(endDate.day - beginDate.day + 1, (i) => MapEntry(beginDate.add(Duration(days: i)), 0)));
+    for (var item in entries) {
+      final date = item.Date;
+      final v = LedgerUtility.GetRealMoney(item.IntMoney);
+      entriesMap.update(date.Today(), (value) => value + v, ifAbsent: () => v);
+      TotalMoney += v;
+    }
+    LedgerEntryMoneys = entriesMap.entries.map((e) => (e.key, e.value)).toList();
+    setState(() => IsHasData = true);
   }
 
   ///
@@ -94,7 +95,7 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
               fitInsideHorizontally: true,
               tooltipPadding: EdgeInsets.zero,
               getTooltipColor: (group) => Colors.transparent,
-              getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem("${rod.toY.ToSmartString()}￥", const TextStyle()),
+              getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(rod.toY.toStringAsFixed(0), const TextStyle()),
             )),
         gridData: const FlGridData(show: false),
         borderData: FlBorderData(show: false),
