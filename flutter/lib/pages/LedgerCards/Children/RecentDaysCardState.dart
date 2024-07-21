@@ -8,9 +8,9 @@ import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Utilities/Utility.dart';
-import 'package:quick_log_money/pages/LedgerCards/CardBase.dart';
+import 'package:quick_log_money/pages/LedgerCards/CardStateBase.dart';
 
-part 'RecentDaysCard.g.dart';
+part 'RecentDaysCardState.g.dart';
 
 ///
 const RecentDaysTypeNames = ["本周", "近七天", "近十四天"];
@@ -34,7 +34,7 @@ class RecentDaysConfig implements ICardConfigurable {
 }
 
 ///
-class RecentDaysCardState extends CardBaseConfigState<RecentDaysConfig> {
+class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
   List<(DateTime, double)> LedgerEntryMoneys = List.empty();
 
   @override

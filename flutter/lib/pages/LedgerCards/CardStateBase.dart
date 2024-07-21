@@ -1,21 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/Database/UserDB.dart';
+import 'package:quick_log_money/pages/LedgerCards/CardWidget.dart';
 
-class CardBase<T extends CardBaseState> extends StatefulWidget {
-  final T Function() CardStateBuilder;
-  final UserCard CardData;
-  const CardBase(this.CardData, this.CardStateBuilder, {super.key});
-  @override
-  // ignore: no_logic_in_create_state
-  T createState() => CardStateBuilder();
-}
-
-abstract class CardBaseState extends State<CardBase> {
+///账本卡片基类
+abstract class CardStateBase extends State<CardWidget> {
   ///
   bool IsHasData = false;
 
@@ -43,6 +37,9 @@ abstract class CardBaseState extends State<CardBase> {
     IsHasData = true;
   }
 
+  @protected
+  Future Delete() async {}
+
   ///
   @override
   Widget build(BuildContext context) {
@@ -66,11 +63,10 @@ abstract class CardBaseState extends State<CardBase> {
   ///
   @protected
   Widget BuildTitle() {
-    return Center(
-        child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 3),
-            child: Text(SubTitle == null ? Title : "$Title($SubTitle)",
-                style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 14), textAlign: TextAlign.left)));
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Text(SubTitle == null ? Title : "$Title($SubTitle)", style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 14), textAlign: TextAlign.left),
+      InkWell(onTap: () => showModalBottomSheet(context: context, builder: (_) => CardSetting(this)), child: const Icon(Icons.more_horiz, color: Colors.grey))
+    ]);
   }
 
   ///
@@ -78,28 +74,17 @@ abstract class CardBaseState extends State<CardBase> {
   Widget BuildContent();
 }
 
-///
+///账本卡片的配置数据类型
 abstract class ICardConfigurable {
   Map<String, dynamic> toJson();
 }
 
-///
-abstract class CardBaseConfigState<T extends ICardConfigurable> extends CardBaseState {
+///账本卡片存在配置文件
+abstract class CardConfigStateBase<T extends ICardConfigurable> extends CardStateBase {
   late T Config = CreateConfig();
 
   @protected
   T CreateConfig();
-
-  @override
-  Widget BuildTitle() {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      super.BuildTitle(),
-      InkWell(
-        onTap: () => showModalBottomSheet(context: context, builder: (_) => CardSetting(this)),
-        child: const Icon(Icons.more_horiz, color: Colors.grey),
-      ),
-    ]);
-  }
 
   @protected
   Widget BuildConfig(BuildContext context, void Function(VoidCallback) setState, T newConfig);
@@ -113,20 +98,22 @@ abstract class CardBaseConfigState<T extends ICardConfigurable> extends CardBase
   }
 }
 
-///
-class CardSetting<T extends ICardConfigurable> extends StatefulWidget {
-  final CardBaseConfigState Card;
+///账本卡片的设置面板
+class CardSetting extends StatefulWidget {
+  final CardStateBase Card;
   const CardSetting(this.Card, {super.key});
   @override
-  State<CardSetting> createState() => _CardSettingState<T>();
+  State<CardSetting> createState() => _CardSettingState();
 }
 
-class _CardSettingState<T extends ICardConfigurable> extends State<CardSetting> {
-  late final T NewConfig;
+class _CardSettingState extends State<CardSetting> {
+  late final ICardConfigurable? NewConfig;
 
   @override
   void initState() {
-    NewConfig = widget.Card.CreateConfig() as T;
+    if (widget.Card is CardConfigStateBase) {
+      NewConfig = (widget.Card as CardConfigStateBase).CreateConfig();
+    }
     super.initState();
   }
 
@@ -136,14 +123,35 @@ class _CardSettingState<T extends ICardConfigurable> extends State<CardSetting> 
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Center(child: Text("${widget.Card.Title}设置")),
-        widget.Card.BuildConfig(context, setState, NewConfig),
-        TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.Card.SaveConfig(NewConfig);
-            },
-            child: const Text("保存"))
+        if (widget.Card is CardConfigStateBase) (widget.Card as CardConfigStateBase).BuildConfig(context, setState, NewConfig!) else const SizedBox(height: 10),
+        _BuildBottomButtons(),
       ]),
     );
+  }
+
+  Widget _BuildBottomButtons() {
+    return Row(children: [
+      Expanded(
+        child: TextButton(
+          onPressed: () {},
+          onLongPress: () => widget.Card.Delete().whenComplete(() {
+            Navigator.pop(context);
+            BotToast.showText(text: "${widget.Card.Title}卡片已经删除");
+          }),
+          child: const Text("删除卡片(长按)"),
+        ),
+      ),
+      if (widget.Card is CardConfigStateBase) ...[
+        const SizedBox(width: 8),
+        Expanded(
+          child: TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                (widget.Card as CardConfigStateBase).SaveConfig(NewConfig!);
+              },
+              child: const Text("保存")),
+        ),
+      ]
+    ]);
   }
 }

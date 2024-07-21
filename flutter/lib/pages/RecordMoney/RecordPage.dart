@@ -4,7 +4,7 @@ import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dar
 import 'package:quick_log_money/Pages/RecordMoney/RecordBottomPanel.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'package:quick_log_money/pages/LedgerCards/CardList.dart';
-import 'package:quick_log_money/pages/LedgerCards/LedgerCardUtility.dart';
+import 'package:quick_log_money/pages/LedgerCards/CardWidget.dart';
 
 /// 账单记录页面
 class RecordPage extends StatelessWidget {

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'RecentDaysCard.dart';
+part of 'RecentDaysCardState.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

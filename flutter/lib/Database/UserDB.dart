@@ -6,7 +6,7 @@ import 'package:quick_log_money/Database/DatabaseHelper.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Utilities/Def.dart';
 import 'package:quick_log_money/Utilities/Prefs.dart';
-import 'package:quick_log_money/pages/LedgerCards/LedgerCardUtility.dart';
+import 'package:quick_log_money/pages/LedgerCards/CardWidget.dart';
 
 part 'UserDB.g.dart';
 
