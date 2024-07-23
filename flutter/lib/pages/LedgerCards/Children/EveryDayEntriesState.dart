@@ -16,7 +16,7 @@ part 'EveryDayEntriesState.g.dart';
 @JsonSerializable()
 class EveryDayEntriesConfig implements ICardConfigurable {
   ///
-  int DaysCount = 1;
+  int DaysCount = 3;
 
   ///
   int ContentHeight = 0;
@@ -36,7 +36,7 @@ class EveryDayEntriesState extends CardConfigStateBase<EveryDayEntriesConfig> {
   String get Title => "账本条目";
 
   @override
-  String? get SubTitle => "${Config.DaysCount}天 $TotalMoney￥";
+  String? get SubTitle => "近${Config.DaysCount}天 $TotalMoney￥";
 
   @override
   double? get ContentHeight => Config.ContentHeight == 0 ? null : Config.ContentHeight.toDouble();
@@ -60,12 +60,13 @@ class EveryDayEntriesState extends CardConfigStateBase<EveryDayEntriesConfig> {
 
   @override
   Widget BuildContent() {
+    if (Entries.isEmpty) return const Center(child: Text("暂无记录..."));
     return EntryGroups.List(Entries);
   }
 
   @override
   State CreateConfigState() {
-    return EveryDayEntriesConfigState();
+    return EveryDayEntriesSettingState();
   }
 
   @override
@@ -75,7 +76,7 @@ class EveryDayEntriesState extends CardConfigStateBase<EveryDayEntriesConfig> {
 }
 
 ///
-class EveryDayEntriesConfigState extends CardConfigSettingStateBase<EveryDayEntriesConfig> {
+class EveryDayEntriesSettingState extends CardConfigSettingStateBase<EveryDayEntriesConfig> {
   @override
   Widget BuildContent() {
     return SettingsList(shrinkWrap: true, sections: [

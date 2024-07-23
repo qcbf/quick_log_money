@@ -16,10 +16,10 @@ class Pages {
 
   static MaterialPageRoute? Router(RouteSettings settings) {
     WidgetBuilder? page;
-    if (Prefs.IsNotUserId) {
-      page = Routes[Login];
-    } else {
+    if (Prefs.IsLogined) {
       page = Routes[settings.name];
+    } else {
+      page = Routes[Login];
     }
 
     if (page == null) {

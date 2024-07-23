@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
             onPressed: () async {
               final cancel = BotToast.showLoading();
               try {
-                await UserDBHelper.LoginAnonym();
+                await UserDBHelper.LoginForAnonym();
                 cancel();
                 if (!mounted) return;
                 Navigator.pushReplacementNamed(context, Pages.Home);

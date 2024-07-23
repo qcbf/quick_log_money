@@ -47,7 +47,7 @@ class MainApp extends StatelessWidget {
         darkTheme: _GetTheme(Brightness.dark),
         onGenerateRoute: Pages.Router,
         onGenerateInitialRoutes: (initialRoute) {
-          var firstPageName = Prefs.IsNotUserId ? Pages.Login : (Prefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home);
+          var firstPageName = Prefs.IsLogined ? (Prefs.IsFirstPageToRecord.value ? Pages.Record : Pages.Home) : Pages.Login;
           return [Pages.Router(RouteSettings(name: firstPageName))!];
         },
         navigatorObservers: [BotToastNavigatorObserver()],

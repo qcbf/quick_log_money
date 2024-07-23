@@ -7,8 +7,8 @@ import 'package:quick_log_money/Utilities/Prefs.dart';
 
 part 'LedgerDB.g.dart';
 
-late final LedgerDBHelper LedgerDB;
-late final UserLedgerDao Ledger;
+late LedgerDBHelper LedgerDB;
+late UserLedgerDao Ledger;
 
 ///
 class UserLedgerDao {
@@ -119,9 +119,9 @@ class LedgerDBHelper extends _$LedgerDBHelper {
 
   ///
   static Future Init() async {
-    assert(!Prefs.IsNotUserId, "not found UserId");
+    assert(Prefs.IsLogined, "not found UserId");
     if (_LedgerDBIsConnected) LedgerDB.close();
-    LedgerDB = LedgerDBHelper.FromUser(Prefs.UserId);
+    LedgerDB = LedgerDBHelper.FromUser(User.Id);
     _LedgerDBIsConnected = true;
     await DatabaseHelper.DebugTryResetDatabase(LedgerDB);
     Ledger = await UserLedgerDao.Create();

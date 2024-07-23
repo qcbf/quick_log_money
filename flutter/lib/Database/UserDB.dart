@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/services.dart';
 import 'package:quick_log_money/Database/DatabaseHelper.dart';
@@ -11,22 +12,24 @@ import 'package:quick_log_money/pages/LedgerCards/CardWidget.dart';
 part 'UserDB.g.dart';
 
 late final UserDBHelper UserDB;
-late final UserDao User;
+late UserDao User;
 
 class UserDao {
   final UserInfo Info;
   final Iterable<int> RecentTags;
+  int get Id => Info.Id;
   UserDao({required this.Info, required this.RecentTags});
 }
 
 ///
+@TableIndex(name: "UserInfos.Token", columns: {#Token})
 class UserInfos extends Table {
   IntColumn get Id => integer().autoIncrement()();
   IntColumn get LedgerId => integer()();
   IntColumn get LedgerRecentCount => integer().withDefault(const Constant(8)).nullable()();
   TextColumn get Name => text()();
   TextColumn get Icon => text()();
-  TextColumn get Token => text().nullable()();
+  TextColumn get Token => text()();
   DateTimeColumn get VipExpiryDate => dateTime().nullable()();
   DateTimeColumn get RegisterDate => dateTime().withDefault(currentDate)();
 }
@@ -75,38 +78,38 @@ class UserDBHelper extends _$UserDBHelper {
   static Future Init() async {
     UserDB = UserDBHelper("users");
     await DatabaseHelper.DebugTryResetDatabase(UserDB);
-    if (Prefs.IsNotUserId) return;
-    try {
-      final result = await Future.wait<dynamic>([
-        UserDB.managers.userInfos.filter((f) => f.Id(Prefs.UserId)).getSingle(),
-        (UserDB.selectOnly(UserDB.userLedgerRecentTags)
-              ..addColumns([UserDB.userLedgerRecentTags.TagId])
-              ..where(UserDB.userLedgerRecentTags.Uid.equals(Prefs.UserId)))
-            .get(),
-      ]);
-      await _OnLoginFinish(UserDao(
-        Info: result[0],
-        RecentTags: (result[1] as List<TypedResult>).map((e) => e.read(UserDB.userLedgerRecentTags.TagId)!),
-      ));
-    } catch (e) {
-      Prefs.SetNotUserId();
-      rethrow;
+    if (Prefs.IsLogined) {
+      await LoginForToken(Prefs.UserToken);
     }
   }
 
   static Future Loginout() async {
-    Prefs.SetNotUserId();
-    // User = UserDao(Info: UserInfo(Id: 0, LedgerId: 0, Name: "", Icon: "", RegisterDate: DateTime(0)));
+    Prefs.UserToken = "";
     await LedgerDBHelper.Uninit();
   }
 
   ///
-  static Future Login(String username, String password) async {
+  static Future LoginForUser(String username, String password) async {
     // _OnLoginFinish();
+    return null;
   }
 
   ///
-  static Future LoginAnonym() async {
+  static Future LoginForToken(String token) {
+    return _LoginImpl(UserDB.managers.userInfos.filter((f) => f.Token(token)));
+  }
+
+  ///
+  static Future LoginForAnonym() async {
+    // 判断是否已经存在匿名账户
+    final existUser = await (UserDB.selectOnly(UserDB.userInfos)
+          ..addColumns([UserDB.userInfos.Token])
+          ..where(UserDB.userInfos.Id.equals(1) & UserDB.userInfos.Token.equals(".")))
+        .getSingleOrNull();
+    if (existUser != null) {
+      return LoginForToken(existUser.read(UserDB.userInfos.Token)!);
+    }
+
     // 创造账本数据
     final ledgerJson = jsonDecode(await rootBundle.loadString(Def.LedgerConfigPath, cache: false))["Template"] as Map<String, dynamic>;
     final ledgerInfo = LedgerInfosCompanion.insert(Name: ledgerJson["Name"], Icon: ledgerJson["Icon"]);
@@ -114,8 +117,8 @@ class UserDBHelper extends _$UserDBHelper {
         .entries
         .expand((e) => (e.value as List).map((tag) => LedgerTagsCompanion.insert(Group: e.key, Name: tag[0], Icon: tag[1])));
 
-    await _OnLoginFinish(await UserDB.transaction<UserDao>(() async {
-      final user = await UserDB.managers.userInfos.createReturning((o) => o(Name: "游客", Icon: "", LedgerId: 0));
+    User = await UserDB.transaction<UserDao>(() async {
+      final user = await UserDB.managers.userInfos.createReturning((o) => o(Name: "游客", Icon: "", LedgerId: 0, Token: "."));
 
       final ledgerDB = LedgerDBHelper.FromUser(user.Id);
       final ledgerId = await LedgerDBHelper.CreateLedger(user.Id, ledgerDB, ledgerInfo, tags);
@@ -130,14 +133,41 @@ class UserDBHelper extends _$UserDBHelper {
 
       await UserDB.managers.userLedgerRecentTags.bulkCreate((o) => tagIds);
       await ledgerDB.close();
+      await UserDB.managers.userCards.bulkCreate((o) => [
+            o(Uid: user.Id, Name: "RecentDays", Place: ELedgerCardSpace.Record),
+            o(Uid: user.Id, Name: "EveryDayEntries", Place: ELedgerCardSpace.Record),
+            o(Uid: user.Id, Name: "Month", Place: ELedgerCardSpace.Home),
+            o(Uid: user.Id, Name: "RecentDays", Place: ELedgerCardSpace.Home),
+            o(Uid: user.Id, Name: "EveryDayEntries", Place: ELedgerCardSpace.Home),
+          ]);
       return UserDao(Info: user.copyWith(LedgerId: ledgerId), RecentTags: tagIds.map((e) => e.TagId.value));
-    }));
+    });
+    Prefs.UserToken = User.Info.Token;
+    await LedgerDBHelper.Init();
   }
 
   ///
-  static Future _OnLoginFinish(UserDao u) async {
-    User = u;
-    Prefs.UserId = User.Info.Id;
-    await LedgerDBHelper.Init();
+  static Future _LoginImpl(ProcessedTableManager query) async {
+    try {
+      final info = await query.getSingleOrNull() as UserInfo?;
+      if (info == null) {
+        Prefs.UserToken = "";
+        BotToast.showSimpleNotification(title: "找不到用户");
+        return;
+      }
+
+      final recentTags = (await (UserDB.selectOnly(UserDB.userLedgerRecentTags)
+                ..addColumns([UserDB.userLedgerRecentTags.TagId])
+                ..where(UserDB.userLedgerRecentTags.Uid.equals(info.Id)))
+              .get())
+          .map((e) => e.read(UserDB.userLedgerRecentTags.TagId)!);
+
+      User = UserDao(Info: info, RecentTags: recentTags);
+      Prefs.UserToken = User.Info.Token;
+      await LedgerDBHelper.Init();
+    } catch (e) {
+      BotToast.showSimpleNotification(title: "登录失败");
+      rethrow;
+    }
   }
 }

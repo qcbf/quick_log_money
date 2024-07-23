@@ -45,8 +45,8 @@ class $UserInfosTable extends UserInfos
   static const VerificationMeta _TokenMeta = const VerificationMeta('Token');
   @override
   late final GeneratedColumn<String> Token = GeneratedColumn<String>(
-      'token', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+      'token', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _VipExpiryDateMeta =
       const VerificationMeta('VipExpiryDate');
   @override
@@ -112,6 +112,8 @@ class $UserInfosTable extends UserInfos
     if (data.containsKey('token')) {
       context.handle(
           _TokenMeta, Token.isAcceptableOrUnknown(data['token']!, _TokenMeta));
+    } else if (isInserting) {
+      context.missing(_TokenMeta);
     }
     if (data.containsKey('vip_expiry_date')) {
       context.handle(
@@ -145,7 +147,7 @@ class $UserInfosTable extends UserInfos
       Icon: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}icon'])!,
       Token: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}token']),
+          .read(DriftSqlType.string, data['${effectivePrefix}token'])!,
       VipExpiryDate: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}vip_expiry_date']),
       RegisterDate: attachedDatabase.typeMapping.read(
@@ -165,7 +167,7 @@ class UserInfo extends DataClass implements Insertable<UserInfo> {
   final int? LedgerRecentCount;
   final String Name;
   final String Icon;
-  final String? Token;
+  final String Token;
   final DateTime? VipExpiryDate;
   final DateTime RegisterDate;
   const UserInfo(
@@ -174,7 +176,7 @@ class UserInfo extends DataClass implements Insertable<UserInfo> {
       this.LedgerRecentCount,
       required this.Name,
       required this.Icon,
-      this.Token,
+      required this.Token,
       this.VipExpiryDate,
       required this.RegisterDate});
   @override
@@ -187,9 +189,7 @@ class UserInfo extends DataClass implements Insertable<UserInfo> {
     }
     map['name'] = Variable<String>(Name);
     map['icon'] = Variable<String>(Icon);
-    if (!nullToAbsent || Token != null) {
-      map['token'] = Variable<String>(Token);
-    }
+    map['token'] = Variable<String>(Token);
     if (!nullToAbsent || VipExpiryDate != null) {
       map['vip_expiry_date'] = Variable<DateTime>(VipExpiryDate);
     }
@@ -206,8 +206,7 @@ class UserInfo extends DataClass implements Insertable<UserInfo> {
           : Value(LedgerRecentCount),
       Name: Value(Name),
       Icon: Value(Icon),
-      Token:
-          Token == null && nullToAbsent ? const Value.absent() : Value(Token),
+      Token: Value(Token),
       VipExpiryDate: VipExpiryDate == null && nullToAbsent
           ? const Value.absent()
           : Value(VipExpiryDate),
@@ -224,7 +223,7 @@ class UserInfo extends DataClass implements Insertable<UserInfo> {
       LedgerRecentCount: serializer.fromJson<int?>(json['LedgerRecentCount']),
       Name: serializer.fromJson<String>(json['Name']),
       Icon: serializer.fromJson<String>(json['Icon']),
-      Token: serializer.fromJson<String?>(json['Token']),
+      Token: serializer.fromJson<String>(json['Token']),
       VipExpiryDate: serializer.fromJson<DateTime?>(json['VipExpiryDate']),
       RegisterDate: serializer.fromJson<DateTime>(json['RegisterDate']),
     );
@@ -238,7 +237,7 @@ class UserInfo extends DataClass implements Insertable<UserInfo> {
       'LedgerRecentCount': serializer.toJson<int?>(LedgerRecentCount),
       'Name': serializer.toJson<String>(Name),
       'Icon': serializer.toJson<String>(Icon),
-      'Token': serializer.toJson<String?>(Token),
+      'Token': serializer.toJson<String>(Token),
       'VipExpiryDate': serializer.toJson<DateTime?>(VipExpiryDate),
       'RegisterDate': serializer.toJson<DateTime>(RegisterDate),
     };
@@ -250,7 +249,7 @@ class UserInfo extends DataClass implements Insertable<UserInfo> {
           Value<int?> LedgerRecentCount = const Value.absent(),
           String? Name,
           String? Icon,
-          Value<String?> Token = const Value.absent(),
+          String? Token,
           Value<DateTime?> VipExpiryDate = const Value.absent(),
           DateTime? RegisterDate}) =>
       UserInfo(
@@ -261,7 +260,7 @@ class UserInfo extends DataClass implements Insertable<UserInfo> {
             : this.LedgerRecentCount,
         Name: Name ?? this.Name,
         Icon: Icon ?? this.Icon,
-        Token: Token.present ? Token.value : this.Token,
+        Token: Token ?? this.Token,
         VipExpiryDate:
             VipExpiryDate.present ? VipExpiryDate.value : this.VipExpiryDate,
         RegisterDate: RegisterDate ?? this.RegisterDate,
@@ -323,7 +322,7 @@ class UserInfosCompanion extends UpdateCompanion<UserInfo> {
   final Value<int?> LedgerRecentCount;
   final Value<String> Name;
   final Value<String> Icon;
-  final Value<String?> Token;
+  final Value<String> Token;
   final Value<DateTime?> VipExpiryDate;
   final Value<DateTime> RegisterDate;
   const UserInfosCompanion({
@@ -342,12 +341,13 @@ class UserInfosCompanion extends UpdateCompanion<UserInfo> {
     this.LedgerRecentCount = const Value.absent(),
     required String Name,
     required String Icon,
-    this.Token = const Value.absent(),
+    required String Token,
     this.VipExpiryDate = const Value.absent(),
     this.RegisterDate = const Value.absent(),
   })  : LedgerId = Value(LedgerId),
         Name = Value(Name),
-        Icon = Value(Icon);
+        Icon = Value(Icon),
+        Token = Value(Token);
   static Insertable<UserInfo> custom({
     Expression<int>? Id,
     Expression<int>? LedgerId,
@@ -376,7 +376,7 @@ class UserInfosCompanion extends UpdateCompanion<UserInfo> {
       Value<int?>? LedgerRecentCount,
       Value<String>? Name,
       Value<String>? Icon,
-      Value<String?>? Token,
+      Value<String>? Token,
       Value<DateTime?>? VipExpiryDate,
       Value<DateTime>? RegisterDate}) {
     return UserInfosCompanion(
@@ -962,6 +962,8 @@ abstract class _$UserDBHelper extends GeneratedDatabase {
   late final $UserLedgerRecentTagsTable userLedgerRecentTags =
       $UserLedgerRecentTagsTable(this);
   late final $UserCardsTable userCards = $UserCardsTable(this);
+  late final Index userInfosToken = Index('UserInfos.Token',
+      'CREATE INDEX "UserInfos.Token" ON user_infos (token)');
   late final Index userLedgerRecentTagsUid = Index('UserLedgerRecentTags.Uid',
       'CREATE INDEX "UserLedgerRecentTags.Uid" ON user_ledger_recent_tags (uid)');
   late final Index userCardsPlace = Index('UserCards.Place',
@@ -976,6 +978,7 @@ abstract class _$UserDBHelper extends GeneratedDatabase {
         userInfos,
         userLedgerRecentTags,
         userCards,
+        userInfosToken,
         userLedgerRecentTagsUid,
         userCardsPlace,
         userCardsUid
@@ -988,7 +991,7 @@ typedef $$UserInfosTableCreateCompanionBuilder = UserInfosCompanion Function({
   Value<int?> LedgerRecentCount,
   required String Name,
   required String Icon,
-  Value<String?> Token,
+  required String Token,
   Value<DateTime?> VipExpiryDate,
   Value<DateTime> RegisterDate,
 });
@@ -998,7 +1001,7 @@ typedef $$UserInfosTableUpdateCompanionBuilder = UserInfosCompanion Function({
   Value<int?> LedgerRecentCount,
   Value<String> Name,
   Value<String> Icon,
-  Value<String?> Token,
+  Value<String> Token,
   Value<DateTime?> VipExpiryDate,
   Value<DateTime> RegisterDate,
 });
@@ -1025,7 +1028,7 @@ class $$UserInfosTableTableManager extends RootTableManager<
             Value<int?> LedgerRecentCount = const Value.absent(),
             Value<String> Name = const Value.absent(),
             Value<String> Icon = const Value.absent(),
-            Value<String?> Token = const Value.absent(),
+            Value<String> Token = const Value.absent(),
             Value<DateTime?> VipExpiryDate = const Value.absent(),
             Value<DateTime> RegisterDate = const Value.absent(),
           }) =>
@@ -1045,7 +1048,7 @@ class $$UserInfosTableTableManager extends RootTableManager<
             Value<int?> LedgerRecentCount = const Value.absent(),
             required String Name,
             required String Icon,
-            Value<String?> Token = const Value.absent(),
+            required String Token,
             Value<DateTime?> VipExpiryDate = const Value.absent(),
             Value<DateTime> RegisterDate = const Value.absent(),
           }) =>

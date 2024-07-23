@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
+import 'package:quick_log_money/pages/LedgerCards/CardList.dart';
+import 'package:quick_log_money/pages/LedgerCards/CardWidget.dart';
 import 'DrawerMenu.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,9 +16,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: BuildTop(),
+      appBar: _BuildBar(),
       floatingActionButton: BuildFloatingBottom(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      body: _BuildBody(),
       drawer: DrawerMenu(context: context),
     );
   }
@@ -26,9 +29,7 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: FloatingActionButton(
-        onPressed: () async {
-          Navigator.pushNamed(context, Pages.Record);
-        },
+        onPressed: () => Navigator.pushReplacementNamed(context, Pages.Record),
         mini: false,
         shape: const CircleBorder(),
         child: const Icon(Icons.add),
@@ -37,11 +38,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   ///
-  PreferredSizeWidget BuildTop() {
+  PreferredSizeWidget _BuildBar() {
     return AppBar(
       centerTitle: true,
       title: ConditionalValueListener.AsyncValue(Ledger.Info, (context, value, child) => Text(value.Name, style: const TextStyle(fontSize: 14))),
       actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.widgets))],
     );
+  }
+
+  ///
+  Widget _BuildBody() {
+    return const CardList(ELedgerCardSpace.Home);
   }
 }

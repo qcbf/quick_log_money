@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordBottomPanel.dart';
+import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'package:quick_log_money/pages/LedgerCards/CardList.dart';
 import 'package:quick_log_money/pages/LedgerCards/CardWidget.dart';
@@ -26,26 +26,33 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
   late TabController _TabCtrl;
 
   @override
+  void initState() {
+    _TabCtrl = TabController(length: 2, vsync: this);
+    _TabCtrl.addListener(() {
+      if (_TabCtrl.indexIsChanging) SetIsCost(context);
+    });
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _TabCtrl.dispose();
+    super.dispose();
+  }
+
+  /// 设置是否消费记账
+  void SetIsCost(BuildContext context) {
+    var data = context.read<RecordEntryEditingProvider>();
+    data.IsIncome = _TabCtrl.index == 1;
+    data.Notify();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        leading: SizedBox(
-          width: kToolbarHeight,
-          child: IconButton(
-              onPressed: () async {
-                if (!await Navigator.maybePop(context)) {
-                  if (!context.mounted) return;
-                  Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
-                }
-              },
-              icon: const Icon(Icons.arrow_back)),
-        ),
-        title: TabBar(controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
-        actions: [SizedBox(height: kToolbarHeight, width: kToolbarHeight, child: IconButton(onPressed: () {}, icon: const Icon(Icons.settings)))],
-      ),
+      appBar: _BuildBar(context),
       body: const Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -56,26 +63,25 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _TabCtrl.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _TabCtrl = TabController(length: 2, vsync: this);
-    _TabCtrl.addListener(() {
-      if (_TabCtrl.indexIsChanging) SetIsCost(context);
-    });
-  }
-
-  /// 设置是否消费记账
-  void SetIsCost(BuildContext context) {
-    var data = context.read<RecordEntryEditingProvider>();
-    data.IsIncome = _TabCtrl.index == 1;
-    data.Notify();
+  ///
+  AppBar _BuildBar(BuildContext context) {
+    return AppBar(
+      automaticallyImplyLeading: false,
+      centerTitle: true,
+      leading: SizedBox(
+        width: kToolbarHeight,
+        child: IconButton(
+            onPressed: () async {
+              if (!await Navigator.maybePop(context)) {
+                if (!context.mounted) return;
+                Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
+              }
+            },
+            icon: const Icon(Icons.arrow_back)),
+      ),
+      title: TabBar(controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
+      actions: [SizedBox(height: kToolbarHeight, width: kToolbarHeight, child: IconButton(onPressed: () {}, icon: const Icon(Icons.settings)))],
+    );
   }
 
   /// 左右滑动

@@ -34,7 +34,7 @@ class DrawerMenu extends StatelessWidget {
             Text(User.Info.Name, style: Theme.of(context).textTheme.headlineMedium),
             Text("ID:${User.Info.Id}", style: Theme.of(context).textTheme.labelMedium),
             Conditional.SwitchIndex(() {
-              if (User.Info.Token == null) {
+              if (User.Info.Token.isEmpty) {
                 return 0;
               } else if (User.Info.VipExpiryDate == null) {
                 return 1;
