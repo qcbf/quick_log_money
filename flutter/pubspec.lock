@@ -310,14 +310,6 @@ packages:
       url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
     source: hosted
     version: "3.0.2"
-  flutter_settings_ui:
-    dependency: "direct main"
-    description:
-      name: flutter_settings_ui
-      sha256: dcc506fab724192594e5c232b6214a941abd6e7b5151626635b89258fadbc17c
-      url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
-    source: hosted
-    version: "3.0.1"
   flutter_shaders:
     dependency: transitive
     description:

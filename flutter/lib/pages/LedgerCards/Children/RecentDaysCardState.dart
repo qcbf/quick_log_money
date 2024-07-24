@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:drift/drift.dart' as drift;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Utilities/Utility.dart';
@@ -151,17 +150,13 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
 class RecentDaysCardSettingState extends CardConfigSettingStateBase<RecentDaysConfig> {
   @override
   Widget BuildContent() {
-    return SettingsList(shrinkWrap: true, sections: [
-      SettingsSection(tiles: [
-        SettingsTile(
-          title: const Text("显示"),
-          trailing: DropdownButton(
-              alignment: AlignmentDirectional.center,
-              value: Config.Type,
-              items: ERecentDaysType.values.map((e) => DropdownMenuItem(value: e, child: Text(RecentDaysTypeNames[e.index]))).toList(),
-              onChanged: (value) => setState(() => Config.Type = value!)),
-        )
-      ])
-    ]);
+    return ListTile(
+      title: const Text("显示"),
+      trailing: DropdownButton(
+          alignment: AlignmentDirectional.center,
+          value: Config.Type,
+          items: ERecentDaysType.values.map((e) => DropdownMenuItem(value: e, child: Text(RecentDaysTypeNames[e.index]))).toList(),
+          onChanged: (value) => setState(() => Config.Type = value!)),
+    );
   }
 }

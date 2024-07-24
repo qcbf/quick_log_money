@@ -1,0 +1,77 @@
+import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:quick_log_money/CommonWidgets/Conditional.dart';
+import 'package:quick_log_money/Utilities/Def.dart';
+import 'package:quick_log_money/Utilities/Prefs.dart';
+
+class SettingPage extends StatefulWidget {
+  const SettingPage({super.key});
+
+  @override
+  State<SettingPage> createState() => _SettingPageState();
+}
+
+class _SettingPageState extends State<SettingPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("设置")),
+      body: _BuildContent(),
+    );
+  }
+
+  Widget _BuildContent() {
+    return ListView(children: [
+      _BuildSettingGroup(_BuildCommon()),
+      _BuildSettingGroup(_BuildRecord()),
+    ]);
+  }
+
+  Widget _BuildSettingGroup(List<Widget> children) {
+    return Card(child: Column(children: children));
+  }
+
+  ///
+  List<Widget> _BuildCommon() {
+    return [
+      ///
+      ListTile(
+          title: const Text("主题"),
+          trailing: DropdownButton(
+              value: 0,
+              items: const [DropdownMenuItem(value: 0, child: Text("自动")), DropdownMenuItem(value: 1, child: Text("黑暗")), DropdownMenuItem(value: 2, child: Text("白色"))],
+              onChanged: (value) {})),
+
+      ///
+      ListTile(
+          title: const Text("语言"),
+          trailing: DropdownButton(
+              value: 0,
+              items: const [
+                DropdownMenuItem(value: 0, child: Text("中文")),
+                DropdownMenuItem(value: 1, child: Text("英文")),
+              ],
+              onChanged: (value) {})),
+      SwitchListTile(value: Prefs.IsFirstPageToRecord.value, title: const Text("打开就记账"), onChanged: (v) => setState(() => Prefs.IsFirstPageToRecord.value = v)),
+    ];
+  }
+
+  ///
+  List<Widget> _BuildRecord() {
+    return [
+      ///
+      FutureBuilder(
+          future: PackageInfo.fromPlatform(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return Conditional.GlobalFallback();
+            return AboutListTile(
+              applicationIcon: Image.asset(Def.IconPath, width: 64),
+              applicationVersion: snapshot.data?.version,
+              applicationName: "随手速记账",
+              applicationLegalese: "qcbf@qq.com",
+              child: const Text("关于"),
+            );
+          }),
+    ];
+  }
+}

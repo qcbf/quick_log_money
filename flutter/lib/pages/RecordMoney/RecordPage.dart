@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordBottomPanel.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
@@ -53,11 +54,11 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: _BuildBar(context),
-      body: const Column(
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(child: CardList(ELedgerCardSpace.Record)),
-          SizedBox(height: 390, child: RecordBottomPanel()),
+          Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const CardList(ELedgerCardSpace.Record))),
+          const SizedBox(height: 385, child: RecordBottomPanel()),
         ],
       ),
     );
@@ -85,14 +86,14 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
   }
 
   /// 左右滑动
-  // void _GestureSwipe(details) {
-  //   var newIndex = _TabCtrl.index;
-  //   var factor = 10;
-  //   if (details.primaryVelocity! > factor) {
-  //     newIndex += 1;
-  //   } else if (details.primaryVelocity! < -factor) {
-  //     newIndex -= 1;
-  //   }
-  //   _TabCtrl.animateTo(newIndex % _TabCtrl.length);
-  // }
+  void _GestureSwipe(details) {
+    var newIndex = _TabCtrl.index;
+    var factor = 10;
+    if (details.primaryVelocity! > factor) {
+      newIndex += 1;
+    } else if (details.primaryVelocity! < -factor) {
+      newIndex -= 1;
+    }
+    _TabCtrl.animateTo(newIndex % _TabCtrl.length);
+  }
 }

@@ -23,7 +23,6 @@ dependencies:
   decimal: ^3.0.2
   fl_chart: ^0.68.0
   flutter_animate: ^4.5.0
-  flutter_settings_ui: ^3.0.1
 
 dev_dependencies:
   flutter_test:
@@ -50,6 +49,10 @@ flutter_launcher_icons:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: CommonIcon
+      fonts:
+        - asset: Assets/CommonIcon.ttf
   assets:
     - Assets/Ledger/
     - Assets/Ledger/TagIcons/

@@ -133,7 +133,7 @@ class CardSettingState extends State<CardSetting> {
       onPressed: () {},
       onLongPress: () => widget.Card.Delete().whenComplete(() {
         Navigator.pop(context);
-        BotToast.showText(text: "${widget.Card.Title}卡片已经删除");
+        BotToast.showText(text: "${widget.Card.Title} 删除还没做!");
       }),
       child: const Text("删除卡片(长按)"),
     );

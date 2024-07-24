@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:quick_log_money/CommonWidgets/Ledger/Entry/EntryGroups.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
@@ -79,16 +78,17 @@ class EveryDayEntriesState extends CardConfigStateBase<EveryDayEntriesConfig> {
 class EveryDayEntriesSettingState extends CardConfigSettingStateBase<EveryDayEntriesConfig> {
   @override
   Widget BuildContent() {
-    return SettingsList(shrinkWrap: true, sections: [
-      SettingsSection(tiles: [
-        SettingsTile(
-            title: const Text("显示天数"),
-            trailing: SizedBox(
-                width: 60,
-                child:
-                    _BuildNumberInput([FilteringTextInputFormatter.digitsOnly], Config.DaysCount.toString(), (value) => Config.DaysCount = int.parse(value), maxLength: 2))),
-        SettingsTile(title: const Text("卡片高度"), trailing: _BuildContentHeight()),
-      ])
+    return Column(children: [
+      ListTile(
+        title: const Text("显示天数"),
+        trailing: SizedBox(
+            width: 60,
+            child: _BuildNumberInput([FilteringTextInputFormatter.digitsOnly], Config.DaysCount.toString(), (value) => Config.DaysCount = int.parse(value), maxLength: 2)),
+      ),
+      ListTile(
+        title: const Text("卡片高度"),
+        trailing: _BuildContentHeight(),
+      )
     ]);
   }
 
@@ -96,6 +96,7 @@ class EveryDayEntriesSettingState extends CardConfigSettingStateBase<EveryDayEnt
   Widget _BuildContentHeight() {
     final isAutoHeight = Config.ContentHeight == 0;
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (!isAutoHeight)
           SizedBox(
