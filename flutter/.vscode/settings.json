@@ -10,7 +10,7 @@
 		"*.iml": true,
 		"build": true,
 		// "android": true,
-		"ios": true,
+		// "ios": true,
 		"windows": true,
 		"linux": true,
 		"macos": true,
