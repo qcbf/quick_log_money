@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordBottomPanel.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
@@ -51,15 +50,19 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: _BuildBar(context),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const CardList(ELedgerCardSpace.Record))),
-          const SizedBox(height: 385, child: RecordBottomPanel()),
-        ],
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) => _Pop(context),
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: _BuildBar(context),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const CardList(ELedgerCardSpace.Record))),
+            const SizedBox(height: 385, child: RecordBottomPanel()),
+          ],
+        ),
       ),
     );
   }
@@ -71,14 +74,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
       centerTitle: true,
       leading: SizedBox(
         width: kToolbarHeight,
-        child: IconButton(
-            onPressed: () async {
-              if (!await Navigator.maybePop(context)) {
-                if (!context.mounted) return;
-                Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
-              }
-            },
-            icon: const Icon(Icons.arrow_back)),
+        child: IconButton(onPressed: () => _Pop(context), icon: const Icon(Icons.arrow_back)),
       ),
       title: TabBar(controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
       actions: [SizedBox(height: kToolbarHeight, width: kToolbarHeight, child: IconButton(onPressed: () {}, icon: const Icon(Icons.settings)))],
@@ -95,5 +91,11 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
       newIndex -= 1;
     }
     _TabCtrl.animateTo(newIndex % _TabCtrl.length);
+  }
+
+  static Future<void> _Pop(BuildContext context) async {
+    if (!Navigator.canPop(context)) {
+      Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
+    }
   }
 }
