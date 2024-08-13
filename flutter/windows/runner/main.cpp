@@ -26,7 +26,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
-  Win32Window::Size size(358, 800);
+  Win32Window::Size size(358, 800);//ace2pro
+  // Win32Window::Size size(370, 800);//iphone14
   if (!window.Create(L"随手速记账", origin, size)) {
     return EXIT_FAILURE;
   }

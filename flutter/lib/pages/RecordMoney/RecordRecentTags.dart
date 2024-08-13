@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
-import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagListUI.dart';
+import 'package:quick_log_money/CommonWidgets/Ledger/Entry/TagUI.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Database/UserDB.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
@@ -18,26 +18,45 @@ class _RecordRecentTagsState extends State<RecordRecentTags> {
   Widget build(BuildContext context) {
     return ConditionalValueListener.AsyncValue(
       Ledger.ExpenseTag,
-      (context, value, child) => BuildTags(),
-      Fallback: () => TagListUI(0, List<LedgerTag>.filled(8, const LedgerTag(Id: 1, Group: "", Name: "...", Icon: "")), (_) {}),
+      (context, value, child) {
+        var entry = context.read<RecordEntryEditingProvider>();
+        if (entry.Tag.Id == 0) {
+          entry.Tag = Ledger.ExpenseTag.value.AllTags[User.RecentTags.first]!;
+        }
+        return BuildTags(User.RecentTags.map((e) => Ledger.ExpenseTag.value.AllTags[e]!).toList().reversed);
+      },
+      Fallback: () => BuildTags(List<LedgerTag>.filled(8, const LedgerTag(Id: 1, Group: "", Name: "...", Icon: ""))),
     );
   }
 
   ///
-  Widget BuildTags() {
+  Widget BuildTags(Iterable<LedgerTag> Tags) {
+    return Wrap(
+      children: [for (var tag in Tags) BuildTag(context, tag)],
+    );
+  }
+
+  ///
+  Widget BuildTag(BuildContext context, LedgerTag tagData) {
     var entry = context.read<RecordEntryEditingProvider>();
-    if (entry.Tag.Id == 0) {
-      entry.Tag = Ledger.ExpenseTag.value.AllTags[User.RecentTags.first]!;
-      Future.delayed(Durations.short1, () => entry.Notify());
-    }
-    
-    return TagListUI(
-      entry.Tag.Id,
-      User.RecentTags.map((e) => Ledger.ExpenseTag.value.AllTags[e]!).toList().reversed,
-      (tag) => setState(() => entry
-        ..Tag = tag
-        ..Notify()),
-      Physics: null,
+    final isSelected = tagData.Id == entry.Tag.Id;
+    return FractionallySizedBox(
+      widthFactor: 0.25,
+      child: Padding(
+        padding: const EdgeInsets.all(1.5),
+        child: TagUI(
+          BtnStyle: isSelected ? ButtonStyle(side: WidgetStatePropertyAll(BorderSide(color: Theme.of(context).colorScheme.primary, width: 1))) : null,
+          ContentColor: isSelected ? Colors.blue : null,
+          tagData,
+          () {
+            setState(() {
+              entry
+                ..Tag = tagData
+                ..Notify();
+            });
+          },
+        ),
+      ),
     );
   }
 }

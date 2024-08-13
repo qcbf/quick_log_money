@@ -14,6 +14,7 @@ class RecordKeyboardPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     var children = [Expanded(flex: 35, child: _BuildLeftMenu(context)), Expanded(flex: 10, child: _BuildRightMenu(context))];
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         const RecordRecentTags(),

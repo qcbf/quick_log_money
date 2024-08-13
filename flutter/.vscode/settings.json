@@ -11,7 +11,7 @@
 		"build": true,
 		// "android": true,
 		// "ios": true,
-		"windows": true,
+		// "windows": true,
 		"linux": true,
 		"macos": true,
 		"web": true,
