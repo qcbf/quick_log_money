@@ -40,6 +40,7 @@ class UserLedgerRecentTags extends Table {
   IntColumn get Id => integer().autoIncrement()();
   IntColumn get Uid => integer()();
   IntColumn get TagId => integer()();
+  DateTimeColumn get Time => dateTime().withDefault(Constant(DateTime(0)))();
 }
 
 ///
@@ -59,7 +60,7 @@ class UserDBHelper extends _$UserDBHelper {
   UserDBHelper(String name) : super(DatabaseHelper.OpenConnection(name));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -67,8 +68,13 @@ class UserDBHelper extends _$UserDBHelper {
       onCreate: (m) => m.createAll(),
       onUpgrade: (m, from, to) async {
         await customStatement('PRAGMA foreign_keys = OFF');
+        if (from < 2) {
+          await m.addColumn(userLedgerRecentTags, userLedgerRecentTags.Time);
+          await managers.userLedgerRecentTags.update((o) => o(Time: Value(DateTime.now())));
+        }
       },
       beforeOpen: (details) async {
+        if (details.wasCreated) {}
         await customStatement('PRAGMA foreign_keys = ON');
       },
     );
@@ -128,7 +134,7 @@ class UserDBHelper extends _$UserDBHelper {
       final tagIds = await (ledgerDB.selectOnly(ledgerDB.ledgerTags)
             ..addColumns([ledgerDB.ledgerTags.Id])
             ..limit(recentCount))
-          .map((e) => UserLedgerRecentTagsCompanion.insert(Uid: user.Id, TagId: e.read(ledgerDB.ledgerTags.Id)!))
+          .map((e) => UserLedgerRecentTagsCompanion.insert(Uid: user.Id, TagId: e.read(ledgerDB.ledgerTags.Id)!, Time: Value(DateTime.now())))
           .get();
 
       await UserDB.managers.userLedgerRecentTags.bulkCreate((o) => tagIds);
@@ -148,26 +154,22 @@ class UserDBHelper extends _$UserDBHelper {
 
   ///
   static Future _LoginImpl(ProcessedTableManager query) async {
-    try {
-      final info = await query.getSingleOrNull() as UserInfo?;
-      if (info == null) {
-        Prefs.UserToken = "";
-        BotToast.showSimpleNotification(title: "找不到用户");
-        return;
-      }
-
-      final recentTags = (await (UserDB.selectOnly(UserDB.userLedgerRecentTags)
-                ..addColumns([UserDB.userLedgerRecentTags.TagId])
-                ..where(UserDB.userLedgerRecentTags.Uid.equals(info.Id)))
-              .get())
-          .map((e) => e.read(UserDB.userLedgerRecentTags.TagId)!);
-
-      User = UserDao(Info: info, RecentTags: recentTags);
-      Prefs.UserToken = User.Info.Token;
-      await LedgerDBHelper.Init();
-    } catch (e) {
-      BotToast.showSimpleNotification(title: "登录失败");
-      rethrow;
+    final info = await query.getSingleOrNull() as UserInfo?;
+    if (info == null) {
+      Prefs.UserToken = "";
+      BotToast.showSimpleNotification(title: "找不到用户");
+      return;
     }
+
+    final recentTags = (await (UserDB.selectOnly(UserDB.userLedgerRecentTags)
+              ..addColumns([UserDB.userLedgerRecentTags.TagId])
+              ..where(UserDB.userLedgerRecentTags.Uid.equals(info.Id))
+              ..orderBy([OrderingTerm.desc(UserDB.userLedgerRecentTags.Time)]))
+            .get())
+        .map((e) => e.read(UserDB.userLedgerRecentTags.TagId)!);
+
+    User = UserDao(Info: info, RecentTags: recentTags);
+    Prefs.UserToken = User.Info.Token;
+    await LedgerDBHelper.Init();
   }
 }

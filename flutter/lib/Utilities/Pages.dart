@@ -30,4 +30,12 @@ class Pages {
     }
     return MaterialPageRoute(builder: page, settings: settings);
   }
+
+  static void PopOrHome(BuildContext context) {
+    if (!Navigator.canPop(context)) {
+      Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
+    } else {
+      Navigator.pop(context);
+    }
+  }
 }

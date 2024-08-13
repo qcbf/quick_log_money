@@ -1,7 +1,9 @@
 import 'package:bot_toast/bot_toast.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
+import 'package:quick_log_money/Database/UserDB.dart';
 import 'package:quick_log_money/Utilities/Utility.dart';
 
 /// 编辑时的条目数据
@@ -27,11 +29,34 @@ class RecordEntryEditingProvider with ChangeNotifier {
     if (money == 0) {
       return "请填写金额";
     }
+
     final loadingCancel = BotToast.showLoading();
     await LedgerDB.managers.ledgerEntries.create((o) => LedgerEntriesCompanion.insert(TagId: Tag.Id, IntMoney: money, Date: Date, Comment: Comment));
+    
+    final sql = UserDB.managers.userLedgerRecentTags.filter((f) => f.Uid(User.Id) & f.TagId(Tag.Id));
+    if (await sql.exists()) {
+      await sql.update((o) => o(Time: Value(Date)));
+    } else {
+      await (User.RecentTags.length < User.Info.LedgerRecentCount!
+          ? UserDB.managers.userLedgerRecentTags.create((o) => o(TagId: Tag.Id, Uid: User.Id, Time: Value(Date)))
+          : _UpdateRecentTag());
+    }
+
     loadingCancel();
     IsSaved = true;
     return null;
+  }
+
+  Future _UpdateRecentTag() async {
+    final r = UserDB.userLedgerRecentTags;
+    var id = (await (UserDB.selectOnly(r)
+              ..addColumns([r.Id])
+              ..where(r.Uid.equals(User.Id))
+              ..orderBy([OrderingTerm.desc(r.Time)])
+              ..limit(1))
+            .getSingle())
+        .read(r.Id)!;
+    await UserDB.managers.userLedgerRecentTags.filter((f) => f.Id(id)).orderBy((o) => o.Time.desc()).limit(1).update((o) => o(TagId: Value(Tag.Id), Time: Value(Date)));
   }
 
   void SetState(VoidCallback handler, {bool isHapticFeedback = true}) {

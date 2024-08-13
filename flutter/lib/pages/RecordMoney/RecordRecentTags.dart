@@ -21,13 +21,16 @@ class _RecordRecentTagsState extends State<RecordRecentTags> {
       (context, value, child) {
         var entry = context.read<RecordEntryEditingProvider>();
         if (entry.Tag.Id == 0) {
-          entry.Tag = Ledger.ExpenseTag.value.AllTags[User.RecentTags.first]!;
+          entry.Tag = Ledger.ExpenseTag.value.AllTags[User.RecentTags.firstOrNull] ?? _CreateEmptyTagData();
         }
         return BuildTags(User.RecentTags.map((e) => Ledger.ExpenseTag.value.AllTags[e]!).toList().reversed);
       },
-      Fallback: () => BuildTags(List<LedgerTag>.filled(8, const LedgerTag(Id: 1, Group: "", Name: "...", Icon: ""))),
+      Fallback: () => BuildTags(List<LedgerTag>.filled(8, _CreateEmptyTagData())),
     );
   }
+
+  ///
+  LedgerTag _CreateEmptyTagData() => const LedgerTag(Id: 0, Group: "", Name: "...", Icon: "");
 
   ///
   Widget BuildTags(Iterable<LedgerTag> Tags) {

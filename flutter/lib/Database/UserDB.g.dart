@@ -462,8 +462,15 @@ class $UserLedgerRecentTagsTable extends UserLedgerRecentTags
   late final GeneratedColumn<int> TagId = GeneratedColumn<int>(
       'tag_id', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _TimeMeta = const VerificationMeta('Time');
   @override
-  List<GeneratedColumn> get $columns => [Id, Uid, TagId];
+  late final GeneratedColumn<DateTime> Time = GeneratedColumn<DateTime>(
+      'time', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: Constant(DateTime(0)));
+  @override
+  List<GeneratedColumn> get $columns => [Id, Uid, TagId, Time];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -490,6 +497,10 @@ class $UserLedgerRecentTagsTable extends UserLedgerRecentTags
     } else if (isInserting) {
       context.missing(_TagIdMeta);
     }
+    if (data.containsKey('time')) {
+      context.handle(
+          _TimeMeta, Time.isAcceptableOrUnknown(data['time']!, _TimeMeta));
+    }
     return context;
   }
 
@@ -505,6 +516,8 @@ class $UserLedgerRecentTagsTable extends UserLedgerRecentTags
           .read(DriftSqlType.int, data['${effectivePrefix}uid'])!,
       TagId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}tag_id'])!,
+      Time: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}time'])!,
     );
   }
 
@@ -519,14 +532,19 @@ class UserLedgerRecentTag extends DataClass
   final int Id;
   final int Uid;
   final int TagId;
+  final DateTime Time;
   const UserLedgerRecentTag(
-      {required this.Id, required this.Uid, required this.TagId});
+      {required this.Id,
+      required this.Uid,
+      required this.TagId,
+      required this.Time});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(Id);
     map['uid'] = Variable<int>(Uid);
     map['tag_id'] = Variable<int>(TagId);
+    map['time'] = Variable<DateTime>(Time);
     return map;
   }
 
@@ -535,6 +553,7 @@ class UserLedgerRecentTag extends DataClass
       Id: Value(Id),
       Uid: Value(Uid),
       TagId: Value(TagId),
+      Time: Value(Time),
     );
   }
 
@@ -545,6 +564,7 @@ class UserLedgerRecentTag extends DataClass
       Id: serializer.fromJson<int>(json['Id']),
       Uid: serializer.fromJson<int>(json['Uid']),
       TagId: serializer.fromJson<int>(json['TagId']),
+      Time: serializer.fromJson<DateTime>(json['Time']),
     );
   }
   @override
@@ -554,20 +574,24 @@ class UserLedgerRecentTag extends DataClass
       'Id': serializer.toJson<int>(Id),
       'Uid': serializer.toJson<int>(Uid),
       'TagId': serializer.toJson<int>(TagId),
+      'Time': serializer.toJson<DateTime>(Time),
     };
   }
 
-  UserLedgerRecentTag copyWith({int? Id, int? Uid, int? TagId}) =>
+  UserLedgerRecentTag copyWith(
+          {int? Id, int? Uid, int? TagId, DateTime? Time}) =>
       UserLedgerRecentTag(
         Id: Id ?? this.Id,
         Uid: Uid ?? this.Uid,
         TagId: TagId ?? this.TagId,
+        Time: Time ?? this.Time,
       );
   UserLedgerRecentTag copyWithCompanion(UserLedgerRecentTagsCompanion data) {
     return UserLedgerRecentTag(
       Id: data.Id.present ? data.Id.value : this.Id,
       Uid: data.Uid.present ? data.Uid.value : this.Uid,
       TagId: data.TagId.present ? data.TagId.value : this.TagId,
+      Time: data.Time.present ? data.Time.value : this.Time,
     );
   }
 
@@ -576,20 +600,22 @@ class UserLedgerRecentTag extends DataClass
     return (StringBuffer('UserLedgerRecentTag(')
           ..write('Id: $Id, ')
           ..write('Uid: $Uid, ')
-          ..write('TagId: $TagId')
+          ..write('TagId: $TagId, ')
+          ..write('Time: $Time')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(Id, Uid, TagId);
+  int get hashCode => Object.hash(Id, Uid, TagId, Time);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is UserLedgerRecentTag &&
           other.Id == this.Id &&
           other.Uid == this.Uid &&
-          other.TagId == this.TagId);
+          other.TagId == this.TagId &&
+          other.Time == this.Time);
 }
 
 class UserLedgerRecentTagsCompanion
@@ -597,35 +623,44 @@ class UserLedgerRecentTagsCompanion
   final Value<int> Id;
   final Value<int> Uid;
   final Value<int> TagId;
+  final Value<DateTime> Time;
   const UserLedgerRecentTagsCompanion({
     this.Id = const Value.absent(),
     this.Uid = const Value.absent(),
     this.TagId = const Value.absent(),
+    this.Time = const Value.absent(),
   });
   UserLedgerRecentTagsCompanion.insert({
     this.Id = const Value.absent(),
     required int Uid,
     required int TagId,
+    this.Time = const Value.absent(),
   })  : Uid = Value(Uid),
         TagId = Value(TagId);
   static Insertable<UserLedgerRecentTag> custom({
     Expression<int>? Id,
     Expression<int>? Uid,
     Expression<int>? TagId,
+    Expression<DateTime>? Time,
   }) {
     return RawValuesInsertable({
       if (Id != null) 'id': Id,
       if (Uid != null) 'uid': Uid,
       if (TagId != null) 'tag_id': TagId,
+      if (Time != null) 'time': Time,
     });
   }
 
   UserLedgerRecentTagsCompanion copyWith(
-      {Value<int>? Id, Value<int>? Uid, Value<int>? TagId}) {
+      {Value<int>? Id,
+      Value<int>? Uid,
+      Value<int>? TagId,
+      Value<DateTime>? Time}) {
     return UserLedgerRecentTagsCompanion(
       Id: Id ?? this.Id,
       Uid: Uid ?? this.Uid,
       TagId: TagId ?? this.TagId,
+      Time: Time ?? this.Time,
     );
   }
 
@@ -641,6 +676,9 @@ class UserLedgerRecentTagsCompanion
     if (TagId.present) {
       map['tag_id'] = Variable<int>(TagId.value);
     }
+    if (Time.present) {
+      map['time'] = Variable<DateTime>(Time.value);
+    }
     return map;
   }
 
@@ -649,7 +687,8 @@ class UserLedgerRecentTagsCompanion
     return (StringBuffer('UserLedgerRecentTagsCompanion(')
           ..write('Id: $Id, ')
           ..write('Uid: $Uid, ')
-          ..write('TagId: $TagId')
+          ..write('TagId: $TagId, ')
+          ..write('Time: $Time')
           ..write(')'))
         .toString();
   }
@@ -1158,12 +1197,14 @@ typedef $$UserLedgerRecentTagsTableCreateCompanionBuilder
   Value<int> Id,
   required int Uid,
   required int TagId,
+  Value<DateTime> Time,
 });
 typedef $$UserLedgerRecentTagsTableUpdateCompanionBuilder
     = UserLedgerRecentTagsCompanion Function({
   Value<int> Id,
   Value<int> Uid,
   Value<int> TagId,
+  Value<DateTime> Time,
 });
 
 class $$UserLedgerRecentTagsTableTableManager extends RootTableManager<
@@ -1187,21 +1228,25 @@ class $$UserLedgerRecentTagsTableTableManager extends RootTableManager<
             Value<int> Id = const Value.absent(),
             Value<int> Uid = const Value.absent(),
             Value<int> TagId = const Value.absent(),
+            Value<DateTime> Time = const Value.absent(),
           }) =>
               UserLedgerRecentTagsCompanion(
             Id: Id,
             Uid: Uid,
             TagId: TagId,
+            Time: Time,
           ),
           createCompanionCallback: ({
             Value<int> Id = const Value.absent(),
             required int Uid,
             required int TagId,
+            Value<DateTime> Time = const Value.absent(),
           }) =>
               UserLedgerRecentTagsCompanion.insert(
             Id: Id,
             Uid: Uid,
             TagId: TagId,
+            Time: Time,
           ),
         ));
 }
@@ -1223,6 +1268,11 @@ class $$UserLedgerRecentTagsTableFilterComposer
       column: $state.table.TagId,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get Time => $state.composableBuilder(
+      column: $state.table.Time,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
 }
 
 class $$UserLedgerRecentTagsTableOrderingComposer
@@ -1240,6 +1290,11 @@ class $$UserLedgerRecentTagsTableOrderingComposer
 
   ColumnOrderings<int> get TagId => $state.composableBuilder(
       column: $state.table.TagId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get Time => $state.composableBuilder(
+      column: $state.table.Time,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }

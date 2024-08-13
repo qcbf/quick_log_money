@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quick_log_money/Database/UserDB.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordBottomPanel.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
@@ -84,7 +85,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
       centerTitle: true,
       leading: SizedBox(
         width: kToolbarHeight,
-        child: IconButton(onPressed: () => Navigator.maybePop(context), icon: const Icon(Icons.arrow_back)),
+        child: IconButton(onPressed: () => Pages.PopOrHome(context), icon: const Icon(Icons.arrow_back)),
       ),
       title: TabBar(controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
       actions: [SizedBox(height: kToolbarHeight, width: kToolbarHeight, child: IconButton(onPressed: () {}, icon: const Icon(Icons.settings)))],
