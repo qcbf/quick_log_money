@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _BuildOtherLogin() => Column(
         children: [
           const Center(child: Text("其他账号登录", style: TextStyle(color: Colors.grey, fontSize: 14))),
-          ButtonBar(
+          OverflowBar(
             alignment: MainAxisAlignment.center,
             children: [
               //tag wx

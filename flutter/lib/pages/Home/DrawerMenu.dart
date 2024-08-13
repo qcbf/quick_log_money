@@ -1,10 +1,8 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Database/UserDB.dart';
 import 'package:quick_log_money/Utilities/CommonIcons.dart';
 import 'package:quick_log_money/Utilities/Pages.dart';
-import 'package:quick_log_money/Utilities/Prefs.dart';
 
 ///抽屉菜单
 class DrawerMenu extends StatelessWidget {
@@ -77,34 +75,34 @@ class DrawerMenu extends StatelessWidget {
   }
 
   ///
-  ListTile _BuildFirstPageToRecord() {
-    return ListTile(
-      leading: const Icon(Icons.settings),
-      title: const Text("首次打开记账"),
-      trailing: ValueListenableBuilder(
-          valueListenable: Prefs.IsFirstPageToRecord,
-          builder: (context, value, child) {
-            return Switch(
-                value: value,
-                onChanged: (value) {
-                  Prefs.IsFirstPageToRecord.value = value;
-                });
-          }),
-    );
-  }
+  // ListTile _BuildFirstPageToRecord() {
+  //   return ListTile(
+  //     leading: const Icon(Icons.settings),
+  //     title: const Text("首次打开记账"),
+  //     trailing: ValueListenableBuilder(
+  //         valueListenable: Prefs.IsFirstPageToRecord,
+  //         builder: (context, value, child) {
+  //           return Switch(
+  //               value: value,
+  //               onChanged: (value) {
+  //                 Prefs.IsFirstPageToRecord.value = value;
+  //               });
+  //         }),
+  //   );
+  // }
 
   ///
-  Widget _BuildLogout(BuildContext context) {
-    return ListTile(
-      title: const Text("注销登录"),
-      leading: const Icon(Icons.settings),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () async {
-        final cancel = BotToast.showLoading();
-        Navigator.pushNamedAndRemoveUntil(context, Pages.Login, (_) => false);
-        await UserDBHelper.Loginout();
-        cancel();
-      },
-    );
-  }
+  // Widget _BuildLogout(BuildContext context) {
+  //   return ListTile(
+  //     title: const Text("注销登录"),
+  //     leading: const Icon(Icons.settings),
+  //     trailing: const Icon(Icons.chevron_right),
+  //     onTap: () async {
+  //       final cancel = BotToast.showLoading();
+  //       Navigator.pushNamedAndRemoveUntil(context, Pages.Login, (_) => false);
+  //       await UserDBHelper.Loginout();
+  //       cancel();
+  //     },
+  //   );
+  // }
 }

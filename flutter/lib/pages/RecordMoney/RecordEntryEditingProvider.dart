@@ -18,6 +18,8 @@ class RecordEntryEditingProvider with ChangeNotifier {
   ///
   bool IsIncome = false;
 
+  bool IsSaved = false;
+
   final MoneyCalc = Calculator();
 
   Future<String?> Save() async {
@@ -28,12 +30,13 @@ class RecordEntryEditingProvider with ChangeNotifier {
     final loadingCancel = BotToast.showLoading();
     await LedgerDB.managers.ledgerEntries.create((o) => LedgerEntriesCompanion.insert(TagId: Tag.Id, IntMoney: money, Date: Date, Comment: Comment));
     loadingCancel();
+    IsSaved = true;
     return null;
   }
 
   void SetState(VoidCallback handler, {bool isHapticFeedback = true}) {
     handler.call();
-    notifyListeners();
+    Notify();
     if (isHapticFeedback) HapticFeedback.lightImpact();
   }
 

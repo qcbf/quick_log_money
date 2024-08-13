@@ -5,13 +5,17 @@ import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dar
 import 'package:quick_log_money/Utilities/Pages.dart';
 import 'package:quick_log_money/pages/LedgerCards/CardList.dart';
 import 'package:quick_log_money/pages/LedgerCards/CardWidget.dart';
+import 'package:quick_log_money/pages/RecordMoney/RecordSaveProvider.dart';
 
 /// 账单记录页面
 class RecordPage extends StatelessWidget {
   const RecordPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(create: (context) => RecordEntryEditingProvider(), child: _RecordPageContent(key: key));
+    return MultiProvider(providers: [
+      ChangeNotifierProvider(create: (context) => RecordEntryEditingProvider()),
+      ChangeNotifierProvider(create: (context) => RecordSaveProvider()),
+    ], child: _RecordPageContent(key: key));
   }
 }
 
@@ -50,21 +54,27 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) => _Pop(context),
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: _BuildBar(context),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const CardList(ELedgerCardSpace.Record))),
-            const SizedBox(height: 385, child: RecordBottomPanel()),
-          ],
+    return Consumer<RecordSaveProvider>(builder: (context, value, child) {
+      return PopScope(
+        canPop: Navigator.canPop(context) || context.read<RecordEntryEditingProvider>().IsSaved,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) {
+            Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
+          }
+        },
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          appBar: _BuildBar(context),
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: GestureDetector(onHorizontalDragEnd: _GestureSwipe, child: const CardList(ELedgerCardSpace.Record))),
+              const SizedBox(height: 385, child: RecordBottomPanel()),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   ///
@@ -74,7 +84,7 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
       centerTitle: true,
       leading: SizedBox(
         width: kToolbarHeight,
-        child: IconButton(onPressed: () => _Pop(context), icon: const Icon(Icons.arrow_back)),
+        child: IconButton(onPressed: () => Navigator.maybePop(context), icon: const Icon(Icons.arrow_back)),
       ),
       title: TabBar(controller: _TabCtrl, onTap: (value) => SetIsCost(context), tabs: const [Tab(text: "支出"), Tab(text: "收入")]),
       actions: [SizedBox(height: kToolbarHeight, width: kToolbarHeight, child: IconButton(onPressed: () {}, icon: const Icon(Icons.settings)))],
@@ -91,11 +101,5 @@ class _RecordPageContentState extends State<_RecordPageContent> with SingleTicke
       newIndex -= 1;
     }
     _TabCtrl.animateTo(newIndex % _TabCtrl.length);
-  }
-
-  static Future<void> _Pop(BuildContext context) async {
-    if (!Navigator.canPop(context)) {
-      Navigator.pushNamedAndRemoveUntil(context, Pages.Home, (route) => false);
-    }
   }
 }
