@@ -6,7 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Prefs {
   ///
   static final PrefsItem<bool> IsFirstPageToRecord = PrefsItem("IsFirstPageToRecord", false, (name, value) async => await Prefs.LocalStorager.setBool(name, value));
+  static final PrefsItem<bool> IsRecordSaveExit = PrefsItem("IsRecordSaveExit", true, (name, value) async => await Prefs.LocalStorager.setBool(name, value));
+  
 
+  ///
 // ======================================================================================
   static late final SharedPreferences LocalStorager;
 

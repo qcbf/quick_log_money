@@ -53,6 +53,7 @@ class _SettingPageState extends State<SettingPage> {
               ],
               onChanged: (value) {})),
       SwitchListTile(value: Prefs.IsFirstPageToRecord.value, title: const Text("打开就记账"), onChanged: (v) => setState(() => Prefs.IsFirstPageToRecord.value = v)),
+      SwitchListTile(value: Prefs.IsRecordSaveExit.value, title: const Text("保存记账自动退出APP"), onChanged: (v) => setState(() => Prefs.IsRecordSaveExit.value = v)),
     ];
   }
 
