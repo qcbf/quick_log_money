@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -61,7 +63,7 @@ class _SettingPageState extends State<SettingPage> {
             width: 80,
             child: TextField(
                 textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
+                keyboardType: Platform.isIOS ? null : TextInputType.number,
                 textInputAction: TextInputAction.done,
                 controller: TextEditingController(text: Prefs.RecordKeyboardHeight.value.toString()),
                 onSubmitted: (value) => Prefs.RecordKeyboardHeight.value = double.tryParse(value)?.clamp(100, 800) ?? 400),
