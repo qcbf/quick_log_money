@@ -57,10 +57,14 @@ class _SettingPageState extends State<SettingPage> {
       SwitchListTile(title: const Text("保存记账自动退出APP"), value: Prefs.IsRecordSaveExit.value, onChanged: (v) => setState(() => Prefs.IsRecordSaveExit.value = v)),
       ListTile(
           title: const Text("记账键盘高度"),
-          trailing: TextField(
-              keyboardType: TextInputType.number,
-              controller: TextEditingController(text: Prefs.RecordKeyboardHeight.value.toString()),
-              onSubmitted: (value) => Prefs.RecordKeyboardHeight.value = double.parse(value))),
+          trailing: SizedBox(
+            width: 80,
+            child: TextField(
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                controller: TextEditingController(text: Prefs.RecordKeyboardHeight.value.toString()),
+                onSubmitted: (value) => Prefs.RecordKeyboardHeight.value = double.parse(value)),
+          )),
     ];
   }
 
