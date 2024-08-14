@@ -46,7 +46,7 @@ class _RecordRecentTagsState extends State<RecordRecentTags> {
     return FractionallySizedBox(
       widthFactor: 0.25,
       child: Padding(
-        padding: const EdgeInsets.all(1.5),
+        padding: const EdgeInsets.all(1),
         child: TagUI(
           BtnStyle: isSelected ? ButtonStyle(side: WidgetStatePropertyAll(BorderSide(color: Theme.of(context).colorScheme.primary, width: 1))) : null,
           ContentColor: isSelected ? Colors.blue : null,

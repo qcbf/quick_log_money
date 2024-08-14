@@ -14,8 +14,11 @@ class TagUI extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: OnPressed,
-      style: const ButtonStyle(padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 1, vertical: 1)), shape: WidgetStatePropertyAll(RoundedRectangleBorder()))
-          .merge(BtnStyle),
+      style: const ButtonStyle(
+        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 1, vertical: 1)),
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder()),
+        minimumSize: WidgetStatePropertyAll(Size(64, 45)),
+      ).merge(BtnStyle),
       child: Column(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         Image.asset(LedgerUtility.LedgerIconNameToAssetPath(Data.Icon), height: 20, excludeFromSemantics: true, errorBuilder: (a, b, c) => const Icon(Icons.sync, size: 18)),
         FittedBox(child: Text(Data.Name, style: const TextStyle(fontSize: 12).copyWith(color: ContentColor))),
