@@ -64,7 +64,7 @@ class _SettingPageState extends State<SettingPage> {
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.done,
                 controller: TextEditingController(text: Prefs.RecordKeyboardHeight.value.toString()),
-                onSubmitted: (value) => Prefs.RecordKeyboardHeight.value = double.parse(value)),
+                onSubmitted: (value) => Prefs.RecordKeyboardHeight.value = double.tryParse(value)?.clamp(100, 800) ?? 400),
           )),
     ];
   }
