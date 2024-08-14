@@ -62,6 +62,7 @@ class _SettingPageState extends State<SettingPage> {
             child: TextField(
                 textAlign: TextAlign.center,
                 keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
                 controller: TextEditingController(text: Prefs.RecordKeyboardHeight.value.toString()),
                 onSubmitted: (value) => Prefs.RecordKeyboardHeight.value = double.parse(value)),
           )),
