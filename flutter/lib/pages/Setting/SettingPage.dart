@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:quick_log_money/CommonWidgets/Conditional.dart';
@@ -52,8 +53,14 @@ class _SettingPageState extends State<SettingPage> {
                 DropdownMenuItem(value: 1, child: Text("英文")),
               ],
               onChanged: (value) {})),
-      SwitchListTile(value: Prefs.IsFirstPageToRecord.value, title: const Text("打开就记账"), onChanged: (v) => setState(() => Prefs.IsFirstPageToRecord.value = v)),
-      SwitchListTile(value: Prefs.IsRecordSaveExit.value, title: const Text("保存记账自动退出APP"), onChanged: (v) => setState(() => Prefs.IsRecordSaveExit.value = v)),
+      SwitchListTile(title: const Text("打开就记账"), value: Prefs.IsFirstPageToRecord.value, onChanged: (v) => setState(() => Prefs.IsFirstPageToRecord.value = v)),
+      SwitchListTile(title: const Text("保存记账自动退出APP"), value: Prefs.IsRecordSaveExit.value, onChanged: (v) => setState(() => Prefs.IsRecordSaveExit.value = v)),
+      ListTile(
+          title: const Text("记账键盘高度"),
+          trailing: TextField(
+              keyboardType: TextInputType.number,
+              controller: TextEditingController(text: Prefs.RecordKeyboardHeight.value.toString()),
+              onSubmitted: (value) => Prefs.RecordKeyboardHeight.value = double.parse(value))),
     ];
   }
 

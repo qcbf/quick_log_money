@@ -7,7 +7,7 @@ class Prefs {
   ///
   static final PrefsItem<bool> IsFirstPageToRecord = PrefsItem("IsFirstPageToRecord", false, (name, value) async => await Prefs.LocalStorager.setBool(name, value));
   static final PrefsItem<bool> IsRecordSaveExit = PrefsItem("IsRecordSaveExit", true, (name, value) async => await Prefs.LocalStorager.setBool(name, value));
-  
+  static final PrefsItem<double> RecordKeyboardHeight = PrefsItem("RecordKeyboardHeight", 385, (name, value) async => await Prefs.LocalStorager.setDouble(name, value));
 
   ///
 // ======================================================================================
