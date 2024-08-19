@@ -60,21 +60,10 @@ class RecordKeyboardPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-          flex: 258,
+          flex: 230,
           child: Padding(
             padding: paddingValue,
             child: Consumer<RecordEntryEditingProvider>(builder: (BuildContext context, RecordEntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
-          ),
-        ),
-        Expanded(
-          flex: 80,
-          child: Padding(
-            padding: paddingValue,
-            child: TextButton(
-              style: style,
-              onPressed: () {},
-              child: const Text("存模板"),
-            ),
           ),
         ),
         Expanded(

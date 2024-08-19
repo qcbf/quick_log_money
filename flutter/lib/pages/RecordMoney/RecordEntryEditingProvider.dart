@@ -8,6 +8,8 @@ import 'package:quick_log_money/Utilities/Utility.dart';
 
 /// 编辑时的条目数据
 class RecordEntryEditingProvider with ChangeNotifier {
+  int? Id;
+
   ///
   DateTime Date = DateTime.now();
 
@@ -24,15 +26,37 @@ class RecordEntryEditingProvider with ChangeNotifier {
 
   final MoneyCalc = Calculator();
 
+  RecordEntryEditingProvider([int? id]) {
+    if (id != null) ReadDB(id);
+  }
+
+  Future ReadDB(int id) async {
+    Id = id;
+    var cancelLoading = BotToast.showLoading();
+    final entryDB = await LedgerDB.managers.ledgerEntries.filter((f) => f.Id(id)).getSingle();
+    Comment = entryDB.Comment;
+    Tag = Ledger.ExpenseTag.value.AllTags[entryDB.TagId]!;
+    Date = entryDB.Date;
+    MoneyCalc.Values[0] = CalcNumeric.ForIntMoney(LedgerUtility.GetRealMoney(entryDB.IntMoney));
+    Notify();
+    cancelLoading();
+  }
+
+  ///
   Future<String?> Save() async {
     var money = MoneyCalc.GetResult();
     if (money == 0) {
       return "请填写金额";
     }
 
-    final loadingCancel = BotToast.showLoading();
-    await LedgerDB.managers.ledgerEntries.create((o) => LedgerEntriesCompanion.insert(TagId: Tag.Id, IntMoney: money, Date: Date, Comment: Comment));
-    
+    final cancelLoading = BotToast.showLoading();
+    var entryDB = LedgerEntriesCompanion.insert(TagId: Tag.Id, IntMoney: money, Date: Date, Comment: Comment);
+    if (Id == null) {
+      await LedgerDB.managers.ledgerEntries.create((o) => entryDB);
+    } else {
+      await LedgerDB.managers.ledgerEntries.filter((f) => f.Id(Id!)).update((o) => entryDB);
+    }
+
     final sql = UserDB.managers.userLedgerRecentTags.filter((f) => f.Uid(User.Id) & f.TagId(Tag.Id));
     if (await sql.exists()) {
       await sql.update((o) => o(Time: Value(Date)));
@@ -42,7 +66,7 @@ class RecordEntryEditingProvider with ChangeNotifier {
           : _UpdateRecentTag());
     }
 
-    loadingCancel();
+    cancelLoading();
     IsSaved = true;
     return null;
   }
@@ -131,10 +155,17 @@ class Calculator {
 }
 
 class CalcNumeric {
-  String IntegerStr;
+  String IntegerStr = "";
   String? DecimalStr;
 
   CalcNumeric({this.IntegerStr = "", this.DecimalStr});
+  CalcNumeric.ForIntMoney(double money) {
+    var money1 = money.toInt();
+    IntegerStr = money1.toString();
+    
+    var money2 = money - money1;
+    if (money2 >= 0.01) DecimalStr = money2.ToSmartString().replaceFirst(".", "");
+  }
 
   @override
   String toString() {

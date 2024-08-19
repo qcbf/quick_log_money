@@ -19,7 +19,8 @@ class RecordSaveBtn extends StatelessWidget {
         return TextButton(
           style: Style,
           onPressed: () async {
-            final err = await context.read<RecordEntryEditingProvider>().Save();
+            var entry = context.read<RecordEntryEditingProvider>();
+            final err = await entry.Save();
             if (err != null) {
               BotToast.showSimpleNotification(title: err, duration: Durations.extralong4);
               return;
@@ -27,7 +28,7 @@ class RecordSaveBtn extends StatelessWidget {
             if (!context.mounted) return;
             context.read<RecordSaveProvider>().IsSaved = true;
             BotToast.showSimpleNotification(title: "保存成功", duration: Durations.extralong4);
-            if (Prefs.IsRecordSaveExit.value) {
+            if (entry.Id == null && Prefs.IsRecordSaveExit.value) {
               if (Platform.isIOS) {
                 SystemChannels.platform.invokeMethod<void>("SystemNavigator.pop");
               } else {
