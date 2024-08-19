@@ -30,6 +30,7 @@ class RecordEntryEditingProvider with ChangeNotifier {
     if (id != null) ReadDB(id);
   }
 
+  ///
   Future ReadDB(int id) async {
     Id = id;
     var cancelLoading = BotToast.showLoading();
@@ -81,6 +82,12 @@ class RecordEntryEditingProvider with ChangeNotifier {
             .getSingle())
         .read(r.Id)!;
     await UserDB.managers.userLedgerRecentTags.filter((f) => f.Id(id)).orderBy((o) => o.Time.desc()).limit(1).update((o) => o(TagId: Value(Tag.Id), Time: Value(Date)));
+  }
+
+  ///
+  Future Delete() async {
+    if (Id == null) return;
+    LedgerDB.managers.ledgerEntries.filter((f) => f.Id(Id!)).delete();
   }
 
   void SetState(VoidCallback handler, {bool isHapticFeedback = true}) {
@@ -162,9 +169,8 @@ class CalcNumeric {
   CalcNumeric.ForIntMoney(double money) {
     var money1 = money.toInt();
     IntegerStr = money1.toString();
-    
     var money2 = money - money1;
-    if (money2 >= 0.01) DecimalStr = money2.ToSmartString().replaceFirst(".", "");
+    if (money2 >= 0.01) DecimalStr = money2.ToSmartString().replaceFirst("0.", "");
   }
 
   @override

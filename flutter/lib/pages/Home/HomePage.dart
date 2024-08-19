@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: FloatingActionButton(
-        onPressed: () => Navigator.pushReplacementNamed(context, Pages.Record),
+        onPressed: () => Navigator.pushNamed(context, Pages.Record),
         mini: false,
         shape: const CircleBorder(),
         child: const Icon(Icons.add),

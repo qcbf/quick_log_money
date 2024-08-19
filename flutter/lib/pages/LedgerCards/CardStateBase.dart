@@ -18,10 +18,6 @@ abstract class CardStateBase extends State<CardWidget> {
   String get Title;
 
   ///
-  @protected
-  String? get SubTitle => null;
-
-  ///
   double? get ContentHeight => null;
 
   ///
@@ -53,7 +49,7 @@ abstract class CardStateBase extends State<CardWidget> {
         child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        BuildTitle(),
+        BuildHeadBar(),
         const Divider(height: 1),
         content,
       ]),
@@ -62,11 +58,16 @@ abstract class CardStateBase extends State<CardWidget> {
 
   ///
   @protected
-  Widget BuildTitle() {
+  Widget BuildHeadBar() {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(SubTitle == null ? Title : "$Title($SubTitle)", style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 14), textAlign: TextAlign.left),
+      DefaultTextStyle(style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 14), textAlign: TextAlign.left, child: BuildHeadTitle()),
       InkWell(onTap: OnClickSetting, child: const Icon(Icons.more_horiz, color: Colors.grey))
     ]);
+  }
+
+  @protected
+  Widget BuildHeadTitle() {
+    return Text(Title);
   }
 
   @protected

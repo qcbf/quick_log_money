@@ -1,8 +1,10 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordEntryEditingProvider.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordRecentTags.dart';
 import 'package:quick_log_money/Pages/RecordMoney/RecordSaveBtn.dart';
+import 'package:quick_log_money/Utilities/Pages.dart';
 
 /// 底部输入键盘
 class RecordKeyboardPanel extends StatelessWidget {
@@ -56,16 +58,30 @@ class RecordKeyboardPanel extends StatelessWidget {
   Widget _BuildRightMenu(BuildContext context) {
     const paddingValue = EdgeInsets.fromLTRB(0, 2, 0, 0);
     var style = _BtnStyle.copyWith(padding: const WidgetStatePropertyAll(EdgeInsets.zero));
+    final entry = context.read<RecordEntryEditingProvider>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-          flex: 230,
+          flex: 220,
           child: Padding(
             padding: paddingValue,
             child: Consumer<RecordEntryEditingProvider>(builder: (BuildContext context, RecordEntryEditingProvider value, Widget? child) => RecordSaveBtn(Style: style)),
           ),
         ),
+        if (entry.Id != null)
+          Expanded(
+            flex: 100,
+            child: Padding(
+              padding: paddingValue,
+              child: TextButton(
+                style: style,
+                onPressed: () => _OnClickDelete(context, false),
+                onLongPress: () => _OnClickDelete(context, true),
+                child: const Icon(Icons.delete_forever),
+              ),
+            ),
+          ),
         Expanded(
           flex: 120,
           child: Padding(
@@ -161,6 +177,16 @@ class RecordKeyboardPanel extends StatelessWidget {
         }
       }
     }
+  }
+
+  void _OnClickDelete(BuildContext context, bool isLongPress) {
+    if (!isLongPress) {
+      BotToast.showSimpleNotification(title: "长按删除这条账单", align: Alignment.bottomCenter);
+      return;
+    }
+    context.read<RecordEntryEditingProvider>().Delete();
+
+    Pages.PopOrHome(context);
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Utilities/Utility.dart';
 import 'package:quick_log_money/pages/LedgerCards/CardStateBase.dart';
@@ -34,13 +35,16 @@ class RecentDaysConfig implements ICardConfigurable {
 
 ///
 class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
+  ///
+  late Stream<List<drift.TypedResult>> DBStream;
+
   List<(DateTime, double)> LedgerEntryMoneys = List.empty();
   double TotalMoney = 0;
+  late DateTime BeginDate;
+  late DateTime EndDate;
 
   @override
   String get Title => "最近账单";
-  @override
-  String? get SubTitle => "${RecentDaysTypeNames[Config.Type.index]} ${TotalMoney.toInt()}￥";
   @override
   double? get ContentHeight => 120;
 
@@ -53,30 +57,24 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
   Future<FutureOr> RefreshState() async {
     setState(() => IsHasData = false);
     final DateTime now = DateTime.now();
-    final DateTime beginDate;
-    final DateTime endDate;
     switch (Config.Type) {
       case ERecentDaysType.CurrentWeek:
-        beginDate = DateTime(now.year, now.month, now.day - now.weekday + 1);
-        endDate = DateTime(now.year, now.month, now.day + (7 - now.weekday), 23, 59, 59);
+        BeginDate = DateTime(now.year, now.month, now.day - now.weekday + 1);
+        EndDate = DateTime(now.year, now.month, now.day + (7 - now.weekday), 23, 59, 59);
         break;
       case ERecentDaysType.SevenDays:
-        beginDate = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 6));
-        endDate = now;
+        BeginDate = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 6));
+        EndDate = now;
       case ERecentDaysType.Fourteen:
-        beginDate = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 13));
-        endDate = now;
+        BeginDate = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 13));
+        EndDate = now;
     }
 
-    final entries = await LedgerDB.managers.ledgerEntries.filter((f) => f.Date.isBetween(beginDate, endDate)).get();
-    final Map<DateTime, double> entriesMap = Map.fromEntries(List.generate(endDate.day - beginDate.day + 1, (i) => MapEntry(beginDate.add(Duration(days: i)), 0)));
-    for (var item in entries) {
-      final date = item.Date;
-      final v = LedgerUtility.GetRealMoney(item.IntMoney);
-      entriesMap.update(date.Today(), (value) => value + v, ifAbsent: () => v);
-      TotalMoney += v;
-    }
-    LedgerEntryMoneys = entriesMap.entries.map((e) => (e.key, e.value)).toList();
+    DBStream = (LedgerDB.selectOnly(LedgerDB.ledgerEntries)
+          ..addColumns([LedgerDB.ledgerEntries.IntMoney, LedgerDB.ledgerEntries.Date])
+          ..where(LedgerDB.ledgerEntries.Date.isBetweenValues(BeginDate, EndDate)))
+        .watch();
+
     setState(() => IsHasData = true);
   }
 
@@ -84,40 +82,63 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
   @override
   Widget BuildContent() {
     final color = Theme.of(context).dividerColor;
-    return BarChart(BarChartData(
-        alignment: BarChartAlignment.spaceAround,
-        barTouchData: BarTouchData(
-            enabled: false,
-            touchTooltipData: BarTouchTooltipData(
-              tooltipMargin: 0,
-              fitInsideVertically: true,
-              fitInsideHorizontally: true,
-              tooltipPadding: EdgeInsets.zero,
-              getTooltipColor: (group) => Colors.transparent,
-              getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(rod.toY.toStringAsFixed(0), const TextStyle()),
-            )),
-        gridData: const FlGridData(show: false),
-        borderData: FlBorderData(show: false),
-        titlesData: FlTitlesData(
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (value, meta) => GetLabelText(LedgerEntryMoneys[value.toInt()].$1))),
-          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        ),
-        barGroups: List.generate(
-            LedgerEntryMoneys.length,
-            (i) => BarChartGroupData(
-                  x: i,
-                  showingTooltipIndicators: [0],
-                  barRods: [
-                    BarChartRodData(
-                      width: Config.Type == ERecentDaysType.Fourteen ? null : 25,
-                      toY: LedgerEntryMoneys[i].$2,
-                      color: color,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(5), bottom: Radius.zero),
-                    )
-                  ],
-                ))));
+    return StreamBuilder(
+        stream: DBStream,
+        builder: (context, value) {
+          if (!value.hasData) return Conditional.GlobalFallback();
+
+          TotalMoney = 0;
+          final Map<DateTime, double> entriesMap = Map.fromEntries(List.generate(EndDate.day - BeginDate.day + 1, (i) => MapEntry(BeginDate.add(Duration(days: i)), 0)));
+          for (var item in value.data!) {
+            final date = item.read(LedgerDB.ledgerEntries.Date)!;
+            final v = LedgerUtility.GetRealMoney(item.read(LedgerDB.ledgerEntries.IntMoney)!);
+            entriesMap.update(date.Today(), (value) => value + v, ifAbsent: () => v);
+            TotalMoney += v;
+          }
+          LedgerEntryMoneys = entriesMap.entries.map((e) => (e.key, e.value)).toList();
+
+          final nowDate = DateTime.now();
+          return BarChart(BarChartData(
+              alignment: BarChartAlignment.spaceAround,
+              barTouchData: BarTouchData(
+                  enabled: false,
+                  touchTooltipData: BarTouchTooltipData(
+                    tooltipMargin: 0,
+                    fitInsideVertically: true,
+                    fitInsideHorizontally: true,
+                    tooltipPadding: EdgeInsets.zero,
+                    getTooltipColor: (group) => Colors.transparent,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(rod.toY.toStringAsFixed(0), const TextStyle()),
+                  )),
+              gridData: const FlGridData(show: false),
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (value, meta) => GetLabelText(nowDate, LedgerEntryMoneys[value.toInt()].$1))),
+                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              ),
+              barGroups: List.generate(
+                  LedgerEntryMoneys.length,
+                  (i) => BarChartGroupData(
+                        x: i,
+                        showingTooltipIndicators: [0],
+                        barRods: [
+                          BarChartRodData(
+                            width: Config.Type == ERecentDaysType.Fourteen ? null : 25,
+                            toY: LedgerEntryMoneys[i].$2,
+                            color: color,
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(5), bottom: Radius.zero),
+                          )
+                        ],
+                      ))));
+        });
+  }
+
+  @override
+  Widget BuildHeadTitle() {
+    return Text("$Title (${RecentDaysTypeNames[Config.Type.index]} ${TotalMoney.ToSmartString()}￥)");
   }
 
   ///
@@ -127,18 +148,23 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
   }
 
   ///
-  Text GetLabelText(DateTime date) {
+  Text GetLabelText(DateTime now, DateTime date) {
     if (Config.Type == ERecentDaysType.CurrentWeek) {
-      return Text(switch (date.weekday) {
-        DateTime.monday => "周一",
-        DateTime.tuesday => "周二",
-        DateTime.wednesday => "周三",
-        DateTime.thursday => "周四",
-        DateTime.friday => "周五",
-        DateTime.saturday => "周六",
-        DateTime.sunday => "周日",
-        _ => throw Exception(),
-      });
+      TextStyle? style;
+      if (now.day == date.day) style = const TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey);
+      return Text(
+        switch (date.weekday) {
+          DateTime.monday => "周一",
+          DateTime.tuesday => "周二",
+          DateTime.wednesday => "周三",
+          DateTime.thursday => "周四",
+          DateTime.friday => "周五",
+          DateTime.saturday => "周六",
+          DateTime.sunday => "周日",
+          _ => throw Exception(),
+        },
+        style: style,
+      );
     } else if (Config.Type == ERecentDaysType.SevenDays) {
       return Text(date.ToSmartString(isShort: true));
     } else {

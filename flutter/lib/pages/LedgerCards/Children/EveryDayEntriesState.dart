@@ -28,39 +28,42 @@ class EveryDayEntriesConfig implements ICardConfigurable {
 
 ///
 class EveryDayEntriesState extends CardConfigStateBase<EveryDayEntriesConfig> {
-  late List<LedgerEntry> Entries;
-  int TotalMoney = 0;
+  late Stream<List<LedgerEntry>> Entries;
 
   @override
   String get Title => "账本条目";
-
-  @override
-  String? get SubTitle => "近${Config.DaysCount}天 $TotalMoney￥";
 
   @override
   double? get ContentHeight => Config.ContentHeight == 0 ? null : Config.ContentHeight.toDouble();
 
   @override
   FutureOr RefreshState() async {
-    Entries = await LedgerDB.managers.ledgerEntries
+    Entries = LedgerDB.managers.ledgerEntries
         .filter((f) => f.Date.isAfter(DateTime.now().Today().subtract(Duration(days: Config.DaysCount - 1))))
         .orderBy((o) => o.Date.desc())
-        .get();
-
-    /// calc total
-    var intMoney = 0;
-    for (var entry in Entries) {
-      intMoney += entry.IntMoney;
-    }
-    TotalMoney = LedgerUtility.GetRealMoney(intMoney).toInt();
-
+        .watch();
     setState(() => IsHasData = true);
   }
 
   @override
   Widget BuildContent() {
-    if (Entries.isEmpty) return const Center(child: Text("暂无记录..."));
-    return EntryGroups.List(Entries);
+    return StreamBuilder(
+      stream: Entries,
+      builder: (context, snapshot) {
+        if (snapshot.data?.isEmpty != false) return const Center(child: Text("暂无记录..."));
+        return EntryGroups.List(snapshot.data!);
+      },
+    );
+  }
+
+  @override
+  Widget BuildHeadTitle() {
+    return StreamBuilder(
+        stream: Entries,
+        builder: (context, v) {
+          var totalMoney = v.data?.fold(0, (previousValue, element) => previousValue + element.IntMoney) ?? 0;
+          return Text("$Title (近${Config.DaysCount}天 ${LedgerUtility.GetRealMoneyStr(totalMoney)}￥)");
+        });
   }
 
   @override

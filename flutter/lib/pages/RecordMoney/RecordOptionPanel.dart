@@ -70,22 +70,25 @@ class RecordOptionPanel extends StatelessWidget {
   }
 
   ///
-  Padding _BuildComment(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: 6, bottom: 6),
-        child: TextField(
-          textInputAction: TextInputAction.done,
-          maxLength: 256,
-          style: const TextStyle(fontSize: 13),
-          decoration: const InputDecoration(
-            contentPadding: EdgeInsets.only(left: 6, top: 0, bottom: 0),
-            hintText: "......点击输入备注",
-            hintStyle: TextStyle(fontSize: 13),
-            hintTextDirection: TextDirection.rtl,
-            counterText: "",
-            border: InputBorder.none,
-            isDense: true,
-          ),
-          onChanged: (text) => context.read<RecordEntryEditingProvider>().Comment = text,
+  Padding _BuildComment(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 6),
+      child: TextField(
+        textInputAction: TextInputAction.done,
+        maxLength: 256,
+        style: const TextStyle(fontSize: 13),
+        controller: TextEditingController(text: context.read<RecordEntryEditingProvider>().Comment),
+        decoration: const InputDecoration(
+          contentPadding: EdgeInsets.only(left: 6, top: 0, bottom: 0),
+          hintText: "......点击输入备注",
+          hintStyle: TextStyle(fontSize: 13),
+          hintTextDirection: TextDirection.rtl,
+          counterText: "",
+          border: InputBorder.none,
+          isDense: true,
         ),
-      );
+        onChanged: (text) => context.read<RecordEntryEditingProvider>().Comment = text,
+      ),
+    );
+  }
 }

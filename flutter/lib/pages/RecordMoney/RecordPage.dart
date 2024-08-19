@@ -13,8 +13,9 @@ class RecordPage extends StatelessWidget {
   const RecordPage({super.key});
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments as int?;
     return MultiProvider(providers: [
-      ChangeNotifierProvider(create: (context) => RecordEntryEditingProvider(ModalRoute.of(context)?.settings.arguments as int?)),
+      ChangeNotifierProvider(create: (context) => RecordEntryEditingProvider(args)),
       ChangeNotifierProvider(create: (context) => RecordSaveProvider()),
     ], child: _RecordPageContent(key: key));
   }
