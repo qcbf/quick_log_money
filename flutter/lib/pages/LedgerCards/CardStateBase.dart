@@ -39,7 +39,12 @@ abstract class CardStateBase extends State<CardWidget> {
   ///
   @override
   Widget build(BuildContext context) {
-    var content = Conditional.Single(() => IsHasData, () => BuildContent());
+    return BuildContainer(BuildHeadbar, () => Container());
+  }
+
+  @protected
+  Widget BuildContainer(Widget Function() buildHeadbar, Widget Function() buildContent) {
+    var content = Conditional.Single(() => IsHasData, () => buildContent());
     final contentHeight = ContentHeight;
     if (contentHeight != null) {
       content = SizedBox(height: contentHeight, child: content);
@@ -49,7 +54,7 @@ abstract class CardStateBase extends State<CardWidget> {
         child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        BuildHeadBar(),
+        buildHeadbar(),
         const Divider(height: 1),
         content,
       ]),
@@ -58,7 +63,7 @@ abstract class CardStateBase extends State<CardWidget> {
 
   ///
   @protected
-  Widget BuildHeadBar() {
+  Widget BuildHeadbar() {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       DefaultTextStyle(style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 14), textAlign: TextAlign.left, child: BuildHeadTitle()),
       InkWell(onTap: OnClickSetting, child: const Icon(Icons.more_horiz, color: Colors.grey))
@@ -74,10 +79,6 @@ abstract class CardStateBase extends State<CardWidget> {
   void OnClickSetting() {
     showModalBottomSheet(isScrollControlled: true, context: context, builder: (_) => CardSetting(this));
   }
-
-  ///
-  @protected
-  Widget BuildContent();
 }
 
 ///账本卡片的配置数据类型

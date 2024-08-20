@@ -5,6 +5,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:quick_log_money/CommonWidgets/Conditional.dart';
 import 'package:quick_log_money/CommonWidgets/Ledger/Entry/EntryGroups.dart';
 import 'package:quick_log_money/Database/LedgerDB.dart';
 import 'package:quick_log_money/Utilities/Utility.dart';
@@ -46,14 +47,12 @@ class EveryDayEntriesState extends CardConfigStateBase<EveryDayEntriesConfig> {
   }
 
   @override
-  Widget BuildContent() {
+  Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: Entries,
-      builder: (context, snapshot) {
-        if (snapshot.data?.isEmpty != false) return const Center(child: Text("暂无记录..."));
-        return EntryGroups.List(snapshot.data!);
-      },
-    );
+        stream: Entries,
+        builder: (context, snapshot) {
+          return BuildContainer(BuildHeadbar, snapshot.hasData ? () => EntryGroups.List(snapshot.data!) : Conditional.GlobalFallback);
+        });
   }
 
   @override

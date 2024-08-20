@@ -37,8 +37,6 @@ class RecentDaysConfig implements ICardConfigurable {
 class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
   ///
   late Stream<List<drift.TypedResult>> DBStream;
-
-  List<(DateTime, double)> LedgerEntryMoneys = List.empty();
   double TotalMoney = 0;
   late DateTime BeginDate;
   late DateTime EndDate;
@@ -78,62 +76,62 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
     setState(() => IsHasData = true);
   }
 
-  ///
   @override
-  Widget BuildContent() {
-    final color = Theme.of(context).dividerColor;
+  Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: DBStream,
-        builder: (context, value) {
-          if (!value.hasData) return Conditional.GlobalFallback();
+        stream: DBStream, builder: (context, snapshot) => BuildContainer(BuildHeadbar, snapshot.hasData ? () => _BuildContent(snapshot.data!) : Conditional.GlobalFallback));
+  }
 
-          TotalMoney = 0;
-          final Map<DateTime, double> entriesMap = Map.fromEntries(List.generate(EndDate.day - BeginDate.day + 1, (i) => MapEntry(BeginDate.add(Duration(days: i)), 0)));
-          for (var item in value.data!) {
-            final date = item.read(LedgerDB.ledgerEntries.Date)!;
-            final v = LedgerUtility.GetRealMoney(item.read(LedgerDB.ledgerEntries.IntMoney)!);
-            entriesMap.update(date.Today(), (value) => value + v, ifAbsent: () => v);
-            TotalMoney += v;
-          }
-          LedgerEntryMoneys = entriesMap.entries.map((e) => (e.key, e.value)).toList();
+  ///
+  Widget _BuildContent(List<drift.TypedResult> data) {
+    final color = Theme.of(context).dividerColor;
 
-          final nowDate = DateTime.now();
-          return BarChart(BarChartData(
-              alignment: BarChartAlignment.spaceAround,
-              barTouchData: BarTouchData(
-                  enabled: false,
-                  touchTooltipData: BarTouchTooltipData(
-                    tooltipMargin: 0,
-                    fitInsideVertically: true,
-                    fitInsideHorizontally: true,
-                    tooltipPadding: EdgeInsets.zero,
-                    getTooltipColor: (group) => Colors.transparent,
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(rod.toY.toStringAsFixed(0), const TextStyle()),
-                  )),
-              gridData: const FlGridData(show: false),
-              borderData: FlBorderData(show: false),
-              titlesData: FlTitlesData(
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                bottomTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (value, meta) => GetLabelText(nowDate, LedgerEntryMoneys[value.toInt()].$1))),
-                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              ),
-              barGroups: List.generate(
-                  LedgerEntryMoneys.length,
-                  (i) => BarChartGroupData(
-                        x: i,
-                        showingTooltipIndicators: [0],
-                        barRods: [
-                          BarChartRodData(
-                            width: Config.Type == ERecentDaysType.Fourteen ? null : 25,
-                            toY: LedgerEntryMoneys[i].$2,
-                            color: color,
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(5), bottom: Radius.zero),
-                          )
-                        ],
-                      ))));
-        });
+    TotalMoney = 0;
+    final Map<DateTime, double> entriesMap = Map.fromEntries(List.generate(EndDate.day - BeginDate.day + 1, (i) => MapEntry(BeginDate.add(Duration(days: i)), 0)));
+    for (var item in data) {
+      final date = item.read(LedgerDB.ledgerEntries.Date)!;
+      final v = LedgerUtility.GetRealMoney(item.read(LedgerDB.ledgerEntries.IntMoney)!);
+      entriesMap.update(date.Today(), (value) => value + v, ifAbsent: () => v);
+      TotalMoney += v;
+    }
+    final entryMoneys = entriesMap.entries.map((e) => (e.key, e.value)).toList();
+
+    final nowDate = DateTime.now();
+
+    return BarChart(BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        barTouchData: BarTouchData(
+            enabled: false,
+            touchTooltipData: BarTouchTooltipData(
+              tooltipMargin: 0,
+              fitInsideVertically: true,
+              fitInsideHorizontally: true,
+              tooltipPadding: EdgeInsets.zero,
+              getTooltipColor: (group) => Colors.transparent,
+              getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(rod.toY.toStringAsFixed(0), const TextStyle()),
+            )),
+        gridData: const FlGridData(show: false),
+        borderData: FlBorderData(show: false),
+        titlesData: FlTitlesData(
+          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (value, meta) => GetLabelText(nowDate, entryMoneys[value.toInt()].$1))),
+          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        ),
+        barGroups: List.generate(
+            entryMoneys.length,
+            (i) => BarChartGroupData(
+                  x: i,
+                  showingTooltipIndicators: [0],
+                  barRods: [
+                    BarChartRodData(
+                      width: Config.Type == ERecentDaysType.Fourteen ? null : 25,
+                      toY: entryMoneys[i].$2,
+                      color: color,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(5), bottom: Radius.zero),
+                    )
+                  ],
+                ))));
   }
 
   @override

@@ -37,56 +37,55 @@ class MonthCardState extends CardStateBase {
   }
 
   @override
-  Widget BuildContent() {
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: DBStream, builder: (context, snapshot) => BuildContainer(BuildHeadbar, snapshot.hasData ? () => _BuildContent(snapshot.data!) : Conditional.GlobalFallback));
+  }
+
+  Widget _BuildContent(List<drift.TypedResult> data) {
     final color = Theme.of(context).dividerColor;
     final nowDate = DateTime.now();
     const leftTitleCount = 4;
-    return StreamBuilder(
-        stream: DBStream,
-        builder: (context, v) {
-          if (!v.hasData) return Conditional.GlobalFallback();
+    TotalMoney = 0;
+    EveryDayMoneys.fillRange(0, EveryDayMoneys.length, 0);
+    for (var entry in data) {
+      var money = LedgerUtility.GetRealMoney(entry.read(LedgerDB.ledgerEntries.IntMoney)!);
+      TotalMoney += money;
+      EveryDayMoneys[entry.read(LedgerDB.ledgerEntries.Date)!.day] += money;
+    }
 
-          TotalMoney = 0;
-          EveryDayMoneys.fillRange(0, EveryDayMoneys.length, 0);
-          for (var entry in v.data!) {
-            var money = LedgerUtility.GetRealMoney(entry.read(LedgerDB.ledgerEntries.IntMoney)!);
-            TotalMoney += money;
-            EveryDayMoneys[entry.read(LedgerDB.ledgerEntries.Date)!.day] += money;
-          }
+    final maxMoney = EveryDayMoneys.max;
+    final moneyInterval = maxMoney / leftTitleCount;
 
-          final maxMoney = EveryDayMoneys.max;
-          final moneyInterval = maxMoney / leftTitleCount;
-
-          return Row(
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [for (int i = leftTitleCount; i > 0; i--) Text(LedgerUtility.GetHumanMoney(moneyInterval * i))],
-              ),
-              Flexible(
-                child: LineChart(LineChartData(
-                  borderData: FlBorderData(show: false),
-                  lineTouchData: LineTouchData(
-                      enabled: true,
-                      touchTooltipData: LineTouchTooltipData(
-                        fitInsideVertically: true,
-                        fitInsideHorizontally: true,
-                        getTooltipItems: (touchedSpots) => [
-                          for (var item in touchedSpots)
-                            LineTooltipItem("${DateTime(nowDate.year, nowDate.month, item.x.toInt()).ToSmartString()} ${item.y.ToSmartString()}￥", const TextStyle())
-                        ],
-                      )),
-                  titlesData: const FlTitlesData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(color: color, spots: [
-                      for (var i = 0; i < EveryDayMoneys.length; i++) FlSpot((i + 1).toDouble(), EveryDayMoneys[i]),
-                    ])
+    return Row(
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [for (int i = leftTitleCount; i > 0; i--) Text(LedgerUtility.GetHumanMoney(moneyInterval * i))],
+        ),
+        Flexible(
+          child: LineChart(LineChartData(
+            borderData: FlBorderData(show: false),
+            lineTouchData: LineTouchData(
+                enabled: true,
+                touchTooltipData: LineTouchTooltipData(
+                  fitInsideVertically: true,
+                  fitInsideHorizontally: true,
+                  getTooltipItems: (touchedSpots) => [
+                    for (var item in touchedSpots)
+                      LineTooltipItem("${DateTime(nowDate.year, nowDate.month, item.x.toInt()).ToSmartString()} ${item.y.ToSmartString()}￥", const TextStyle())
                   ],
                 )),
-              ),
+            titlesData: const FlTitlesData(show: false),
+            lineBarsData: [
+              LineChartBarData(color: color, spots: [
+                for (var i = 0; i < EveryDayMoneys.length; i++) FlSpot((i + 1).toDouble(), EveryDayMoneys[i]),
+              ])
             ],
-          );
-        });
+          )),
+        ),
+      ],
+    );
   }
 
   @override
