@@ -87,7 +87,7 @@ class RecentDaysCardState extends CardConfigStateBase<RecentDaysConfig> {
     final color = Theme.of(context).dividerColor;
 
     TotalMoney = 0;
-    final Map<DateTime, double> entriesMap = Map.fromEntries(List.generate(EndDate.day - BeginDate.day + 1, (i) => MapEntry(BeginDate.add(Duration(days: i)), 0)));
+    final Map<DateTime, double> entriesMap = Map.fromEntries(List.generate(EndDate.difference(BeginDate).inDays, (i) => MapEntry(BeginDate.add(Duration(days: i)), 0)));
     for (var item in data) {
       final date = item.read(LedgerDB.ledgerEntries.Date)!;
       final v = LedgerUtility.GetRealMoney(item.read(LedgerDB.ledgerEntries.IntMoney)!);
