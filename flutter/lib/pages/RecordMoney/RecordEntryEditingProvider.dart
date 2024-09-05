@@ -77,7 +77,7 @@ class RecordEntryEditingProvider with ChangeNotifier {
     var id = (await (UserDB.selectOnly(r)
               ..addColumns([r.Id])
               ..where(r.Uid.equals(User.Id))
-              ..orderBy([OrderingTerm.desc(r.Time)])
+              ..orderBy([OrderingTerm.asc(r.Time)])
               ..limit(1))
             .getSingle())
         .read(r.Id)!;
